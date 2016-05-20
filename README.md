@@ -11,11 +11,11 @@ When you first run the sample app it displays a list of activities that demonstr
 
 ![Sample App Activities](activities.png)
 
-|Title|Activity Class|Description|
-|-|-|-|
-|**Stream live video and audio**|`CameraActivity.java`|This activity demonstrates the primary camera, audio, and live streaming capabilities of the GoCoder SDK.|
-|**Stream an MP4 file**|`MP4BroadcastActivity.java`|This activity demonstrates how to broadcast the frames from a local MP4 file using the WZBroadcast and WZBroadcastComponent (and related) classes/interfaces, which provide lower-level access to the various components involved in a Wowza broadcast.|
-|**Capture an MP4 file**|`MP4CaptureActivity.java`|This activity saves the video from the camera to an MP4 file on the device's local storage as it is being streamed.|
+| Title | Activity Class | Description |
+| --- | --- | --- |
+|**Stream live video and audio** | `CameraActivity.java` |This activity demonstrates the primary camera, audio, and live streaming capabilities of the GoCoder SDK. |
+| **Stream an MP4 file** | `MP4BroadcastActivity.java` |This activity demonstrates how to broadcast the frames from a local MP4 file using the WZBroadcast and WZBroadcastComponent (and related) classes/interfaces, which provide lower-level access to the various components involved in a Wowza broadcast. |
+| **Capture an MP4 file** | `MP4CaptureActivity.java` |This activity saves the video from the camera to an MP4 file on the device's local storage as it is being streamed. |
 
 ## More resources
 - [Wowza GoCoder Software Development Kit](https://www.wowza.com/products/gocoder/sdk)
