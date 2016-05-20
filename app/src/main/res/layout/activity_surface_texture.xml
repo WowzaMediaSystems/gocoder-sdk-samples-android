@@ -1,0 +1,36 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context=".opengles.SurfaceTextureActivity">
+
+    <com.wowza.gocoder.sdk.sampleapp.opengles.SurfaceTextureView
+        android:id="@+id/gl_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ic_broadcast"
+        android:src="@drawable/ic_play"
+        android:layout_alignParentBottom="true"
+        android:onClick="onToggleBroadcast"
+        android:cropToPadding="false"
+        android:background="#000000ff"
+        android:padding="10dp"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitCenter" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ic_settings"
+        android:src="@drawable/ic_settings"
+        android:onClick="onSettings"
+        android:background="#000000ff"
+        android:padding="10dp"
+        android:layout_alignBottom="@+id/ic_broadcast"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

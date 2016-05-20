@@ -1,0 +1,110 @@
+<resources>
+    <string name="app_name_short">GoCoder SDK</string>
+    <string name="app_name_long">Wowza GoCoder SDK Examples</string>
+
+    <string name="camera_example_title">GoCoder SDK Capture Example</string>
+    <string name="mp4_broadcast_title">GoCoder SDK MP4 Broadcast Example</string>
+    <string name="mp4_capture_title">GoCoder SDK MP4 Capture Example</string>
+    <string name="surface_view_title">GoCoder SDK OpenGL ES Capture Example</string>
+
+    <string name="configuration_settings_title">Configuration Settings</string>
+
+    <string name="streaming_settings">Streaming Settings</string>
+
+    <string name="connection_settings_title">Connection Settings</string>
+    <string name="connection_settings_summary">Specify the connection settings for the Wowza Streaming Engine</string>
+
+    <string name="wz_live_host_address_title">Host Address</string>
+    <string name="wz_live_host_address_summary">The hostname or IP address of a Wowza Streaming Engine server</string>
+    <string name="wz_live_host_address_dialog_title">Enter the hostname or IP address</string>
+
+    <string name="wz_live_port_number_title">Port Number</string>
+    <string name="wz_live_port_number_summary">The port no. for the Wowza Streaming Engine</string>
+    <string name="wz_live_port_number_dialog_title">Enter the port number</string>
+    <string name="wz_live_port_number_default_value">1935</string>
+
+    <string name="wz_live_app_name_title">Application Name</string>
+    <string name="wz_live_app_name_summary">The name of the live streaming application</string>
+    <string name="wz_live_app_name_dialog_title">Enter the application name</string>
+    <string name="wz_live_app_name_default_value">live</string>
+
+    <string name="wz_live_stream_name_title">Stream Name</string>
+    <string name="wz_live_stream_name_summary">The name of the live stream</string>
+    <string name="wz_live_stream_name_dialog_title">Enter the steam name</string>
+    <string name="wz_live_stream_name_default_value">myStream</string>
+
+    <string name="wz_live_username_title">Source User Name</string>
+    <string name="wz_live_username_summary">The username for source authentication</string>
+    <string name="wz_live_username_dialog_title">Enter the source username</string>
+
+    <string name="wz_live_password_title">Source Password</string>
+    <string name="wz_live_password_summary">The password for source authentication</string>
+    <string name="wz_live_password_dialog_title">Enter the source password</string>
+
+    <string name="wz_video_enabled_title">Stream Video</string>
+    <string name="wz_video_enabled_title_summary">Indicate if video should be included in the live stream</string>
+    <string name="wz_video_enabled_default_value">true</string>
+
+    <string name="video_settings_title">Video Stream Settings</string>
+    <string name="video_settings_summary">Specify the settings for the video stream</string>
+
+    <string name="wz_video_size_title">Video size and bitrate</string>
+    <string name="wz_video_size_summary">Commonly used frame size and bitrate combinations</string>
+    <string name="wz_video_size_dialog_title">Select a video size / bitrate</string>
+    <string name="wz_video_size_default_value">4</string>
+
+    <string name="wz_video_framerate_title">Framerate</string>
+    <string name="wz_video_framerate_summary">The framerate for the video stream (fps)</string>
+    <string name="wz_video_framerate_dialog_title">Enter the framerate (fps)</string>
+    <string name="wz_video_framerate_default_value">30</string>
+
+    <string name="wz_video_keyframe_interval_title">Keyframe interval</string>
+    <string name="wz_video_keyframe_interval_summary">The no. of frames between keyframes</string>
+    <string name="wz_video_keyframe_interval_dialog_title">Enter the keyframe interval</string>
+    <string name="wz_video_keyframe_interval_default_value">30</string>
+
+    <string name="wz_video_bitrate_title">Bitrate</string>
+    <string name="wz_video_bitrate_summary">The bitrate for the video stream</string>
+    <string name="wz_video_bitrate_dialog_title">Enter the bitrate</string>
+    <string name="wz_video_bitrate_default_value">1500</string>
+
+    <string name="wz_video_profile_level_title">H.264 profile level</string>
+    <string name="wz_video_profile_level_summary">The H.264 profile and profile level</string>
+    <string name="wz_video_profile_level_dialog_title">Select a profile level</string>
+    <string name="wz_video_profile_level_default_value">1</string>
+
+    <string name="wz_video_letterbox_portrait_title">Letterboxed portrait video</string>
+    <string name="wz_video_letterbox_portrait_summary">Video captured in portrait mode will be letter boxed</string>
+    <string name="wz_video_letterbox_portrait_default_value">false</string>
+
+    <string name="wz_video_captured_video_rotates_title">Captured video rotates</string>
+    <string name="wz_video_captured_video_rotates_summary">The captured video rotates as the device is rotated</string>
+    <string name="wz_video_captured_video_rotates_default_value">true</string>
+
+    <string name="wz_audio_enabled_title">Stream audio</string>
+    <string name="wz_audio_enabled_title_summary">Indicates if audio should be streamed</string>
+    <string name="wz_audio_enabled_default_value">true</string>
+
+    <string name="audio_settings_title">Audio Stream Settings</string>
+    <string name="audio_settings_summary">Specify the settings for the audio stream</string>
+
+    <string name="wz_audio_samplerate_title">Sample rate</string>
+    <string name="wz_audio_samplerate_summary">The sample rate for the audio stream (hz)</string>
+    <string name="wz_audio_samplerate_dialog_title">Enter the sample rate (hz)</string>
+    <string name="wz_audio_samplerate_default_value">41000</string>
+
+    <string name="wz_audio_bitrate_title">Bitrate</string>
+    <string name="wz_audio_bitrate_summary">The bitrate for the audio stream</string>
+    <string name="wz_audio_bitrate_dialog_title">Enter the bitrate</string>
+    <string name="wz_audio_bitrate_default_value">64000</string>
+
+    <string name="wz_audio_stereo_title">Stream stereo audio</string>
+    <string name="wz_audio_stereo_summary">The audio will be streamed in stereo</string>
+    <string name="wz_audio_stereo_default_value">true</string>
+
+    <string name="status_connecting">Connecting...</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_disconnecting">Disconnecting...</string>
+    <string name="button_dismiss">Dismiss</string>
+
+</resources>

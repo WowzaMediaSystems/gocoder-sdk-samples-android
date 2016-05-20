@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header android:fragment="com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefsActivity$ConnectionSettingsFragment"
+        android:title="@string/connection_settings_title"
+        android:icon="@drawable/ic_satellite"
+        android:summary="@string/connection_settings_summary" />
+
+    <header android:fragment="com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefsActivity$VideoSettingsFragment"
+        android:title="@string/video_settings_title"
+        android:icon="@drawable/ic_videocam"
+        android:summary="@string/video_settings_summary"/>
+
+</preference-headers>

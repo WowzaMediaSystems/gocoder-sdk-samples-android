@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:wowza="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context=".mp4.MP4BroadcastActivity">
+
+    <VideoView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/vwVideoPlayer"
+        android:layout_alignParentStart="false"
+        android:visibility="invisible"
+        android:layout_centerInParent="true" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="right|center_vertical"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:background="#00ffffff"
+        android:clickable="false">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ic_broadcast"
+            android:src="@drawable/ic_play"
+            android:layout_alignParentBottom="true"
+            android:onClick="onToggleBroadcast"
+            android:cropToPadding="false"
+            android:background="#000000ff"
+            android:layout_centerHorizontal="true"
+            android:scaleType="fitCenter" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ic_loop"
+            android:src="@drawable/ic_refresh"
+            android:onClick="onLoop"
+            android:background="#000000ff"
+            android:padding="10dp"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentEnd="true" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ic_settings"
+            android:src="@drawable/ic_settings"
+            android:onClick="onSettings"
+            android:background="#000000ff"
+            android:padding="10dp"
+            android:layout_alignBottom="@+id/ic_broadcast"
+            android:layout_alignParentEnd="true" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ic_videos"
+            android:src="@drawable/ic_video_library"
+            android:onClick="onSelectMedia"
+            android:background="#000000ff"
+            android:padding="10dp"
+            android:layout_alignBottom="@+id/ic_settings"
+            android:layout_alignParentStart="true" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/vwHelp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Press "
+                android:id="@+id/helpInfo1"
+                android:layout_alignEnd="@+id/txtFrameSize"
+                android:layout_gravity="center_vertical"
+                android:textSize="16dp"
+                android:textIsSelectable="true" />
+
+            <ImageButton
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/helpInfo2"
+                android:src="@drawable/ic_video_library"
+                android:background="#000000ff"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" to select an MP4 video file to stream"
+                android:id="@+id/helpInfo3"
+                android:textAlignment="center"
+                android:layout_gravity="center_vertical"
+                android:textSize="16dp"
+                android:textIsSelectable="true" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <com.wowza.gocoder.sdk.sampleapp.ui.StatusView
+        android:id="@+id/statusView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+    </com.wowza.gocoder.sdk.sampleapp.ui.StatusView>
+
+</RelativeLayout>

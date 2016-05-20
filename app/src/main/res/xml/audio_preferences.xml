@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/audio_settings_title"
+        android:summary="@string/audio_settings_summary">
+
+    <CheckBoxPreference
+        android:key="wz_audio_enabled"
+        android:title="@string/wz_audio_enabled_title"
+        android:summary="@string/wz_audio_enabled_title_summary"
+        android:defaultValue="@string/wz_audio_enabled_default_value"
+        />
+
+    <EditTextPreference
+        android:key="wz_audio_samplerate"
+        android:dependency="wz_audio_enabled"
+        android:title="@string/wz_audio_samplerate_title"
+        android:summary="@string/wz_audio_samplerate_summary"
+        android:dialogTitle="@string/wz_audio_samplerate_dialog_title"
+        android:defaultValue="@string/wz_audio_samplerate_default_value"
+        android:numeric="integer"
+        />
+
+    <CheckBoxPreference
+        android:key="wz_audio_stereo"
+        android:dependency="wz_audio_enabled"
+        android:title="@string/wz_audio_stereo_title"
+        android:summary="@string/wz_audio_stereo_summary"
+        android:defaultValue="@string/wz_audio_stereo_default_value"
+        />
+
+    <EditTextPreference
+        android:key="wz_audio_bitrate"
+        android:dependency="wz_audio_enabled"
+        android:title="@string/wz_audio_bitrate_title"
+        android:summary="@string/wz_audio_bitrate_summary"
+        android:dialogTitle="@string/wz_audio_bitrate_dialog_title"
+        android:defaultValue="@string/wz_audio_bitrate_default_value"
+        android:numeric="integer"
+        />
+
+</PreferenceScreen>

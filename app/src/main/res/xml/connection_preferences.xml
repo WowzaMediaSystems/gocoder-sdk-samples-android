@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/connection_settings_title"
+        android:summary="@string/connection_settings_summary">
+    <EditTextPreference
+        android:dialogTitle="@string/wz_live_host_address_dialog_title"
+        android:key="wz_live_host_address"
+        android:summary="@string/wz_live_host_address_summary"
+        android:title="@string/wz_live_host_address_title" />
+
+    <EditTextPreference
+        android:defaultValue="@string/wz_live_port_number_default_value"
+        android:dialogTitle="@string/wz_live_port_number_dialog_title"
+        android:key="wz_live_port_number"
+        android:numeric="integer"
+        android:summary="@string/wz_live_port_number_summary"
+        android:title="@string/wz_live_port_number_title" />
+
+    <EditTextPreference
+        android:defaultValue="@string/wz_live_app_name_default_value"
+        android:dialogTitle="@string/wz_live_app_name_dialog_title"
+        android:key="wz_live_app_name"
+        android:summary="@string/wz_live_app_name_summary"
+        android:title="@string/wz_live_app_name_title" />
+
+    <EditTextPreference
+        android:defaultValue="@string/wz_live_stream_name_default_value"
+        android:dialogTitle="@string/wz_live_stream_name_dialog_title"
+        android:key="wz_live_stream_name"
+        android:summary="@string/wz_live_stream_name_summary"
+        android:title="@string/wz_live_stream_name_title" />
+
+    <EditTextPreference
+        android:dialogTitle="@string/wz_live_username_dialog_title"
+        android:key="wz_live_username"
+        android:summary="@string/wz_live_username_summary"
+        android:title="@string/wz_live_username_title" />
+
+    <EditTextPreference
+        android:dialogTitle="@string/wz_live_password_dialog_title"
+        android:key="wz_live_password"
+        android:password="true"
+        android:summary="@string/wz_live_password_summary"
+        android:title="@string/wz_live_password_title" />
+</PreferenceScreen>
