@@ -23,7 +23,7 @@ When you first run the sample app, it displays a list of activities that demonst
 
 [Wowza GoCoder SDK Developer Documentation](https://www.wowza.com/resources/gocodersdk/docs/1.0/)
 
-[Wowza GoCoder SDK for Android API Refernence](https://www.wowza.com/resources/gocodersdk/docs/1.0/api-reference-android/)
+[Wowza GoCoder SDK for Android API Reference](https://www.wowza.com/resources/gocodersdk/docs/1.0/api-reference-android/)
 
 [Wowza GoCoder SDK for Android Release Notes](https://www.wowza.com/resources/gocodersdk/docs/1.0/release-notes-android/)
 
