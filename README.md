@@ -1,11 +1,12 @@
 # Wowza GoCoder SDK for Android Sample App
-This repository contains a sample application that demonstrates the capabilities of the [Wowza GoCoder™ SDK for Android](https://www.wowza.com/products/gocoder/sdk).
+This repository contains a sample application that demonstrates the capabilities of the [Wowza GoCoder™ SDK for Android](https://www.wowza.com/products/gocoder/sdk) and is provided for developer educational purposes. To build your own application, you must use the GoCoder SDK.
 
 ## Development Requirements
+Wowza GoCoder SDK. To get a copy of the SDK, send an email message to the [Wowza SDK Team](mailto:sdkteam@wowza.com).
 
-Android SDK 4.4.2 or later
+Android SDK 4.4.2 or later.
 
-Android Studio 1.2.0 or later
+Android Studio 1.2.0 or later.
 
 ## Sample App Activities
 When you first run the sample app, it displays a list of activities that demonstrate the features of the GoCoder SDK.
@@ -19,13 +20,13 @@ When you first run the sample app, it displays a list of activities that demonst
 | **Capture an MP4 file** | `MP4CaptureActivity.java` |This activity saves the video from the camera to an MP4 file on the device's local storage as it's streamed. |
 
 ## More resources
-[Wowza GoCoder Software Development Kit](https://www.wowza.com/products/gocoder/sdk)
-
 [Wowza GoCoder SDK Developer Documentation](https://www.wowza.com/resources/gocodersdk/docs/1.0/)
 
 [Wowza GoCoder SDK for Android API Reference](https://www.wowza.com/resources/gocodersdk/docs/1.0/api-reference-android/)
 
 [Wowza GoCoder SDK for Android Release Notes](https://www.wowza.com/resources/gocodersdk/docs/1.0/release-notes-android/)
+
+[Wowza GoCoder Product Page](https://www.wowza.com/products/gocoder)
 
 Wowza Media Systems™ provides developers with a platform to create streaming applications and solutions. See [Wowza Developer Tools](https://www.wowza.com/resources/developers) to learn more about our APIs and SDK.
 
