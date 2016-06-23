@@ -2,11 +2,12 @@
 This repository contains a sample application that demonstrates the capabilities of the [Wowza GoCoder™ SDK for Android](https://www.wowza.com/products/gocoder/sdk) and is provided for developer educational purposes. To build your own application, you must use the GoCoder SDK.
 
 ## Development Requirements
-Wowza GoCoder SDK. To get a copy of the SDK, send an email message to the [Wowza SDK Team](mailto:sdkteam@wowza.com).
+1. **GoCoder SDK for Android v1.0.0.141**  
 
-Android SDK 4.4.2 or later.
+    :point_right: _**PLEASE NOTE** :point_left: The GoCoder SDK binaries necessary to build the sample apps are not provided here. To request a free trial of the SDK, send a message to [sdkteam@wowza.com](mailto:sdkteam@wowza.com) and you will receive a trial license key along with a link to download the SDK binaries._
 
-Android Studio 1.2.0 or later.
+2. Android SDK 4.4.2 or later.
+3. Android Studio 1.2.0 or later.
 
 ## Sample App Activities
 When you first run the sample app, it displays a list of activities that demonstrate the features of the GoCoder SDK.
