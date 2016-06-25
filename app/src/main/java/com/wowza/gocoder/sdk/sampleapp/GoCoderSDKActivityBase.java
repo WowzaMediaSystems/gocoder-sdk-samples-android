@@ -1,7 +1,18 @@
 /**
- *  This code and all components (c) Copyright 2015-2016, Wowza Media Systems, LLC. All rights reserved.
- *  This code is licensed pursuant to the BSD 3-Clause License.
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
+ *
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
  */
+
 package com.wowza.gocoder.sdk.sampleapp;
 
 import android.app.Activity;
@@ -12,8 +23,10 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.wowza.gocoder.sdk.api.WZPlatformInfo;
+import com.wowza.gocoder.sdk.api.WZVersionInfo;
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.broadcast.WZBroadcast;
 import com.wowza.gocoder.sdk.api.broadcast.WZBroadcastConfig;
@@ -28,34 +41,24 @@ import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
 
 import java.util.Arrays;
 
-/**
- * The base class for each of the GoCoder SDK demo activities
- */
 public abstract class GoCoderSDKActivityBase extends Activity
     implements WZStatusCallback {
 
-    private static String TAG = GoCoderSDKActivityBase.class.getSimpleName();
+    private final static String TAG = GoCoderSDKActivityBase.class.getSimpleName();
 
     private static final String SDK_SAMPLE_APP_LICENSE_KEY = "GSDK-CA41-0001-E32F-0CF1-93EC";
     private static final int PERMISSIONS_REQUEST_CODE = 0x1;
 
+    protected String[] mRequiredPermissions = {};
+
     private static Object sBroadcastLock = new Object();
     private static boolean sBroadcastEnded = true;
 
-    /**
-     * The top-level GoCoder SDK API interface
-     */
-    protected static WowzaGoCoder sGoCoder = null;
-
-    /**
-     * An array of Android manifest permission identifiers required for this activity
-     */
-    protected String[] mRequiredPermissions = {};
-
-    /**
-     * Indicates whether this is a full screen activity or note
-     */
+    // indicates whether this is a full screen activity or note
     protected static boolean sFullScreenActivity = true;
+
+    // GoCoder SDK top level interface
+    protected static WowzaGoCoder sGoCoderSDK = null;
 
     /**
      * Build an array of WZMediaConfigs from the frame sizes supported by the active camera
@@ -74,65 +77,54 @@ public abstract class GoCoderSDKActivityBase extends Activity
         return configs;
     }
 
-    /**
-     * The GoCoder SDK broadcaster
-     */
-    protected WZBroadcast mBroadcast = null;
-    public WZBroadcast getBroadcast() {
-        return mBroadcast;
-    }
-    public void setBroadcast(WZBroadcast broadcast) {
-        mBroadcast = broadcast;
-    }
-
-    /**
-     * The GoCoder SDK broadcast configuration
-     */
-    protected WZBroadcastConfig mBroadcastConfig = null;
-    public WZBroadcastConfig getBroadcastConfig() {
-        return mBroadcastConfig;
-    }
-    public void setBroadcastConfig(WZBroadcastConfig broadcastConfig) {
-        mBroadcastConfig = broadcastConfig;
-    }
-
-    /**
-     * Indicates if the required permissions have been granted for application built for Android 6.0 and up
-     */
     protected boolean mPermissionsGranted = false;
-    public boolean getPermissionsGranted() {
-        return mPermissionsGranted;
+
+    protected WZBroadcast mWZBroadcast = null;
+    public WZBroadcast getBroadcast() {
+        return mWZBroadcast;
     }
-    public void setPermissionsGranted(boolean permissionsGranted) {
-        mPermissionsGranted = permissionsGranted;
+
+    protected WZBroadcastConfig mWZBroadcastConfig = null;
+    public WZBroadcastConfig getBroadcastConfig() {
+        return mWZBroadcastConfig;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        WZLog.debug(TAG, "ON_CREATE");
         super.onCreate(savedInstanceState);
 
-        // Initialize the GoCoder SDK
-        if (sGoCoder == null) {
+        if (sGoCoderSDK == null) {
             // Enable detailed logging from the GoCoder SDK
             WZLog.LOGGING_ENABLED = true;
-            sGoCoder = WowzaGoCoder.init(this, SDK_SAMPLE_APP_LICENSE_KEY);
-            if (sGoCoder == null) {
+
+            // Initialize the GoCoder SDK
+            sGoCoderSDK = WowzaGoCoder.init(this, SDK_SAMPLE_APP_LICENSE_KEY);
+
+            if (sGoCoderSDK == null) {
                 WZLog.error(TAG, WowzaGoCoder.getLastError());
             } else {
-                WZLog.info("GoCoder SDK version number = " + WowzaGoCoder.SDK_VERSION);
-                WZLog.info(WowzaGoCoder.PLATFORM_INFO);
-                WZLog.info(WowzaGoCoder.OPENGLES_INFO);
-                WZLog.info(WZPlatformInfo.displayInfo(this));
+                // Demonstrates the diagnostic APIs available
+                WZLog.info(TAG, "==== GoCoder SDK Version ===\n"
+                        + WZVersionInfo.getInstance().toVerboseString()
+                            + "\n============================");
+                WZLog.info(TAG, "======= Device Information =======\n"
+                        + WowzaGoCoder.PLATFORM_INFO
+                            + "\n==================================");
+                WZLog.info(TAG, "======= Display Information =======\n"
+                        + WZPlatformInfo.displayInfo(this)
+                            + "\n===================================");
+                WZLog.info(TAG, "=================== OpenGL ES Information ===================\n"
+                        + WowzaGoCoder.OPENGLES_INFO
+                            + "\n=============================================================");
             }
         }
 
-        if (sGoCoder != null) {
-            // Create a new broadcaster instance
-            mBroadcast = new WZBroadcast();
-
-            // Create a new broadcast configuration instance
-            mBroadcastConfig = new WZBroadcastConfig(sGoCoder.getConfig());
-            mBroadcastConfig.setLogLevel(WZLog.LOG_LEVEL_DEBUG);
+        if (sGoCoderSDK != null) {
+            // Create a GoCoder broadcaster and an associated streaming configuration
+            mWZBroadcast = new WZBroadcast();
+            mWZBroadcastConfig = new WZBroadcastConfig(sGoCoderSDK.getConfig());
+            mWZBroadcastConfig.setLogLevel(WZLog.LOG_LEVEL_DEBUG);
         }
     }
 
@@ -141,14 +133,13 @@ public abstract class GoCoderSDKActivityBase extends Activity
      */
     @Override
     protected void onResume() {
+        WZLog.debug(TAG, "ON_RESUME");
         super.onResume();
 
-        // Check to see if the permissions required for this activity have been granted. If not, invoke the
-        // permissions granting workflow necessary for Android 6.0 and up
-        if (mBroadcast != null) {
+        if (mWZBroadcast != null) {
             mPermissionsGranted = (mRequiredPermissions.length > 0 ? WowzaGoCoder.hasPermissions(this, mRequiredPermissions) : true);
             if (mPermissionsGranted) {
-                ConfigPrefs.updateConfigFromPrefs(PreferenceManager.getDefaultSharedPreferences(this), mBroadcastConfig);
+                ConfigPrefs.updateConfigFromPrefs(PreferenceManager.getDefaultSharedPreferences(this), mWZBroadcastConfig);
             } else {
                 ActivityCompat.requestPermissions(this,
                         mRequiredPermissions, PERMISSIONS_REQUEST_CODE);
@@ -156,13 +147,20 @@ public abstract class GoCoderSDKActivityBase extends Activity
         }
     }
 
+    @Override
+    protected void onPause() {
+        WZLog.debug(TAG, "ON_PAUSE");
 
-    /**
-     * Invoked after the user dismisses the permissions request dialogs
-     */
+        // Stop any active live stream
+        if (mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
+            endBroadcast(true);
+        }
+
+        super.onPause();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        //
         mPermissionsGranted = true;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_CODE: {
@@ -173,15 +171,6 @@ public abstract class GoCoderSDKActivityBase extends Activity
                 }
             }
         }
-    }
-    @Override
-    protected void onPause() {
-        // If there is a streaming broadcast is progress, stop it before the application pauses
-        if (mBroadcast != null && mBroadcast.getBroadcastStatus().isRunning()) {
-            endBroadcast(true);
-        }
-
-        super.onPause();
     }
 
     /**
@@ -207,71 +196,57 @@ public abstract class GoCoderSDKActivityBase extends Activity
     /**
      * WZStatusCallback interface methods
      */
-
-    /**
-     * This method is called each time the broadcast status changes during initialization and shutdown
-     */
     @Override
     public void onWZStatus(final WZStatus goCoderStatus) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                // Log the broadcast status
+                if (goCoderStatus.isReady())
+                    // Keep the screen on while the broadcast is active
+                   getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                else if (goCoderStatus.isIdle())
+                    // Clear the "keep screen on" flag
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
                 WZLog.debug(TAG, goCoderStatus.toString());
             }
         });
     }
 
-    /**
-     * This method is called if an error occurs when initializing or running a broadcast
-     */
     @Override
     public void onWZError(final WZStatus goCoderStatus) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                // Log the broadcast error
                 WZLog.error(TAG, goCoderStatus.getLastError());
             }
         });
     }
 
-    /**
-     * Start a live streaming broadcast session
-     */
     protected synchronized WZStreamingError startBroadcast() {
         WZStreamingError configValidationError = null;
 
-        // Make sure the broadcaster is idle first
-        if (mBroadcast.getBroadcastStatus().isIdle()) {
-            WZLog.debug(TAG, mBroadcastConfig.toString());
+        if (mWZBroadcast.getStatus().isIdle()) {
+            WZLog.info(TAG, "=============== Broadcast Configuration ===============\n"
+                    + mWZBroadcastConfig.toString()
+                        + "\n=======================================================");
 
-            // Validate the broadcast configuration
-            configValidationError = mBroadcastConfig.validateForBroadcast();
-
+            configValidationError = mWZBroadcastConfig.validateForBroadcast();
             if (configValidationError == null) {
-                // Tell the broadcaster to start the broadcast
-                mBroadcast.startBroadcast(mBroadcastConfig, this);
+                mWZBroadcast.startBroadcast(mWZBroadcastConfig, this);
             }
-
         } else {
             WZLog.error(TAG, "startBroadcast() called while another broadcast is active");
         }
         return configValidationError;
     }
 
-    /**
-     * Shutdown a broadcast session
-     *
-     * @param appPausing Indicates of the app is currently pausing such as when onPause() is called.
-     *                   If set, this method will block until the broadcast is completely shutdown
-     */
     protected synchronized void endBroadcast(boolean appPausing) {
-        if (!mBroadcast.getBroadcastStatus().isIdle()) {
+        if (!mWZBroadcast.getStatus().isIdle()) {
             if (appPausing) {
+                // Stop any active live stream
                 sBroadcastEnded = false;
-                // Tell the broadcaster to end the broadcast
-                mBroadcast.endBroadcast(new WZStatusCallback() {
+                mWZBroadcast.endBroadcast(new WZStatusCallback() {
                     @Override
                     public void onWZStatus(WZStatus wzStatus) {
                         synchronized (sBroadcastLock) {
@@ -290,23 +265,19 @@ public abstract class GoCoderSDKActivityBase extends Activity
                     }
                 });
 
-                // Block until the broadcast has been completely shutdown
                 while(!sBroadcastEnded) {
                     try{
                         sBroadcastLock.wait();
                     } catch (InterruptedException e) {}
                 }
             } else {
-                mBroadcast.endBroadcast(this);
+                mWZBroadcast.endBroadcast(this);
             }
         }  else {
             WZLog.error(TAG, "endBroadcast() called without an active broadcast");
         }
     }
 
-    /**
-     * Shutdown a broadcast session
-     */
     protected synchronized void endBroadcast() {
         endBroadcast(false);
     }

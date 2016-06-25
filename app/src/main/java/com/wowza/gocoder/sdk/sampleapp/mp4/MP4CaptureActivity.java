@@ -1,7 +1,21 @@
 /**
- *  This code and all components (c) Copyright 2015-2016, Wowza Media Systems, LLC. All rights reserved.
- *  This code is licensed pursuant to the BSD 3-Clause License.
+ *  CameraActivity.java
+ *  gocoder-sdk-sampleapp
+ *
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
+ *
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
  */
+
 package com.wowza.gocoder.sdk.sampleapp.mp4;
 
 import android.Manifest;
@@ -9,6 +23,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 
 import com.wowza.gocoder.sdk.api.logging.WZLog;
@@ -21,12 +36,10 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * This activity saves an MP4 video file to local storage during a live streaming broadcast
- */
 public class MP4CaptureActivity extends CameraActivity {
-    private static String TAG = MP4CaptureActivity.class.getSimpleName();
+    private final static String TAG = MP4CaptureActivity.class.getSimpleName();
 
+    protected LinearLayout      mMP4Controls        = null;
     protected Switch            mSwitchMP4          = null;
     protected WZMP4Writer       mMP4Writer          = null;
 
@@ -34,46 +47,35 @@ public class MP4CaptureActivity extends CameraActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Set the permission required by this activity
         mRequiredPermissions = new String[] {
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
 
-        if (sGoCoder != null) {
+        if (sGoCoderSDK != null) {
+            mMP4Controls = (LinearLayout) findViewById(R.id.mp4Controls);
             mSwitchMP4 = (Switch) findViewById(R.id.swSaveMP4);
             mSwitchMP4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    // Enable or display the MP4 video sink based on the MP4 toggle switch
                     if (isChecked) {
-                        mBroadcastConfig.registerVideoSink(mMP4Writer);
+                        mWZBroadcastConfig.registerVideoSink(mMP4Writer);
+                        mWZBroadcastConfig.registerAudioSink(mMP4Writer);
                     } else {
-                        mBroadcastConfig.unregisterVideoSink(mMP4Writer);
+                        mWZBroadcastConfig.unregisterVideoSink(mMP4Writer);
+                        mWZBroadcastConfig.unregisterAudioSink(mMP4Writer);
                     }
                 }
             });
 
             mMP4Writer = new WZMP4Writer();
-            mBroadcastConfig.registerVideoSink(mMP4Writer);
+            mWZBroadcastConfig.registerVideoSink(mMP4Writer);
+            mWZBroadcastConfig.registerAudioSink(mMP4Writer);
 
             mSwitchMP4.setChecked(true);
-            mSwitchMP4.setVisibility(View.VISIBLE);
+            mMP4Controls.setVisibility(View.VISIBLE);
         }
-    }
-
-    /**
-     * Android Activity lifecycle methods
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     /**
@@ -81,9 +83,8 @@ public class MP4CaptureActivity extends CameraActivity {
      */
     @Override
     public void onToggleBroadcast(View v) {
-        if (mBroadcast.getBroadcastStatus().isIdle()) {
+        if (mWZBroadcast.getStatus().isIdle()) {
             if (mSwitchMP4.isChecked()) {
-                // Create the directory in which to store the MP4 file
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
                 File outputFile = getOutputMediaFile();
                 if (outputFile != null)
@@ -99,31 +100,24 @@ public class MP4CaptureActivity extends CameraActivity {
             mStatusView.showMessage("The MP4 file was stored at " + mMP4Writer.getFilePath());
         }
 
-        mBroadcastConfig.setAudioEnabled(false); // audio support coming soon
         super.onToggleBroadcast(v);
    }
-
-    @Override
-    public void onWZStatus(final WZStatus goCoderStatus) {
-        super.onWZStatus(goCoderStatus);
-    }
 
     /**
      * Update the state of the UI controls
      */
     @Override
-    protected boolean updateUIControls() {
-        mSwitchMP4.setVisibility(getBroadcast().getBroadcastStatus().isRunning() ? View.INVISIBLE : View.VISIBLE);
+    protected boolean syncUIControlState() {
+        boolean disableControls = super.syncUIControlState();
 
-        boolean disableControls = super.updateUIControls();
+        mMP4Controls.setVisibility(getBroadcast().getStatus().isRunning() ? View.INVISIBLE : View.VISIBLE);
         mSwitchMP4.setEnabled(!disableControls);
 
         return disableControls;
     }
 
-
     /**
-     * Create the MP4 file container
+     * Create a File for saving an image or video
      */
     private File getOutputMediaFile(){
         // To be safe, you should check that the SDCard is mounted

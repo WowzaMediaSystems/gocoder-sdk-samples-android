@@ -10,9 +10,9 @@
         android:layout_height="fill_parent"
         android:id="@+id/sdkIcon"
         android:scaleType="fitCenter"
-        android:src="@mipmap/ic_launcher"
-        android:paddingLeft="5dip"
-        android:paddingRight="5dip" />
+        android:src="@drawable/ic_wowza"
+        android:paddingLeft="0dip"
+        android:paddingRight="15dip" />
 
     <LinearLayout
         android:layout_width="fill_parent"

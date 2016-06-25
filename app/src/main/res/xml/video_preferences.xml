@@ -56,6 +56,14 @@
         android:defaultValue="@string/wz_video_profile_level_default_value">
     </ListPreference>
 
+    <CheckBoxPreference
+        android:key="wz_video_resize_to_aspect"
+        android:title="@string/wz_video_resize_to_aspect_title"
+        android:summary="@string/wz_video_resize_to_aspect_summary"
+        android:defaultValue="@string/wz_video_resize_to_aspect_default_value"
+        android:dependency="wz_video_enabled"
+        />
+
     <!--
             <CheckBoxPreference
                 android:key="wz_video_letterbox_portrait"

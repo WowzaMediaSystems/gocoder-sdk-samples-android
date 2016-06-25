@@ -1,7 +1,3 @@
-/**
- *  This code and all components (c) Copyright 2015-2016, Wowza Media Systems, LLC. All rights reserved.
- *  This code is licensed pursuant to the BSD 3-Clause License.
- */
 package com.wowza.gocoder.sdk.sampleapp;
 
 import android.app.ListActivity;
@@ -16,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Display a list of the SDK demo activities available
- */
 public class MainActivity extends ListActivity {
 
     private static final String TITLE = "example_title";
@@ -28,15 +21,23 @@ public class MainActivity extends ListActivity {
     private static final String[][] ACTIVITIES = {
             {   "Stream live video and audio",
                 "Broadcast a live video and audio stream captured with the local camera and mic",
-                "CameraActivity"    },
+                "CameraActivity"                        },
 
             {   "Stream an MP4 file",
-                "Broadcast video from an MP4 file stored on the local device",
-                "mp4.MP4BroadcastActivity"    },
+                    "Broadcast video from an MP4 file stored on the local device",
+                    "mp4.MP4BroadcastActivity"          },
 
             {   "Capture an MP4 file",
                     "Broadcast a live video stream while saving it to an MP4 file",
-                    "mp4.MP4CaptureActivity"    }
+                    "mp4.MP4CaptureActivity"            },
+
+            {   "Display a bitmap overlay",
+                    "Display a bitmap as an overlay on the camera preview",
+                    "graphics.BitmapOverlayActivity"    },
+
+            {   "Display an audio level meter",
+                    "Register an audio sample listener and display an audio level meter",
+                    "audio.AudioMeterActivity"          }
     };
 
     @Override

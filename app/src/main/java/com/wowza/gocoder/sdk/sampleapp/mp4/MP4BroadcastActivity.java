@@ -1,62 +1,62 @@
 /**
- *  This code and all components (c) Copyright 2015-2016, Wowza Media Systems, LLC. All rights reserved.
- *  This code is licensed pursuant to the BSD 3-Clause License.
+ *  CameraActivity.java
+ *  gocoder-sdk-sampleapp
+ *
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
+ *
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
  */
+
 package com.wowza.gocoder.sdk.sampleapp.mp4;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
-import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.VideoView;
 
-import com.wowza.gocoder.sdk.api.WowzaGoCoder;
-import com.wowza.gocoder.sdk.api.broadcast.WZBroadcast;
-import com.wowza.gocoder.sdk.api.broadcast.WZBroadcastConfig;
 import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
 import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
-import com.wowza.gocoder.sdk.api.logging.WZLog;
 import com.wowza.gocoder.sdk.api.mp4.WZMP4Broadcaster;
 import com.wowza.gocoder.sdk.api.mp4.WZMP4Util;
+import com.wowza.gocoder.sdk.api.status.WZState;
 import com.wowza.gocoder.sdk.api.status.WZStatus;
-import com.wowza.gocoder.sdk.api.status.WZStatusCallback;
+import com.wowza.gocoder.sdk.sampleapp.GoCoderSDKActivityBase;
 import com.wowza.gocoder.sdk.sampleapp.R;
+import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
 import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
 import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefsActivity;
-import com.wowza.gocoder.sdk.sampleapp.ui.ControlButton;
 
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 
-/**
- * This activity demonstrates the use of an alternate video input source
- * by streaming the frames from an MP4 file
- */
-public class MP4BroadcastActivity extends Activity
-    implements WZStatusCallback {
+public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
+    final private static String TAG = MP4BroadcastActivity.class.getSimpleName();
 
-    private final static String TAG = MP4BroadcastActivity.class.getSimpleName();
-
-    final private static String SDK_SAMPLE_APP_LICENSE_KEY = "GSDK-CA41-0001-E32F-0CF1-93EC";
-
-    private static final int VIDEO_SELECTED_RESULT_CODE = 1;
+    final private static int VIDEO_SELECTED_RESULT_CODE = 1;
 
     // UI controls
-    private ControlButton       mBtnBroadcast;
-    private ControlButton       mBtnSettings;
-    private ControlButton       mBtnFileSelect;
-    private ControlButton       mBtnLoop;
+    private MultiStateButton    mBtnFileSelect;
+    private MultiStateButton    mBtnLoop;
+
+    protected MultiStateButton  mBtnBroadcast     = null;
+    protected MultiStateButton  mBtnSettings      = null;
 
     private VideoView           mVideoView;
     private StatusView          mStatusView;
@@ -64,73 +64,39 @@ public class MP4BroadcastActivity extends Activity
     private Uri                 mMP4FileUri;
     private WZMP4Broadcaster    mMP4Broadcaster;
 
-    private WZBroadcast         mBroadcast;
-    private WZBroadcastConfig   mBroadcastConfig;
-
     private MediaPlayer         mMediaPlayer;
     private boolean             mLooping;
-
-    // GoCoder SDK top level interface
-    private static WowzaGoCoder sGoCoder = null;
-
-    private static final String[] REQUIRED_PERMISSIONS = {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-    };
-    private static final int PERMISSIONS_REQUEST_CODE = 0x1;
-    private boolean mPermissionsGranted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
-
-        mMediaPlayer = null;
-        mLooping = true;
-        mMP4FileUri = null;
-        mPermissionsGranted = false;
-        mBroadcast = null;
-
-        // Initialize the UI controls
         setContentView(R.layout.activity_mp4_broadcast);
 
-        mBtnBroadcast       = new ControlButton(this, R.id.ic_broadcast, false, false, R.drawable.ic_pause, R.drawable.ic_play);
-        mBtnFileSelect      = new ControlButton(this, R.id.ic_videos, true);
-        mBtnSettings        = new ControlButton(this, R.id.ic_settings, true);
-        mBtnLoop            = new ControlButton(this, R.id.ic_loop, true, true, R.drawable.ic_refresh, R.drawable.ic_refresh_off);
+        mRequiredPermissions = new String[]{
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        };
+
+        mMediaPlayer    = null;
+        mLooping        = true;
+        mMP4FileUri     = null;
+
+        mBtnBroadcast       = (MultiStateButton) findViewById(R.id.ic_broadcast);
+        mBtnSettings        = (MultiStateButton) findViewById(R.id.ic_settings);
+
+        mBtnFileSelect      = (MultiStateButton) findViewById(R.id.ic_videos);
+        mBtnLoop            = (MultiStateButton) findViewById(R.id.ic_loop);
 
         mVideoView          = (VideoView) findViewById(R.id.vwVideoPlayer);
         mStatusView         = (StatusView) findViewById(R.id.statusView);
 
-        // Initialize the GoCoder SDK
-        if (sGoCoder == null) {
-            // Enable detailed logging from the GoCoder SDK
-            WZLog.LOGGING_ENABLED = true;
-
-            // Initialize the GoCoder SDK
-            sGoCoder = WowzaGoCoder.init(this, SDK_SAMPLE_APP_LICENSE_KEY);
-            if (sGoCoder == null) {
-                mStatusView.setErrorMessage(WowzaGoCoder.getLastError().getErrorDescription());
-                return;
-            }
-
-            WZLog.info("GoCoder SDK version number = " + WowzaGoCoder.SDK_VERSION);
-            WZLog.info("Platform information = " + WowzaGoCoder.PLATFORM_INFO);
-        }
-
-        if (sGoCoder != null) {
-            // Create a new MP4 broadcaster instance
+        if (sGoCoderSDK != null) {
             mMP4Broadcaster = new WZMP4Broadcaster();
-
-            // Register the MP4 broadcaster as the video source in the broadcast config
-            mBroadcastConfig = new WZBroadcastConfig();
-            mBroadcastConfig.setVideoBroadcaster(mMP4Broadcaster);
-            mBroadcastConfig.setAudioEnabled(false);
-
-            // Crceate the primary GoCoder SDK broadcaster
-            mBroadcast = new WZBroadcast();
+            mWZBroadcastConfig.setVideoBroadcaster(mMP4Broadcaster);
+            mWZBroadcastConfig.setAudioEnabled(false); // audio not yet supported
         }
 
-        // Callback invoked when the video player is ready
+        mBtnLoop.setState(mLooping);
+
         mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mMediaPlayer = mediaPlayer;
@@ -140,15 +106,10 @@ public class MP4BroadcastActivity extends Activity
             }
         });
 
-        // Callback invoked when the video has completed playing
         mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 mMediaPlayer = null;
-                if (mBroadcast != null && mBroadcast.getBroadcastStatus().isRunning()) {
-                    mBroadcast.endBroadcast(MP4BroadcastActivity.this);
-                    updateUIControls();
-                }
             }
         });
     }
@@ -160,45 +121,12 @@ public class MP4BroadcastActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (mBroadcastConfig != null) {
-            ConfigPrefs.updateConfigFromPrefs(PreferenceManager.getDefaultSharedPreferences(this), mBroadcastConfig);
-            mBroadcastConfig.setAudioEnabled(false);
-        }
-
-        updateUIControls();
-
-        // Ensure we have the permissions need
-        mPermissionsGranted = WowzaGoCoder.hasPermissions(this, REQUIRED_PERMISSIONS);
-        if (!mPermissionsGranted) {
-            ActivityCompat.requestPermissions(this,
-                    REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        mPermissionsGranted = true;
-
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CODE: {
-                for(int grantResult : grantResults) {
-                    if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                        mPermissionsGranted = false;
-                    }
-                }
-            }
-        }
+        syncUIControlState();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause");
-
-        // Stop any active broadcast
-        if (mBroadcast != null && mBroadcast.getBroadcastStatus().isRunning())
-            mBroadcast.endBroadcast();
     }
 
     /**
@@ -207,14 +135,11 @@ public class MP4BroadcastActivity extends Activity
     public void onSelectMedia(View v) {
         if (!mPermissionsGranted) {
             mStatusView.setErrorMessage("The application has not been granted permission to read from external storage");
-            ActivityCompat.requestPermissions(this,
-                    REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
         } else {
             selectVideoFile();
         }
     }
 
-    // Setup the video file selection dialog
     private void selectVideoFile() {
         mBtnBroadcast.setEnabled(false);
         mBtnSettings.setEnabled(false);
@@ -227,7 +152,6 @@ public class MP4BroadcastActivity extends Activity
     }
 
     @Override
-    // Invoked once an MP4 file has been selected
     protected void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
         mBtnFileSelect.setEnabled(true);
         mBtnSettings.setEnabled(false);
@@ -238,11 +162,11 @@ public class MP4BroadcastActivity extends Activity
                     Uri fileUri = returnIntent.getData();
                     String mimeType = getContentResolver().getType(fileUri);
 
-                    if (!mimeType.equals("video/mp4")) {
+                    if (mimeType != null && !mimeType.equals("video/mp4")) {
                         mStatusView.setErrorMessage("The video selected is not an MP4 file");
                     } else {
                         setVideoFile(fileUri);
-                        updateUIControls();
+                        syncUIControlState();
                     }
                 }
                 break;
@@ -250,7 +174,6 @@ public class MP4BroadcastActivity extends Activity
         super.onActivityResult(requestCode, resultCode, returnIntent);
     }
 
-    // Set the MP4 file to broadcast
     private void setVideoFile(Uri fileUri) {
         FileDescriptor fd = getFD(fileUri);
 
@@ -259,10 +182,10 @@ public class MP4BroadcastActivity extends Activity
 
             WZMediaConfig fileConfig = WZMP4Util.getFileConfig(fd);
             if (fileConfig != null) {
+                fileConfig.setAudioEnabled(false);
                 mMP4FileUri = fileUri;
 
-                mBroadcastConfig.set(fileConfig);
-                mBroadcastConfig.setAudioEnabled(false);
+                mWZBroadcastConfig.set(fileConfig);
 
                 findViewById(R.id.vwHelp).setVisibility(View.INVISIBLE);
 
@@ -278,12 +201,14 @@ public class MP4BroadcastActivity extends Activity
         }
     }
 
-    // Get a file decriptor for the file selected
     private FileDescriptor getFD(Uri fileUri) {
         FileDescriptor fd;
         try {
             ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(fileUri, "r");
-            fd = pfd.getFileDescriptor();
+            if (pfd != null)
+                fd = pfd.getFileDescriptor();
+            else
+                return null;
         } catch (FileNotFoundException e) {
             fd = null;
         }
@@ -296,35 +221,25 @@ public class MP4BroadcastActivity extends Activity
      */
     public void onToggleBroadcast(View v) {
         if (mMP4FileUri == null) {
-            mStatusView.setErrorMessage("A video file has not been selected");
+            mStatusView.setErrorMessage("An MP4 file has not been selected");
             return;
         }
 
-        boolean startBroadcast = !mBtnBroadcast.isStateOn();
-
-        if (startBroadcast) {
-            // rewind the video player
-            mVideoView.seekTo(0);
-            mVideoView.start();
-
-            // Tell the MP4 broadcaster which file to use
+        if (mWZBroadcast.getStatus().isIdle()) {
             mMP4Broadcaster.setFileDescriptor(getFD(mMP4FileUri));
+            mWZBroadcastConfig.setAudioEnabled(false);
 
-            // Validate the broadcast config
-            WZStreamingError configValidationError = mBroadcastConfig.validateForBroadcast();
+            WZStreamingError configValidationError = mWZBroadcastConfig.validateForBroadcast();
             if (configValidationError != null) {
                 mStatusView.setErrorMessage(configValidationError.getErrorDescription());
             } else {
-                mBroadcast.startBroadcast(mBroadcastConfig, this);
+                mWZBroadcast.startBroadcast(mWZBroadcastConfig, this);
             }
-
-        } else {
-            // Stop the broadcast and video player
+        } else if (mWZBroadcast.getStatus().isRunning()) {
             if (mVideoView.isPlaying()) {
                 mVideoView.pause();
             }
-
-            mBroadcast.endBroadcast(this);
+            mWZBroadcast.endBroadcast(this);
         }
     }
 
@@ -344,7 +259,9 @@ public class MP4BroadcastActivity extends Activity
      */
     public void onLoop(View v) {
         mLooping = mBtnLoop.toggleState();
-        mMediaPlayer.setLooping(mLooping);
+        mMP4Broadcaster.setLooping(mLooping);
+        if (mMediaPlayer != null)
+            mMediaPlayer.setLooping(mLooping);
     }
 
     /**
@@ -356,8 +273,25 @@ public class MP4BroadcastActivity extends Activity
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
+                switch(goCoderStatus.getState()) {
+                    case WZState.IDLE:
+                        // Clear the "keep screen on" flag
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                            mMediaPlayer.stop();
+                        }
+                        break;
+                    case WZState.RUNNING:
+                        // Keep the screen on while we are broadcasting
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                        mVideoView.seekTo(0);
+                        mVideoView.start();
+                        break;
+                }
                 mStatusView.setStatus(goCoderStatus);
-                updateUIControls();
+                syncUIControlState();
             }
         });
     }
@@ -368,18 +302,17 @@ public class MP4BroadcastActivity extends Activity
             @Override
             public void run() {
                 mStatusView.setStatus(goCoderStatus);
-                updateUIControls();
+                syncUIControlState();
             }
         });
     }
 
-
     /**
      * Update the state of the UI controls
      */
-    private void updateUIControls() {
-        boolean disableControls = (mBroadcast == null ||
-                !(mBroadcast.getBroadcastStatus().isIdle() || mBroadcast.getBroadcastStatus().isRunning()));
+    private void syncUIControlState() {
+        boolean disableControls = (mWZBroadcast == null ||
+                !(mWZBroadcast.getStatus().isIdle() || mWZBroadcast.getStatus().isRunning()));
 
         if (disableControls) {
             mBtnBroadcast.setEnabled(false);
@@ -387,14 +320,12 @@ public class MP4BroadcastActivity extends Activity
             mBtnLoop.setEnabled(false);
             mBtnFileSelect.setEnabled(false);
         } else {
-            boolean isStreaming = mBroadcast.getBroadcastStatus().isRunning();
-            mBtnBroadcast.setStateOn(isStreaming);
+            boolean isStreaming = mWZBroadcast.getStatus().isRunning();
+            mBtnBroadcast.setState(isStreaming);
             mBtnBroadcast.setEnabled(mMP4FileUri != null);
 
             mBtnSettings.setEnabled(!isStreaming);
-            mBtnLoop.setVisible(!isStreaming);
             mBtnFileSelect.setEnabled(!isStreaming);
         }
     }
-
 }

@@ -7,4 +7,6 @@
     <color name="black_overlay">#66000000</color>
     <color name="primary_material_dark_1">#931d1d</color>
     <color name="controlButtonPressed">#80ff8400</color>
+    <color name="multiStateButtonPressed">#80ff8400</color>
+    <color name="multiStateButtonDisabled">#c1636363</color>
 </resources>

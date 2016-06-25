@@ -1,8 +1,26 @@
-package com.wowza.gocoder.sdk.sampleapp.ui;
-/**
- *  This code and all components (c) Copyright 2015-2016, Wowza Media Systems, LLC. All rights reserved.
- *  This code is licensed pursuant to the BSD 3-Clause License.
+package com.wowza.gocoder.sdk.sampleapp.ui;/*
+ *
+ * WOWZA MEDIA SYSTEMS, LLC ("Wowza") CONFIDENTIAL
+ * Copyright (c) 2005-2016 Wowza Media Systems, LLC, All Rights Reserved.
+ *
+ * NOTICE: All information contained herein is, and remains the property of Wowza Media Systems, LLC.
+ * The intellectual and technical concepts contained herein are proprietary to Wowza Media Systems, LLC
+ * and may be covered by U.S. and Foreign Patents, patents in process, and are protected by trade secret
+ * or copyright law. Dissemination of this information or reproduction of this material is strictly forbidden
+ * unless prior written permission is obtained from Wowza Media Systems, LLC. Access to the source code
+ * contained herein is hereby forbidden to anyone except current Wowza Media Systems, LLC employees, managers
+ * or contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering such access.
+ *
+ * The copyright notice above does not evidence any actual or intended publication or disclosure of this
+ * source code, which includes information that is confidential and/or proprietary, and is a trade secret, of
+ * Wowza Media Systems, LLC. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR PUBLIC DISPLAY
+ * OF OR THROUGH USE OF THIS SOURCE CODE WITHOUT THE EXPRESS WRITTEN CONSENT OF WOWZA MEDIA SYSTEMS, LLC IS
+ * STRICTLY PROHIBITED, AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES. THE RECEIPT OR POSSESSION
+ * OF THIS SOURCE CODE AND/OR RELATED INFORMATION DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR
+ * DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
+ *
  */
+
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,9 +31,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/**
- * A timer control that displays a running counter of the elapsed time during a live streaming broadcast
- */
 public class TimerView extends TextView {
     final public static long DEFAULT_REFRESH_INTERVAL = 1000L;
 

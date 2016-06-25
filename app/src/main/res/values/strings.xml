@@ -5,7 +5,16 @@
     <string name="camera_example_title">GoCoder SDK Capture Example</string>
     <string name="mp4_broadcast_title">GoCoder SDK MP4 Broadcast Example</string>
     <string name="mp4_capture_title">GoCoder SDK MP4 Capture Example</string>
+    <string name="audio_meter_title">GoCoder SDK Audio Meter Example</string>
+    <string name="audio_meter_help">Press the mic icon to toggle the audio level meter</string>
+
+    <string name="overlay_title">GoCoder SDK Bitmap Overlay Example</string>
+    <string name="overlay_help">Use a pinch gesture to scale the overlay logo</string>
+
     <string name="surface_view_title">GoCoder SDK OpenGL ES Capture Example</string>
+
+    <string name="resize_aspect_mode">Aspect</string>
+    <string name="resize_aspect_fill_mode">Fill</string>
 
     <string name="configuration_settings_title">Configuration Settings</string>
 
@@ -81,6 +90,10 @@
     <string name="wz_video_captured_video_rotates_summary">The captured video rotates as the device is rotated</string>
     <string name="wz_video_captured_video_rotates_default_value">true</string>
 
+    <string name="wz_video_resize_to_aspect_title">Camera preview matches frame size</string>
+    <string name="wz_video_resize_to_aspect_summary">Resize the camera preview view to fit the frame size aspect ratio</string>
+    <string name="wz_video_resize_to_aspect_default_value">false</string>
+
     <string name="wz_audio_enabled_title">Stream audio</string>
     <string name="wz_audio_enabled_title_summary">Indicates if audio should be streamed</string>
     <string name="wz_audio_enabled_default_value">true</string>
@@ -91,7 +104,7 @@
     <string name="wz_audio_samplerate_title">Sample rate</string>
     <string name="wz_audio_samplerate_summary">The sample rate for the audio stream (hz)</string>
     <string name="wz_audio_samplerate_dialog_title">Enter the sample rate (hz)</string>
-    <string name="wz_audio_samplerate_default_value">41000</string>
+    <string name="wz_audio_samplerate_default_value">44100</string>
 
     <string name="wz_audio_bitrate_title">Bitrate</string>
     <string name="wz_audio_bitrate_summary">The bitrate for the audio stream</string>

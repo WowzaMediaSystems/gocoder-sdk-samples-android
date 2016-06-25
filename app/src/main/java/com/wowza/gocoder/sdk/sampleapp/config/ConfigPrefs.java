@@ -1,8 +1,21 @@
-/**
- *  This code and all components (c) Copyright 2015-2016, Wowza Media Systems, LLC. All rights reserved.
- *  This code is licensed pursuant to the BSD 3-Clause License.
- */
 package com.wowza.gocoder.sdk.sampleapp.config;
+/**
+ *  ConfigPrefs.java
+ *  gocoder-sdk-sampleapp
+ *
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
+ *
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
+ */
 
 import android.content.SharedPreferences;
 
@@ -12,9 +25,6 @@ import com.wowza.gocoder.sdk.api.configuration.WowzaConfig;
 import com.wowza.gocoder.sdk.api.devices.WZCamera;
 import com.wowza.gocoder.sdk.api.h264.WZProfileLevel;
 
-/**
- * Updates the GoCoder SDK broadcast configuration with the stored preference values
- */
 public class ConfigPrefs {
 
     public final static int ALL_PREFS               = 0x1;
@@ -27,9 +37,6 @@ public class ConfigPrefs {
     public final static String FIXED_FRAME_SIZE     = "fixed_frame_size";
     public final static String FIXED_FRAME_RATE     = "fixed_frame_rate";
 
-    /**
-     * Update the video and audio preferences
-     */
     public static void updateConfigFromPrefs(SharedPreferences sharedPrefs, WZMediaConfig mediaConfig) {
         // video settings
         mediaConfig.setVideoEnabled(sharedPrefs.getBoolean("wz_video_enabled", true));
@@ -54,14 +61,11 @@ public class ConfigPrefs {
         // audio settings
         mediaConfig.setAudioEnabled(sharedPrefs.getBoolean("wz_audio_enabled", true));
 
-        mediaConfig.setAudioSampleRate(Integer.parseInt(sharedPrefs.getString("wz_audio_sample_rate", String.valueOf(WZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE))));
+        mediaConfig.setAudioSampleRate(Integer.parseInt(sharedPrefs.getString("wz_audio_samplerate", String.valueOf(WZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE))));
         mediaConfig.setAudioChannels(sharedPrefs.getBoolean("wz_audio_stereo", true) ? WZMediaConfig.AUDIO_CHANNELS_STEREO : WZMediaConfig.AUDIO_CHANNELS_MONO);
         mediaConfig.setAudioBitRate(Integer.parseInt(sharedPrefs.getString("wz_audio_bitrate", String.valueOf(WZMediaConfig.DEFAULT_AUDIO_BITRATE))));
     }
 
-    /**
-     * Update the connection preferences
-     */
     public static void updateConfigFromPrefs(SharedPreferences sharedPrefs, WZStreamConfig streamConfig) {
         // connection settings
         streamConfig.setHostAddress(sharedPrefs.getString("wz_live_host_address", null));
@@ -74,9 +78,6 @@ public class ConfigPrefs {
         updateConfigFromPrefs(sharedPrefs, (WZMediaConfig) streamConfig);
     }
 
-    /**
-     * Update the platform specific preferences
-     */
     public static void updateConfigFromPrefs(SharedPreferences sharedPrefs, WowzaConfig wowzaConfig) {
         // WowzaConfig-specific properties
         wowzaConfig.setCapturedVideoRotates(sharedPrefs.getBoolean("wz_captured_video_rotates", true));
@@ -84,19 +85,17 @@ public class ConfigPrefs {
         updateConfigFromPrefs(sharedPrefs, (WZStreamConfig) wowzaConfig);
     }
 
-    /**
-     * Store the active camera id as a preference
-     */
     public static void setActiveCamera(SharedPreferences sharedPrefs, int cameraId) {
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putInt("wz_camera_id", cameraId);
         editor.apply();
     }
 
-    /**
-     * Retrieve the active camera id preference value
-     */
     public static int getActiveCamera(SharedPreferences sharedPrefs) {
         return sharedPrefs.getInt("wz_camera_id", WZCamera.DIRECTION_BACK);
+    }
+
+    public static int getScaleMode(SharedPreferences sharedPrefs) {
+        return sharedPrefs.getBoolean("wz_video_resize_to_aspect", false) ? WZMediaConfig.RESIZE_TO_ASPECT : WZMediaConfig.FILL_VIEW;
     }
 }

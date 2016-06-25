@@ -4,11 +4,7 @@
     xmlns:sampleui="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context=".CameraActivity">
-
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
+    tools:context=".audio.AudioMeterActivity">
 
     <FrameLayout
         android:id="@+id/cameraView"
@@ -23,8 +19,8 @@
             android:layout_gravity="center"
             wowza:scaleMode="fill"
             wowza:defaultCamera="back"
-            wowza:frameSizePreset="frameSize1280x720"/>
-
+            wowza:frameSizePreset="frameSize1280x720"
+        />
     </FrameLayout>
 
     <RelativeLayout
@@ -51,31 +47,21 @@
             <com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/ic_switch_camera"
-                android:src="@drawable/ic_switch_camera"
-                android:cropToPadding="false"
-                android:layout_alignParentStart="false"
-                android:onClick="onSwitchCamera"
+                android:id="@+id/ic_mic"
+                android:src="@drawable/ic_mic_on"
+                sampleui:offSrc="@drawable/ic_mic_off"
+                android:onClick="onToggleMute"
                 android:background="#000000ff"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="false"
                 android:padding="10dp"
-                android:contentDescription="Switch Camera"
-                android:layout_toLeftOf="@+id/ic_settings" />
+                android:contentDescription="Mute"
+            />
 
-            <com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton
+            <com.wowza.gocoder.sdk.sampleapp.ui.AudioLevelMeter
+                android:id="@+id/audioLevelMeter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/ic_torch"
-                android:src="@drawable/ic_torch_off"
-                sampleui:offSrc="@drawable/ic_torch_on"
-                android:onClick="onToggleTorch"
-                android:background="#000000ff"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:padding="10dp"
-                android:contentDescription="Torch" />
-
+                android:layout_marginTop="15dp"
+            />
         </LinearLayout>
 
         <com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton
@@ -102,48 +88,6 @@
             android:layout_alignParentEnd="false"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true" />
-
-        <com.wowza.gocoder.sdk.sampleapp.ui.TimerView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00:00"
-            android:id="@+id/txtTimer"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/rounded_corner"
-            android:textColor="#ffffff"
-            android:textStyle="bold"
-            android:typeface="monospace"
-            android:textAppearance="@android:style/TextAppearance.Medium" />
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/mp4Controls"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Save to MP4"
-                android:id="@+id/textView"
-                android:textAlignment="center"
-                android:layout_marginBottom="5dp"
-                android:gravity="center" />
-
-            <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/swSaveMP4"
-                android:checked="false"
-                android:visibility="visible"/>
-        </LinearLayout>
-
     </RelativeLayout>
 
     <com.wowza.gocoder.sdk.sampleapp.ui.StatusView

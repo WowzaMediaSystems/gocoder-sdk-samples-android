@@ -1,7 +1,21 @@
 /**
- *  This code and all components (c) Copyright 2015-2016, Wowza Media Systems, LLC. All rights reserved.
- *  This code is licensed pursuant to the BSD 3-Clause License.
+ *  ConfigPrefsActivity.java
+ *  gocoder-sdk-sampleapp
+ *
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
+ *
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
  */
+
 package com.wowza.gocoder.sdk.sampleapp.config;
 
 import android.content.Intent;
@@ -77,9 +91,28 @@ public class ConfigPrefsActivity extends PreferenceActivity {
 
     public static class ConnectionSettingsFragment extends PreferenceFragment {
         @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+
+        @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.connection_preferences);
+
+            String[] prefIds = {
+                    "wz_live_host_address",
+                    "wz_live_port_number",
+                    "wz_live_app_name",
+                    "wz_live_stream_name",
+                    "wz_live_username"
+            };
+
+            String[] passwordPrefIds = {
+                    "wz_live_password"
+            };
+
+            configurePrefTitles(this, prefIds, passwordPrefIds);
         }
     }
 
@@ -88,7 +121,7 @@ public class ConfigPrefsActivity extends PreferenceActivity {
         return true;
     }
 
-   public static class VideoSettingsFragment extends PreferenceFragment {
+    public static class VideoSettingsFragment extends PreferenceFragment {
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -98,6 +131,19 @@ public class ConfigPrefsActivity extends PreferenceActivity {
             ListPreference profileLevels = (ListPreference) findPreference("wz_video_profile_level");
             final EditTextPreference bitRate = (EditTextPreference)findPreference("wz_video_bitrate");
 
+            final PreferenceFragment fragment = this;
+            final int sizesTitleRes = videoSizes.getTitleRes();
+            final int bitRateTitleRes = bitRate.getTitleRes();
+            final int profileTitleRes = profileLevels.getTitleRes();
+
+            String[] prefIds = {
+                    "wz_video_framerate",
+                    "wz_video_keyframe_interval",
+                    "wz_video_bitrate"
+            };
+
+            configurePrefTitles(this, prefIds);
+
             if (sVideoConfigs == null || sVideoConfigs.length == 0 || sFixedFrameSize) {
                 getPreferenceScreen().removePreference(videoSizes);
             }
@@ -105,7 +151,10 @@ public class ConfigPrefsActivity extends PreferenceActivity {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 int prefWidth = sharedPreferences.getInt("wz_video_frame_width", WZMediaConfig.DEFAULT_VIDEO_FRAME_WIDTH);
                 int prefHeight = sharedPreferences.getInt("wz_video_frame_height", WZMediaConfig.DEFAULT_VIDEO_FRAME_HEIGHT);
+
                 WZSize prefSize = new WZSize(prefWidth, prefHeight);
+                prefSetTitle(videoSizes, getResources().getString(videoSizes.getTitleRes()), prefSize.toString());
+
                 int prefIndex = sVideoConfigs.length - 1;
 
                 String[] entries = new String[sVideoConfigs.length];
@@ -124,29 +173,33 @@ public class ConfigPrefsActivity extends PreferenceActivity {
                 videoSizes.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object o) {
-                    if (o instanceof String) {
-                        try {
-                            int selectedIndex = Integer.parseInt((String) o);
+                        if (o instanceof String) {
+                            try {
+                                int selectedIndex = Integer.parseInt((String) o);
 
-                            if (selectedIndex >= 0 && selectedIndex < sVideoConfigs.length) {
-                                WZMediaConfig selectedConfig = sVideoConfigs[selectedIndex];
+                                if (selectedIndex >= 0 && selectedIndex < sVideoConfigs.length) {
+                                    WZMediaConfig selectedConfig = sVideoConfigs[selectedIndex];
 
-                                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                                SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
-                                prefsEditor.putInt("wz_video_frame_width", selectedConfig.getVideoFrameWidth());
-                                prefsEditor.putInt("wz_video_frame_height", selectedConfig.getVideoFrameHeight());
-                                prefsEditor.putString("wz_video_bitrate", String.valueOf(selectedConfig.getVideoBitRate()));
-                                prefsEditor.apply();
+                                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                                    SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+                                    prefsEditor.putInt("wz_video_frame_width", selectedConfig.getVideoFrameWidth());
+                                    prefsEditor.putInt("wz_video_frame_height", selectedConfig.getVideoFrameHeight());
+                                    prefsEditor.putString("wz_video_bitrate", String.valueOf(selectedConfig.getVideoBitRate()));
+                                    prefsEditor.apply();
 
-                                bitRate.setText(String.valueOf(selectedConfig.getVideoBitRate()));
+                                    WZSize prefSize = new WZSize(selectedConfig.getVideoFrameWidth(), selectedConfig.getVideoFrameHeight());
+                                    prefSetTitle(preference, fragment.getResources().getString(sizesTitleRes), prefSize.toString());
 
-                                return true;
+                                    bitRate.setText(String.valueOf(selectedConfig.getVideoBitRate()));
+                                    prefSetTitle(bitRate, fragment.getResources().getString(bitRateTitleRes), String.valueOf(selectedConfig.getVideoBitRate()));
+
+                                    return true;
+                                }
+                            } catch (NumberFormatException e) {
+                                // bad no. returned
                             }
-                        } catch (NumberFormatException e) {
-                            // bad no. returned
                         }
-                    }
-                    return false;
+                        return false;
                     }
                 });
             }
@@ -181,6 +234,8 @@ public class ConfigPrefsActivity extends PreferenceActivity {
                 profileLevels.setEntryValues(entryValues);
                 profileLevels.setValueIndex(prefIndex);
 
+                prefSetTitle(profileLevels, getResources().getString(profileTitleRes), (prefIndex != sProfileLevels.length ? profileLevel.toString() : null));
+
                 profileLevels.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object o) {
@@ -195,10 +250,13 @@ public class ConfigPrefsActivity extends PreferenceActivity {
                                     WZProfileLevel selectedProfileLevel = sProfileLevels[selectedIndex];
                                     prefsEditor.putInt("wz_video_profile_level_profile", selectedProfileLevel.getProfile());
                                     prefsEditor.putInt("wz_video_profile_level_level", selectedProfileLevel.getLevel());
+                                    prefSetTitle(preference, fragment.getResources().getString(profileTitleRes), selectedProfileLevel.toString());
                                 } else {
                                     prefsEditor.putInt("wz_video_profile_level_profile", -1);
                                     prefsEditor.putInt("wz_video_profile_level_level", -1);
+                                    prefSetTitle(preference, fragment.getResources().getString(profileTitleRes), null);
                                 }
+
 
                                 prefsEditor.apply();
                                 return true;
@@ -224,7 +282,87 @@ public class ConfigPrefsActivity extends PreferenceActivity {
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.audio_preferences);
+
+            String[] prefIds = {
+                    "wz_audio_samplerate",
+                    "wz_audio_bitrate"
+            };
+
+            configurePrefTitles(this, prefIds);
         }
+    }
+
+    private static void configurePrefTitles(final PreferenceFragment fragment, final String[] textPrefIds, final String[] passwordPrefIds) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(fragment.getActivity());
+
+        for(String prefId : textPrefIds) {
+            Preference pref = fragment.findPreference(prefId);
+            final int prefTitleRes = pref.getTitleRes();
+            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(fragment.getActivity());
+                    SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+                    prefsEditor.putString(preference.getKey(), (String)o);
+                    prefsEditor.apply();
+
+                    prefSetTitle(preference, fragment.getResources().getString(prefTitleRes), (String)o);
+                    return false;
+                }
+            });
+            prefSetTitle(sharedPreferences, pref, prefId, fragment.getResources().getString(pref.getTitleRes()));
+        }
+
+        for(String passwordPrefId : passwordPrefIds) {
+            Preference pref = fragment.findPreference(passwordPrefId);
+            final int prefTitleRes = pref.getTitleRes();
+            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(fragment.getActivity());
+                    SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+                    prefsEditor.putString(preference.getKey(), (String)o);
+                    prefsEditor.apply();
+
+                    prefSetTitle(preference, fragment.getResources().getString(prefTitleRes), (String)o, true);
+                    return false;
+                }
+            });
+            prefSetTitle(sharedPreferences, pref, passwordPrefId, fragment.getResources().getString(pref.getTitleRes()), true);
+        }
+    }
+
+    private static void configurePrefTitles(final PreferenceFragment fragment, final String[] textPrefIds) {
+        configurePrefTitles(fragment, textPrefIds, new String[0]);
+    }
+
+    private static void prefSetTitle(Preference pref, String baseTitle, String prefValue, boolean passwordField) {
+        String prefTitle;
+
+        if (prefValue == null || prefValue.trim().length() == 0)
+            prefTitle = baseTitle + " (not set)";
+        else if (passwordField) {
+            char[] masked = new char[prefValue.length()];
+            Arrays.fill(masked, '*');
+            prefTitle = baseTitle + " [" + String.valueOf(masked) + "]";
+        } else
+            prefTitle = baseTitle + " [" + prefValue + "]";
+
+        pref.setTitle(prefTitle);
+    }
+
+    private static void prefSetTitle(Preference pref, String baseTitle, String prefValue) {
+        prefSetTitle(pref, baseTitle, prefValue,false);
+    }
+
+    private static void prefSetTitle(SharedPreferences sharedPreferences, Preference pref, String prefName, String baseTitle, boolean passwordField) {
+        String prefValue = sharedPreferences.getString(prefName, null);
+
+        prefSetTitle(pref, baseTitle, prefValue, passwordField);
+    }
+
+    private static void prefSetTitle(SharedPreferences sharedPreferences, Preference pref, String prefName, String baseTitle) {
+        prefSetTitle(sharedPreferences, pref, prefName, baseTitle, false);
     }
 
 }

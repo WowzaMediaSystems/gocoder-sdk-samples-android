@@ -24,9 +24,9 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".MainActivity"
-            android:logo="@drawable/ic_wowza"
+            android:logo="@mipmap/ic_launcher"
             android:label="@string/app_name_short">
-            <intent-filter>
+           <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -48,10 +48,15 @@
             android:screenOrientation="fullSensor"
             android:label="@string/mp4_capture_title"/>
 
-        <activity android:name=".opengles.SurfaceTextureActivity"
+        <activity android:name=".audio.AudioMeterActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="landscape"
-            android:label="@string/surface_view_title"/>
+            android:screenOrientation="fullSensor"
+            android:label="@string/audio_meter_title"/>
+
+        <activity android:name=".graphics.BitmapOverlayActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor"
+            android:label="@string/overlay_title"/>
 
         <activity android:name=".config.ConfigPrefsActivity"
             android:icon="@drawable/ic_gear"

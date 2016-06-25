@@ -16,7 +16,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     productFlavors {
+    }
+
+    preBuild.doFirst {
+        if (!file("./libs/com.wowza.gocoder.sdk.aar").exists()) {
+            throw new BuildCancelledException("*** The GoCoder SDK library could not be found in the 'app/libs' folder.\n*** You may be attempting to build one of the SDK sample apps downloaded from GitHub which do not include the SDK library.\n*** Please visit https://www.wowza.com/products/gocoder/sdk to contact the SDK team for licensing and trial request information.")
+        }
     }
 }
 
