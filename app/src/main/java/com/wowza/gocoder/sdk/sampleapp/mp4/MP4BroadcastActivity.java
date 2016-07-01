@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.VideoView;
 
+import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
 import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
 import com.wowza.gocoder.sdk.api.mp4.WZMP4Broadcaster;
@@ -76,9 +77,9 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
                 Manifest.permission.READ_EXTERNAL_STORAGE
         };
 
-        mMediaPlayer    = null;
-        mLooping        = true;
-        mMP4FileUri     = null;
+        mMediaPlayer        = null;
+        mLooping            = true;
+        mMP4FileUri         = null;
 
         mBtnBroadcast       = (MultiStateButton) findViewById(R.id.ic_broadcast);
         mBtnSettings        = (MultiStateButton) findViewById(R.id.ic_settings);
@@ -93,25 +94,27 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
             mMP4Broadcaster = new WZMP4Broadcaster();
             mWZBroadcastConfig.setVideoBroadcaster(mMP4Broadcaster);
             mWZBroadcastConfig.setAudioEnabled(false); // audio not yet supported
+
+            mBtnLoop.setState(mLooping);
+
+            mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    mMediaPlayer = mediaPlayer;
+                    mediaPlayer.setLooping(mLooping);
+                    mediaPlayer.setVolume(0f, 0f);
+                    mediaPlayer.seekTo(0);
+                }
+            });
+
+            mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    mMediaPlayer = null;
+                }
+            });
+        } else if (mStatusView != null) {
+            mStatusView.setErrorMessage(WowzaGoCoder.getLastError().getErrorDescription());
         }
-
-        mBtnLoop.setState(mLooping);
-
-        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mMediaPlayer = mediaPlayer;
-                mediaPlayer.setLooping(mLooping);
-                mediaPlayer.setVolume(0f, 0f);
-                mediaPlayer.seekTo(0);
-            }
-        });
-
-        mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                mMediaPlayer = null;
-            }
-        });
     }
 
     /**

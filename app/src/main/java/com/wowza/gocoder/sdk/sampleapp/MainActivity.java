@@ -23,10 +23,6 @@ public class MainActivity extends ListActivity {
                 "Broadcast a live video and audio stream captured with the local camera and mic",
                 "CameraActivity"                        },
 
-            {   "Stream an MP4 file",
-                    "Broadcast video from an MP4 file stored on the local device",
-                    "mp4.MP4BroadcastActivity"          },
-
             {   "Capture an MP4 file",
                     "Broadcast a live video stream while saving it to an MP4 file",
                     "mp4.MP4CaptureActivity"            },
@@ -34,6 +30,10 @@ public class MainActivity extends ListActivity {
             {   "Display a bitmap overlay",
                     "Display a bitmap as an overlay on the camera preview",
                     "graphics.BitmapOverlayActivity"    },
+
+            {   "Stream an MP4 file",
+                    "Broadcast video from an MP4 file stored on the local device",
+                    "mp4.MP4BroadcastActivity"          },
 
             {   "Display an audio level meter",
                     "Register an audio sample listener and display an audio level meter",

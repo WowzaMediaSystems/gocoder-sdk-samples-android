@@ -110,8 +110,10 @@ public class MP4CaptureActivity extends CameraActivity {
     protected boolean syncUIControlState() {
         boolean disableControls = super.syncUIControlState();
 
-        mMP4Controls.setVisibility(getBroadcast().getStatus().isRunning() ? View.INVISIBLE : View.VISIBLE);
-        mSwitchMP4.setEnabled(!disableControls);
+        if (getBroadcast() != null) {
+            mMP4Controls.setVisibility(getBroadcast().getStatus().isRunning() ? View.INVISIBLE : View.VISIBLE);
+            mSwitchMP4.setEnabled(!disableControls);
+        }
 
         return disableControls;
     }

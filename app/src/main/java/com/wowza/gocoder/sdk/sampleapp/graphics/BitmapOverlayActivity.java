@@ -57,7 +57,7 @@ public class BitmapOverlayActivity extends CameraActivityBase {
     protected void onResume() {
         super.onResume();
 
-        if (sGoCoderSDK != null && mWZCameraView != null) {
+        if (sGoCoderSDK != null && mWZCameraView != null && mWZBitmap == null) {
             // Read in a PNG file from the app resources as a bitmap
             Bitmap overlayBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.overlay_logo);
 

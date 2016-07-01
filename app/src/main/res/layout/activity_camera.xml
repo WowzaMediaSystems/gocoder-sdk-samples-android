@@ -113,7 +113,8 @@
             android:textColor="#ffffff"
             android:textStyle="bold"
             android:typeface="monospace"
-            android:textAppearance="@android:style/TextAppearance.Medium" />
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:orientation="vertical"

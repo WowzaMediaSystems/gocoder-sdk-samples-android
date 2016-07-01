@@ -281,7 +281,7 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
         boolean disableControls = (getBroadcast() == null ||
                 !(getBroadcast().getStatus().isIdle() ||
                         getBroadcast().getStatus().isRunning()));
-        boolean isStreaming = getBroadcast().getStatus().isRunning();
+        boolean isStreaming = (getBroadcast() != null && getBroadcast().getStatus().isRunning());
 
         if (disableControls) {
             if (mBtnBroadcast != null) mBtnBroadcast.setEnabled(false);
