@@ -4,7 +4,7 @@ This repository contains a sample application that demonstrates the capabilities
 ## Development Requirements
 1. **GoCoder SDK for Android v1.0.0.163**  
 
-     _:warning: **PLEASE NOTE:** The GoCoder SDK binaries necessary to build the sample apps are not provided here. To request a free trial of the SDK, send a message to [sdkteam@wowza.com](mailto:sdkteam@wowza.com) and you will receive a trial license key along with a link to download the SDK binaries._
+     _:warning: **PLEASE NOTE:** The GoCoder SDK binaries necessary to build the sample apps are not provided here. To receive a free trial copy of the SDK, please fill out the [GoCoder SDK trial signup form](https://www.wowza.com/products/gocoder/sdk/trial) to be sent a link where you can download the SDK along with a free trial license key._
 
 2. Android SDK 4.4.2 or later.
 3. Android Studio 1.2.0 or later.
