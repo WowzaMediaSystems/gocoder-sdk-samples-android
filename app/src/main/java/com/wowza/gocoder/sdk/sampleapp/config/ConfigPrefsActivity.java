@@ -29,6 +29,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
+import com.wowza.gocoder.sdk.api.configuration.WZStreamConfig;
 import com.wowza.gocoder.sdk.api.geometry.WZSize;
 import com.wowza.gocoder.sdk.api.h264.WZProfileLevel;
 import com.wowza.gocoder.sdk.sampleapp.R;
@@ -101,7 +102,7 @@ public class ConfigPrefsActivity extends PreferenceActivity {
             addPreferencesFromResource(R.xml.connection_preferences);
 
             String[] prefIds = {
-                    "wz_live_host_address",
+                    //"wz_live_host_address",
                     "wz_live_port_number",
                     "wz_live_app_name",
                     "wz_live_stream_name",
@@ -113,6 +114,62 @@ public class ConfigPrefsActivity extends PreferenceActivity {
             };
 
             configurePrefTitles(this, prefIds, passwordPrefIds);
+
+            final PreferenceFragment fragment = this;
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            Preference hostAddress = findPreference("wz_live_host_address");
+
+            final int prefTitleRes = hostAddress.getTitleRes();
+            prefSetTitle(sharedPreferences, hostAddress, "wz_live_host_address", getResources().getString(hostAddress.getTitleRes()));
+
+            hostAddress.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    if (o instanceof String) {
+
+                        // Update host address title
+                        prefSetTitle(preference, fragment.getResources().getString(prefTitleRes), (String)o);
+
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        WZStreamConfig hostConfig = ConfigPrefs.loadAutoCompleteHostConfig(sharedPreferences, (String)o);
+
+                        if (hostConfig != null) {
+
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("wz_live_port_number", String.valueOf(hostConfig.getPortNumber()));
+                            editor.putString("wz_live_app_name", hostConfig.getApplicationName());
+                            editor.putString("wz_live_stream_name", hostConfig.getStreamName());
+                            editor.putString("wz_live_username", hostConfig.getUsername());
+                            editor.apply();
+
+                            AutoCompletePreference pref = (AutoCompletePreference)findPreference("wz_live_port_number");
+                            prefSetTextAndTitle(pref,
+                                    getResources().getString(R.string.wz_live_port_number_title),
+                                    String.valueOf(hostConfig.getPortNumber()));
+
+                            pref = (AutoCompletePreference)findPreference("wz_live_app_name");
+                            prefSetTextAndTitle(pref,
+                                    getResources().getString(R.string.wz_live_app_name_title),
+                                    hostConfig.getApplicationName());
+
+                            pref = (AutoCompletePreference)findPreference("wz_live_stream_name");
+                            prefSetTextAndTitle(pref,
+                                    getResources().getString(R.string.wz_live_stream_name_title),
+                                    hostConfig.getStreamName());
+
+                            pref = (AutoCompletePreference)findPreference("wz_live_username");
+                            prefSetTextAndTitle(pref,
+                                    getResources().getString(R.string.wz_live_username_title),
+                                    hostConfig.getUsername());
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+
         }
     }
 
@@ -257,7 +314,6 @@ public class ConfigPrefsActivity extends PreferenceActivity {
                                     prefSetTitle(preference, fragment.getResources().getString(profileTitleRes), null);
                                 }
 
-
                                 prefsEditor.apply();
                                 return true;
 
@@ -274,6 +330,7 @@ public class ConfigPrefsActivity extends PreferenceActivity {
                 EditTextPreference frameRate = (EditTextPreference)findPreference("wz_video_framerate");
                 getPreferenceScreen().removePreference(frameRate);
             }
+
         }
     }
 
@@ -352,6 +409,11 @@ public class ConfigPrefsActivity extends PreferenceActivity {
     }
 
     private static void prefSetTitle(Preference pref, String baseTitle, String prefValue) {
+        prefSetTitle(pref, baseTitle, prefValue,false);
+    }
+
+    private static void prefSetTextAndTitle(EditTextPreference pref, String baseTitle, String prefValue) {
+        pref.setText(prefValue);
         prefSetTitle(pref, baseTitle, prefValue,false);
     }
 

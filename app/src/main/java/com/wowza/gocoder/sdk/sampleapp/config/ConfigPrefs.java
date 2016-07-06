@@ -18,14 +18,27 @@ package com.wowza.gocoder.sdk.sampleapp.config;
  */
 
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
+import com.wowza.gocoder.sdk.api.broadcast.WZBroadcastConfig;
 import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
 import com.wowza.gocoder.sdk.api.configuration.WZStreamConfig;
 import com.wowza.gocoder.sdk.api.configuration.WowzaConfig;
 import com.wowza.gocoder.sdk.api.devices.WZCamera;
 import com.wowza.gocoder.sdk.api.h264.WZProfileLevel;
+import com.wowza.gocoder.sdk.api.logging.WZLog;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class ConfigPrefs {
+    private final static String TAG = ConfigPrefs.class.getSimpleName();
+
+    private final static String AUTO_COMPLETE_SUFFIX = "_auto_complete";
+    private final static String AUTO_COMPLETE_HOST_CONFIG_PREFIX = "wz_live_host_config_";
 
     public final static int ALL_PREFS               = 0x1;
     public final static int CONNECTION_ONLY_PREFS   = 0x2;
@@ -97,5 +110,184 @@ public class ConfigPrefs {
 
     public static int getScaleMode(SharedPreferences sharedPrefs) {
         return sharedPrefs.getBoolean("wz_video_resize_to_aspect", false) ? WZMediaConfig.RESIZE_TO_ASPECT : WZMediaConfig.FILL_VIEW;
+    }
+
+    public static void storeAutoCompleteHostConfig(SharedPreferences sharedPrefs, WZBroadcastConfig broadcastConfig) {
+        String hostAddress = broadcastConfig.getHostAddress();
+        if (hostAddress == null || hostAddress.trim().length() == 0) return;
+
+        updateAutoCompleteHostsList(sharedPrefs, hostAddress);
+
+        updateAutoCompleteList(sharedPrefs, "wz_live_port_number", Integer.toString(broadcastConfig.getPortNumber()));
+        updateAutoCompleteList(sharedPrefs, "wz_live_app_name", broadcastConfig.getApplicationName());
+        updateAutoCompleteList(sharedPrefs, "wz_live_stream_name", broadcastConfig.getStreamName());
+        updateAutoCompleteList(sharedPrefs, "wz_live_username", broadcastConfig.getUsername());
+
+        String hostConfigKey = hostConfigKey(hostAddress);
+        String storedConfig = (
+                    broadcastConfig.getPortNumber())
+                    + ";" +
+                    (broadcastConfig.getApplicationName() != null ? broadcastConfig.getApplicationName().trim() : "")
+                    + ";" +
+                    (broadcastConfig.getStreamName() != null ? broadcastConfig.getStreamName().trim() : "")
+                    + ";" +
+                    (broadcastConfig.getUsername() != null ? broadcastConfig.getUsername().trim() : ""
+                );
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(hostConfigKey, storedConfig);
+        editor.apply();
+
+        logAutoCompleteLists(sharedPrefs);
+    }
+
+    public static WZStreamConfig loadAutoCompleteHostConfig(SharedPreferences sharedPrefs, String hostAddress) {
+        if (hostAddress == null || hostAddress.trim().length() == 0) return null;
+
+        String hostConfigKey = hostConfigKey(hostAddress);
+        if (!sharedPrefs.contains(hostConfigKey)) return null;
+
+        String storedConfig = sharedPrefs.getString(hostConfigKey, null);
+        if (storedConfig == null) return null;
+
+        String storedValues[] = TextUtils.split(storedConfig, ";");
+        if (storedValues.length != 4) {
+            removeAutoCompleteHostConfig(sharedPrefs, hostAddress);
+            return null;
+        }
+
+        try {
+            int port_number = Integer.parseInt(storedValues[0]);
+
+            WZStreamConfig hostConfig = new WZStreamConfig();
+            hostConfig.setHostAddress(hostAddress);
+            hostConfig.setPortNumber(port_number);
+            if (storedValues[1].trim().length()>0) hostConfig.setApplicationName(storedValues[1]);
+            if (storedValues[2].trim().length()>0) hostConfig.setStreamName(storedValues[2]);
+            if (storedValues[3].trim().length()>0) hostConfig.setUsername(storedValues[3]);
+
+            return hostConfig;
+        } catch (NumberFormatException e) {
+            removeAutoCompleteHostConfig(sharedPrefs, hostAddress);
+            return null;
+        }
+    }
+
+    private static void removeAutoCompleteHostConfig(SharedPreferences sharedPrefs, String hostAddress) {
+        if (hostAddress == null || hostAddress.trim().length() == 0) return;
+
+        String hostConfigKey = hostConfigKey(hostAddress);
+        if (!sharedPrefs.contains(hostConfigKey)) return;
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.remove(hostConfigKey);
+        editor.apply();
+    }
+
+    private static void updateAutoCompleteList(SharedPreferences sharedPrefs, String prefKey, String newValue) {
+        if (prefKey == null || prefKey.trim().length() == 0) return;
+        if (newValue == null || newValue.trim().length() == 0) return;
+
+        Set<String> currentSet = sharedPrefs.getStringSet(autoCompleteKey(prefKey), null);
+        TreeSet<String> curValues = currentSet != null ? new TreeSet<String>(currentSet) : new TreeSet<String>();
+
+        for(String str: curValues) {
+            if(str.equalsIgnoreCase(newValue.trim()))
+                return;
+        }
+        curValues.add(newValue.trim());
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putStringSet(autoCompleteKey(prefKey), curValues);
+        editor.apply();
+    }
+
+    private static boolean updateAutoCompleteHostsList(SharedPreferences sharedPrefs, String hostAddress) {
+        if (hostAddress == null || hostAddress.trim().length() == 0) return false;
+
+        Set<String> currentSet = sharedPrefs.getStringSet(autoCompleteKey("wz_live_host_address"), null);
+        ArrayList<String> currentList = (currentSet != null ?  new ArrayList<String>(currentSet) : new ArrayList<String>());
+
+        String currentEntry = null;
+        for(String storedHost: currentList) {
+            if(storedHost.equalsIgnoreCase(hostAddress.trim()))
+                currentEntry = storedHost;
+        }
+        if (currentEntry != null) currentSet.remove(currentEntry);
+
+        currentList.add(0, hostAddress);
+        currentSet = new HashSet<String>(currentList);
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putStringSet(autoCompleteKey("wz_live_host_address"), currentSet);
+        editor.apply();
+
+        return true;
+    }
+
+    public static String[] getAutoCompleteList(SharedPreferences sharedPrefs, String prefKey) {
+        if (!sharedPrefs.contains(autoCompleteKey(prefKey))) return new String[0];
+
+        Set<String> currentSet = sharedPrefs.getStringSet(autoCompleteKey(prefKey), null);
+        if (currentSet == null) return new String[0];
+
+        return currentSet.toArray(new String[currentSet.size()]);
+    }
+
+    public static void clearAutoCompleteList(SharedPreferences sharedPrefs, String prefKey) {
+        if (prefKey == null || prefKey.trim().length() == 0) return;
+        if (!sharedPrefs.contains(autoCompleteKey(prefKey))) return;
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.remove(autoCompleteKey(prefKey));
+        editor.apply();
+    }
+
+    public static void clearAllAutoCompleteLists(SharedPreferences sharedPrefs) {
+
+        clearAutoCompleteList(sharedPrefs, "wz_live_port_number");
+        clearAutoCompleteList(sharedPrefs, "wz_live_app_name");
+        clearAutoCompleteList(sharedPrefs, "wz_live_stream_name");
+        clearAutoCompleteList(sharedPrefs, "wz_live_username");
+
+        String[] hosts = getAutoCompleteList(sharedPrefs, "wz_live_host_address");
+        clearAutoCompleteList(sharedPrefs, "wz_live_host_address");
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        for(String hostAddress: hosts) {
+            String hostConfigKey = hostConfigKey(hostAddress);
+            if (sharedPrefs.contains(hostConfigKey))
+                editor.remove(hostConfigKey);
+        }
+        editor.apply();
+    }
+
+    private static String autoCompleteKey(String prefKey) {
+        if (prefKey == null || prefKey.trim().length() == 0) return null;
+        return prefKey + AUTO_COMPLETE_SUFFIX;
+    }
+
+    private static String hostConfigKey(String hostAddress) {
+        if (hostAddress == null || hostAddress.trim().length() == 0) return null;
+        return AUTO_COMPLETE_HOST_CONFIG_PREFIX + hostAddress.trim().toLowerCase();
+    }
+
+    public static void logAutoCompleteLists(SharedPreferences sharedPrefs) {
+        String[] hosts = getAutoCompleteList(sharedPrefs, "wz_live_host_address");
+
+        StringBuilder logData = new StringBuilder(
+                            "wz_live_host_address = " + Arrays.toString(hosts) + "\n" +
+                            "wz_live_port_number  = " + Arrays.toString(getAutoCompleteList(sharedPrefs, "wz_live_port_number")) + "\n" +
+                            "wz_live_app_name     = " + Arrays.toString(getAutoCompleteList(sharedPrefs, "wz_live_app_name")) + "\n" +
+                            "wz_live_stream_name  = " + Arrays.toString(getAutoCompleteList(sharedPrefs, "wz_live_stream_name")) + "\n" +
+                            "wz_live_username     = " + Arrays.toString(getAutoCompleteList(sharedPrefs, "wz_live_username")) + "\n");
+
+        for(String hostAddress: hosts) {
+            logData.append("\nhostConfig for " + hostAddress + ":\n\n");
+            WZStreamConfig hostConfig = loadAutoCompleteHostConfig(sharedPrefs, hostAddress);
+            logData.append(hostConfig.toString() + "\n");
+        }
+
+        WZLog.debug(TAG, logData.toString());
     }
 }

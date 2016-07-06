@@ -24,7 +24,6 @@
             android:text="@string/button_dismiss"
             android:id="@+id/btnDismiss"
             android:visibility="visible"
-            android:allowUndo="false"
             android:layout_below="@+id/txtStatus"
             android:layout_centerHorizontal="true" />
 

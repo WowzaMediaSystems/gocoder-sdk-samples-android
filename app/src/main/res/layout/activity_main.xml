@@ -1,18 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.wowza.gocoder.sdk.sampleapp.MainActivity">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:scaleType="fitCenter"
+        android:src="@drawable/overlay_logo"
+        android:alpha="0.1"
+        android:layout_gravity="center"
+        android:adjustViewBounds="false"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+    </ImageView>
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentStart="false"
         android:choiceMode="singleChoice"
-        android:smoothScrollbar="false"
-        android:drawSelectorOnTop="false"
-        android:headerDividersEnabled="false"
-        android:layout_alignParentEnd="false" />
-</RelativeLayout>
+        android:dividerHeight="0dp"
+        android:divider="@null"
+        android:drawSelectorOnTop="false">
+    </ListView>
+
+    <!--
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageView2"
+                    android:src="@drawable/gocoder_logo"
+                    android:paddingRight="15dp"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:text="Wowza GoCoder SDK Examples"
+                    android:id="@+id/textView2"
+                    android:gravity="center_vertical"
+                    android:textStyle="bold" />
+            </LinearLayout>
+    </LinearLayout>
+-->
+
+</FrameLayout>

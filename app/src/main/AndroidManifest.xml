@@ -24,7 +24,7 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".MainActivity"
-            android:logo="@drawable/ic_wowza"
+            android:logo="@drawable/gocoder_logo"
             android:label="@string/app_name_short">
            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,7 +60,8 @@
 
         <activity android:name=".config.ConfigPrefsActivity"
             android:icon="@drawable/ic_gear"
-            android:label="@string/configuration_settings_title" />
+            android:label="@string/configuration_settings_title"
+            android:theme="@style/ConfigTheme"/>
 
     </application>
 

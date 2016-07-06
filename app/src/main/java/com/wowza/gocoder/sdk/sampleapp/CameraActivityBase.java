@@ -100,6 +100,9 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
                 if (goCoderStatus.isRunning()) {
                     // Keep the screen on while we are broadcasting
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                    // Since we have successfully opened up the server connection, store the connection info for auto complete
+                    ConfigPrefs.storeAutoCompleteHostConfig(PreferenceManager.getDefaultSharedPreferences(CameraActivityBase.this), mWZBroadcastConfig);
                 } else if (goCoderStatus.isIdle()) {
                     // Clear the "keep screen on" flag
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -155,7 +158,7 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
         WZProfileLevel avcProfileLevels[] = WZEncoderAPI.getProfileLevels();
         if (avcProfileLevels.length > 1) Arrays.sort(avcProfileLevels);
 
-        ArrayList<WZProfileLevel> allProfileLevels = new ArrayList<>();
+        ArrayList<WZProfileLevel> allProfileLevels = new ArrayList<WZProfileLevel>();
 
         if (avcProfiles.length > 0) {
             for (int avcProfile : avcProfiles) {
@@ -193,7 +196,7 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
                     + "\n==========================================================");
 
             // Let's check if we were able to access all of the cameras on this device
-            ArrayList<String> badCameras = new ArrayList<>();
+            ArrayList<String> badCameras = new ArrayList<String>();
             WZCamera[] allCameras = WZCamera.getDeviceCameras();
             for (int c = 0; c < allCameras.length; c++) {
                 if (!allCameras[c].isAvailable()) {

@@ -16,9 +16,10 @@ public class MainActivity extends ListActivity {
 
     private static final String TITLE = "example_title";
     private static final String DESCRIPTION = "example_description";
+    private static final String ICON = "example_icon";
     private static final String CLASS_NAME = "class_name";
 
-    private static final String[][] ACTIVITIES = {
+    private static final String[][] ACTIVITY_TEXT = {
             {   "Stream live video and audio",
                 "Broadcast a live video and audio stream captured with the local camera and mic",
                 "CameraActivity"                        },
@@ -40,15 +41,27 @@ public class MainActivity extends ListActivity {
                     "audio.AudioMeterActivity"          }
     };
 
+    private static final int[] ACTIVITY_ICONS = {
+            R.drawable.ic_streaming,
+            R.drawable.ic_mp4_capture,
+            R.drawable.ic_bitmap,
+            R.drawable.ic_mp4_streaming,
+            R.drawable.ic_audio_meter
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getActionBar().setTitle(getResources().getString(R.string.app_name_long));
+
+        if (getActionBar() != null) {
+            getActionBar().setTitle(getResources().getString(R.string.app_name_long));
+        }
 
         setListAdapter(new SimpleAdapter(this, createActivityList(),
-                R.layout.example_row, new String[] { TITLE, DESCRIPTION },
-                new int[] { R.id.example_title, R.id.example_description } ));
+                R.layout.example_row,
+                new String[] { TITLE, DESCRIPTION, ICON },
+                new int[] { R.id.example_title, R.id.example_description, R.id.example_icon } ));
     }
 
     @Override
@@ -61,18 +74,22 @@ public class MainActivity extends ListActivity {
     private List<Map<String, Object>> createActivityList() {
         List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
 
-        for (String[] activity : ACTIVITIES) {
+        for (int i=0;i<ACTIVITY_TEXT.length; i++) {
+            String activity_text[] = ACTIVITY_TEXT[i];
+            int activity_icon = ACTIVITY_ICONS[i];
+
             Map<String, Object> tmp = new HashMap<String, Object>();
-            tmp.put(TITLE, activity[0]);
-            tmp.put(DESCRIPTION, activity[1]);
+            tmp.put(TITLE, activity_text[0]);
+            tmp.put(DESCRIPTION, activity_text[1]);
+            tmp.put(ICON, activity_icon);
 
             Intent intent = new Intent();
             try {
-                Class cls = Class.forName("com.wowza.gocoder.sdk.sampleapp." + activity[2]);
+                Class cls = Class.forName("com.wowza.gocoder.sdk.sampleapp." + activity_text[2]);
                 intent.setClass(this, cls);
                 tmp.put(CLASS_NAME, intent);
             } catch (ClassNotFoundException cnfe) {
-                throw new RuntimeException("Unable to find " + activity[2], cnfe);
+                throw new RuntimeException("Unable to find " + activity_text[2], cnfe);
             }
 
             activityList.add(tmp);

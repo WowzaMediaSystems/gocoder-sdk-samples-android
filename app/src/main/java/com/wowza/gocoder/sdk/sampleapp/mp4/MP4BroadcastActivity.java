@@ -1,6 +1,4 @@
 /**
- *  CameraActivity.java
- *  gocoder-sdk-sampleapp
  *
  *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
  *  purpose of educating developers, and is not intended to be used in any production environment.

@@ -30,7 +30,7 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="right|center_vertical"
+        android:layout_gravity="end|center_vertical"
         android:layout_alignParentEnd="false"
         android:background="#32000000"
         android:layout_alignParentStart="true"
@@ -54,14 +54,10 @@
                 android:id="@+id/ic_switch_camera"
                 android:src="@drawable/ic_switch_camera"
                 android:cropToPadding="false"
-                android:layout_alignParentStart="false"
                 android:onClick="onSwitchCamera"
                 android:background="#000000ff"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="false"
                 android:padding="10dp"
-                android:contentDescription="Switch Camera"
-                android:layout_toLeftOf="@+id/ic_settings" />
+                android:contentDescription="Switch Camera" />
 
             <com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton
                 android:layout_width="wrap_content"
@@ -71,8 +67,6 @@
                 sampleui:offSrc="@drawable/ic_torch_on"
                 android:onClick="onToggleTorch"
                 android:background="#000000ff"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
                 android:padding="10dp"
                 android:contentDescription="Torch" />
 
@@ -99,9 +93,8 @@
             android:onClick="onSettings"
             android:background="#000000ff"
             android:padding="10dp"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true" />
 
         <com.wowza.gocoder.sdk.sampleapp.ui.TimerView
             android:layout_width="wrap_content"
@@ -120,10 +113,8 @@
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:id="@+id/mp4Controls"
-            android:layout_marginLeft="10dp"
             android:layout_marginBottom="10dp"
             android:visibility="gone">
 

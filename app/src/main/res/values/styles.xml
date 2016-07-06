@@ -2,9 +2,15 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo">
+
+    </style>
+
+    <style name="ConfigTheme" parent="android:Theme.Holo.Light">
+
     </style>
 
     <style name="FullscreenTheme" parent="AppTheme">
+
     </style>
 
 </resources>

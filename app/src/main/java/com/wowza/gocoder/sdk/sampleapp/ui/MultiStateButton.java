@@ -1,6 +1,4 @@
 /**
- *  ControlButton.java
- *  gocoder-sdk-sampleapp
  *
  *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
  *  purpose of educating developers, and is not intended to be used in any production environment.
@@ -49,7 +47,6 @@ public class MultiStateButton extends ImageView {
                 attrs,
                 com.wowza.gocoder.sdk.sampleapp.R.styleable.MultiStateButton,
                 0, 0);
-
 
         try {
             boolean isOn = a.getBoolean(R.styleable.MultiStateButton_isOn, true);

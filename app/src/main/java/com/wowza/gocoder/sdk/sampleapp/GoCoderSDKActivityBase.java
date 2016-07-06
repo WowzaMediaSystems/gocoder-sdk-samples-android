@@ -17,6 +17,7 @@ package com.wowza.gocoder.sdk.sampleapp;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -137,12 +138,16 @@ public abstract class GoCoderSDKActivityBase extends Activity
         super.onResume();
 
         if (mWZBroadcast != null) {
-            mPermissionsGranted = (mRequiredPermissions.length > 0 ? WowzaGoCoder.hasPermissions(this, mRequiredPermissions) : true);
+            mPermissionsGranted = true;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mPermissionsGranted = (mRequiredPermissions.length > 0 ? WowzaGoCoder.hasPermissions(this, mRequiredPermissions) : true);
+                if (!mPermissionsGranted)
+                    ActivityCompat.requestPermissions(this, mRequiredPermissions, PERMISSIONS_REQUEST_CODE);
+            }
+
             if (mPermissionsGranted) {
                 ConfigPrefs.updateConfigFromPrefs(PreferenceManager.getDefaultSharedPreferences(this), mWZBroadcastConfig);
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        mRequiredPermissions, PERMISSIONS_REQUEST_CODE);
             }
         }
     }
@@ -201,10 +206,13 @@ public abstract class GoCoderSDKActivityBase extends Activity
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                if (goCoderStatus.isReady())
+                if (goCoderStatus.isReady()) {
                     // Keep the screen on while the broadcast is active
-                   getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                else if (goCoderStatus.isIdle())
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                    // Since we have successfully opened up the server connection, store the connection info for auto complete
+                    ConfigPrefs.storeAutoCompleteHostConfig(PreferenceManager.getDefaultSharedPreferences(GoCoderSDKActivityBase.this), mWZBroadcastConfig);
+                } else if (goCoderStatus.isIdle())
                     // Clear the "keep screen on" flag
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
