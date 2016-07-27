@@ -33,9 +33,10 @@ import com.wowza.gocoder.sdk.api.devices.WZCamera;
 import com.wowza.gocoder.sdk.api.devices.WZCameraView;
 import com.wowza.gocoder.sdk.api.devices.WZDeviceUtils;
 import com.wowza.gocoder.sdk.api.encoder.WZEncoderAPI;
+import com.wowza.gocoder.sdk.api.errors.WZError;
 import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
+import com.wowza.gocoder.sdk.api.geometry.WZSize;
 import com.wowza.gocoder.sdk.api.h264.WZProfileLevel;
-import com.wowza.gocoder.sdk.api.logging.WZLog;
 import com.wowza.gocoder.sdk.api.status.WZStatus;
 import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
 import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefsActivity;
@@ -45,7 +46,9 @@ import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
+abstract public class CameraActivityBase extends GoCoderSDKActivityBase
+    implements WZCameraView.PreviewStatusListener{
+
     private final static String TAG = CameraActivityBase.class.getSimpleName();
 
     // UI controls
@@ -73,8 +76,8 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
         super.onResume();
 
         initUIControls();
-        initGoCoderDevices();
 
+        initGoCoderDevices();
         initGoCoderCameraPreview();
 
         syncUIControlState();
@@ -190,11 +193,6 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
             // Init the broadcast config audio broadcaster
             mWZBroadcastConfig.setAudioBroadcaster(mWZAudioDevice);
 
-            // Log information about the cameras discovered on the local device
-            WZLog.info(TAG, "=================== Camera Information ===================\n"
-                    + WZCamera.getCameraInfo()
-                    + "\n==========================================================");
-
             // Let's check if we were able to access all of the cameras on this device
             ArrayList<String> badCameras = new ArrayList<String>();
             WZCamera[] allCameras = WZCamera.getDeviceCameras();
@@ -249,12 +247,6 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
 
                 // Briefly display the video frame size from config
                 Toast.makeText(this, mWZBroadcastConfig.getLabel(true, true, false, true), Toast.LENGTH_LONG).show();
-
-                // Turn on continuous auto focus if the camera supports it
-                WZCamera activeCamera = mWZCameraView.getCamera();
-                if (activeCamera != null && activeCamera.hasCapability(WZCamera.FOCUS_MODE_CONTINUOUS)) {
-                    activeCamera.setFocusMode(WZCamera.FOCUS_MODE_CONTINUOUS);
-                }
             }
 
             // Init the broadcast config video broadcaster
@@ -262,6 +254,18 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
                 mWZBroadcastConfig.setVideoBroadcaster(mWZCameraView.getBroadcaster());
             }
         }
+    }
+
+    @Override
+    public void onWZCameraPreviewStarted(WZCamera wzCamera, WZSize wzSize, int i) {
+    }
+
+    @Override
+    public void onWZCameraPreviewStopped(int cameraId) {
+    }
+
+    @Override
+    public void onWZCameraPreviewError(WZCamera wzCamera, WZError wzError) {
     }
 
     protected void initUIControls() {
@@ -272,7 +276,9 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase {
         mBtnSettings        = (MultiStateButton) findViewById(R.id.ic_settings);
         mStatusView         = (StatusView) findViewById(R.id.statusView);
 
-        mWZCameraView       = (WZCameraView) findViewById(R.id.cameraPreview);
+        // The GoCoder SDK camera view
+        mWZCameraView = (WZCameraView) findViewById(R.id.cameraPreview);
+        mWZCameraView.setPreviewReadyListener(this);
 
         mUIInitialized      = true;
 

@@ -62,9 +62,15 @@ public class CameraActivity extends CameraActivityBase {
     protected void onResume() {
         super.onResume();
 
-        if (sGoCoderSDK != null && mAutoFocusDetector == null) {
-            mAutoFocusDetector = new GestureDetectorCompat(this, new AutoFocusListener(this, mWZCameraView));
+        if (sGoCoderSDK != null && mWZCameraView != null) {
+            if (mAutoFocusDetector == null)
+                mAutoFocusDetector = new GestureDetectorCompat(this, new AutoFocusListener(this, mWZCameraView));
+
+            WZCamera activeCamera = mWZCameraView.getCamera();
+            if (activeCamera != null && activeCamera.hasCapability(WZCamera.FOCUS_MODE_CONTINUOUS))
+                activeCamera.setFocusMode(WZCamera.FOCUS_MODE_CONTINUOUS);
         }
+
     }
 
     @Override
@@ -78,16 +84,22 @@ public class CameraActivity extends CameraActivityBase {
     public void onSwitchCamera(View v) {
         if (mWZCameraView == null) return;
 
+        mBtnTorch.setState(false);
+        mBtnTorch.setEnabled(false);
+
         WZCamera newCamera = mWZCameraView.switchCamera();
-        if (newCamera != null)
+        if (newCamera != null) {
             ConfigPrefs.setActiveCamera(PreferenceManager.getDefaultSharedPreferences(this), newCamera.getCameraId());
 
-        boolean hasTorch = (newCamera != null && newCamera.hasCapability(WZCamera.TORCH));
-        if (hasTorch)
-            mBtnTorch.setState(newCamera.isTorchOn());
-        else
-            mBtnTorch.setState(false);
-        mBtnTorch.setEnabled(hasTorch);
+            if (newCamera.hasCapability(WZCamera.FOCUS_MODE_CONTINUOUS))
+                newCamera.setFocusMode(WZCamera.FOCUS_MODE_CONTINUOUS);
+
+            boolean hasTorch = newCamera.hasCapability(WZCamera.TORCH);
+            if (hasTorch) {
+                mBtnTorch.setState(newCamera.isTorchOn());
+                mBtnTorch.setEnabled(true);
+            }
+        }
     }
 
     /**

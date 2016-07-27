@@ -73,7 +73,7 @@ public class BitmapOverlayActivity extends CameraActivityBase {
             // Register the bitmap renderer with the GoCoder camera preview view as a frame listener
             mWZCameraView.registerFrameListener(mWZBitmap);
 
-            Toast.makeText(this, getString(R.string.overlay_help), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.bitmap_overlay_help), Toast.LENGTH_LONG).show();
         }
     }
 

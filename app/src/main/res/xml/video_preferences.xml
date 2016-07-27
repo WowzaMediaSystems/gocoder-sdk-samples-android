@@ -64,6 +64,14 @@
         android:dependency="wz_video_enabled"
         />
 
+    <CheckBoxPreference
+        android:key="wz_video_use_abr"
+        android:title="@string/wz_video_use_abr_title"
+        android:summary="@string/wz_video_use_abr_summary"
+        android:defaultValue="@string/wz_video_use_abr_default_value"
+        android:dependency="wz_video_enabled"
+        />
+
     <!--
             <CheckBoxPreference
                 android:key="wz_video_letterbox_portrait"

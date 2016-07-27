@@ -32,21 +32,36 @@ public class MainActivity extends ListActivity {
                     "Display a bitmap as an overlay on the camera preview",
                     "graphics.BitmapOverlayActivity"    },
 
+            {   "Display a text overlay",
+                    "Display text as an overlay on the camera preview",
+                    "graphics.TextOverlayActivity"      },
+
             {   "Stream an MP4 file",
                     "Broadcast video from an MP4 file stored on the local device",
                     "mp4.MP4BroadcastActivity"          },
 
+            {   "Facial recognition demo",
+                    "Use facial recognition features to become a Wowza Ninja",
+                    "FaceActivity"                      },
+
             {   "Display an audio level meter",
                     "Register an audio sample listener and display an audio level meter",
-                    "audio.AudioMeterActivity"          }
+                    "audio.AudioMeterActivity"          },
+
+            {   "Display detailed device information",
+                    "Demonstrates the informational APIs available in the SDK",
+                    "InfoActivity"                      }
     };
 
     private static final int[] ACTIVITY_ICONS = {
             R.drawable.ic_streaming,
             R.drawable.ic_mp4_capture,
             R.drawable.ic_bitmap,
+            R.drawable.ic_text_overlay,
             R.drawable.ic_mp4_streaming,
-            R.drawable.ic_audio_meter
+            R.drawable.ic_face,
+            R.drawable.ic_audio_meter,
+            R.drawable.ic_info
     };
 
     @Override

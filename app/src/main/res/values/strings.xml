@@ -7,11 +7,18 @@
     <string name="mp4_capture_title">GoCoder SDK MP4 Capture Example</string>
     <string name="audio_meter_title">GoCoder SDK Audio Meter Example</string>
     <string name="audio_meter_help">Press the mic icon to toggle the audio level meter</string>
+    <string name="info_title">Device Information APIs</string>
+    <string name="face_title">Face Detection Example</string>
 
-    <string name="overlay_title">GoCoder SDK Bitmap Overlay Example</string>
-    <string name="overlay_help">Use a pinch gesture to scale the overlay logo</string>
+    <string name="text_overlay_title">GoCoder SDK Text Overlay Example</string>
+
+    <string name="bitmap_overlay_title">GoCoder SDK Bitmap Overlay Example</string>
+    <string name="bitmap_overlay_help">Use a pinch gesture to scale the overlay logo</string>
 
     <string name="surface_view_title">GoCoder SDK OpenGL ES Capture Example</string>
+
+    <string name="action_send">Send to Wowza Support</string>
+    <string name="action_copy">Copy to clipboard</string>
 
     <string name="resize_aspect_mode">Aspect</string>
     <string name="resize_aspect_fill_mode">Fill</string>
@@ -93,6 +100,10 @@
     <string name="wz_video_resize_to_aspect_title">Camera preview matches frame size</string>
     <string name="wz_video_resize_to_aspect_summary">Resize the camera preview view to fit the frame size aspect ratio</string>
     <string name="wz_video_resize_to_aspect_default_value">false</string>
+
+    <string name="wz_video_use_abr_title">Enable Adaptive Bitrate</string>
+    <string name="wz_video_use_abr_summary">The video bitrate will be dynamically adjusted based on bandwidth</string>
+    <string name="wz_video_use_abr_default_value">false</string>
 
     <string name="wz_audio_enabled_title">Stream audio</string>
     <string name="wz_audio_enabled_title_summary">Indicates if audio should be streamed</string>

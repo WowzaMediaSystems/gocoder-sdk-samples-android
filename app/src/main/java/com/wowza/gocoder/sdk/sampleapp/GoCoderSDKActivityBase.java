@@ -26,8 +26,6 @@ import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.wowza.gocoder.sdk.api.WZPlatformInfo;
-import com.wowza.gocoder.sdk.api.WZVersionInfo;
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.broadcast.WZBroadcast;
 import com.wowza.gocoder.sdk.api.broadcast.WZBroadcastConfig;
@@ -92,7 +90,6 @@ public abstract class GoCoderSDKActivityBase extends Activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        WZLog.debug(TAG, "ON_CREATE");
         super.onCreate(savedInstanceState);
 
         if (sGoCoderSDK == null) {
@@ -104,20 +101,6 @@ public abstract class GoCoderSDKActivityBase extends Activity
 
             if (sGoCoderSDK == null) {
                 WZLog.error(TAG, WowzaGoCoder.getLastError());
-            } else {
-                // Demonstrates the diagnostic APIs available
-                WZLog.info(TAG, "==== GoCoder SDK Version ===\n"
-                        + WZVersionInfo.getInstance().toVerboseString()
-                            + "\n============================");
-                WZLog.info(TAG, "======= Device Information =======\n"
-                        + WowzaGoCoder.PLATFORM_INFO
-                            + "\n==================================");
-                WZLog.info(TAG, "======= Display Information =======\n"
-                        + WZPlatformInfo.displayInfo(this)
-                            + "\n===================================");
-                WZLog.info(TAG, "=================== OpenGL ES Information ===================\n"
-                        + WowzaGoCoder.OPENGLES_INFO
-                            + "\n=============================================================");
             }
         }
 
@@ -134,7 +117,6 @@ public abstract class GoCoderSDKActivityBase extends Activity
      */
     @Override
     protected void onResume() {
-        WZLog.debug(TAG, "ON_RESUME");
         super.onResume();
 
         if (mWZBroadcast != null) {
@@ -154,8 +136,6 @@ public abstract class GoCoderSDKActivityBase extends Activity
 
     @Override
     protected void onPause() {
-        WZLog.debug(TAG, "ON_PAUSE");
-
         // Stop any active live stream
         if (mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
             endBroadcast(true);

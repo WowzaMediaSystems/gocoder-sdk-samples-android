@@ -24,7 +24,7 @@
     </FrameLayout>
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="right|center_vertical"
         android:layout_alignParentEnd="false"
@@ -57,9 +57,9 @@
             android:onClick="onSettings"
             android:background="#000000ff"
             android:padding="10dp"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true" />
+
     </RelativeLayout>
 
     <com.wowza.gocoder.sdk.sampleapp.ui.StatusView

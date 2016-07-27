@@ -59,6 +59,7 @@ public class ConfigPrefs {
         mediaConfig.setVideoFramerate(Integer.parseInt(sharedPrefs.getString("wz_video_frame_rate", String.valueOf(WZMediaConfig.DEFAULT_VIDEO_FRAME_RATE))));
         mediaConfig.setVideoKeyFrameInterval(Integer.parseInt(sharedPrefs.getString("wz_video_keyframe_interval", String.valueOf(WZMediaConfig.DEFAULT_VIDEO_KEYFRAME_INTERVAL))));
         mediaConfig.setVideoBitRate(Integer.parseInt(sharedPrefs.getString("wz_video_bitrate", String.valueOf(WZMediaConfig.DEFAULT_VIDEO_BITRATE))));
+        mediaConfig.setABREnabled(sharedPrefs.getBoolean("wz_video_use_abr", true));
 
         int profile = sharedPrefs.getInt("wz_video_profile_level_profile", -1);
         int level = sharedPrefs.getInt("wz_video_profile_level_level", -1);
@@ -138,7 +139,7 @@ public class ConfigPrefs {
         editor.putString(hostConfigKey, storedConfig);
         editor.apply();
 
-        logAutoCompleteLists(sharedPrefs);
+        //logAutoCompleteLists(sharedPrefs);
     }
 
     public static WZStreamConfig loadAutoCompleteHostConfig(SharedPreferences sharedPrefs, String hostAddress) {
