@@ -27,3 +27,5 @@ Wowza Media Systems™ provides developers with a platform to create streaming a
 
 ## License
 This code is distributed under the [BSD 3-Clause License](https://github.com/WowzaMediaSystems/gocoder-sdk-samples-android/blob/master/LICENSE.txt).
+
+![alt tag](http://wowzalogs.com/stats/githubimage.php?plugin=gocoder-sdk-samples-android)
