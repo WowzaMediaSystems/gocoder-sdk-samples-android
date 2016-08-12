@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -43,7 +42,6 @@ import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefsActivity;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 abstract public class CameraActivityBase extends GoCoderSDKActivityBase
@@ -52,16 +50,16 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
     private final static String TAG = CameraActivityBase.class.getSimpleName();
 
     // UI controls
-    protected MultiStateButton      mBtnBroadcast     = null;
-    protected MultiStateButton      mBtnSettings      = null;
-    protected StatusView            mStatusView       = null;
+    protected MultiStateButton mBtnBroadcast = null;
+    protected MultiStateButton mBtnSettings  = null;
+    protected StatusView       mStatusView   = null;
 
     // The GoCoder SDK camera preview display view
-    protected WZCameraView    mWZCameraView     = null;
-    protected WZAudioDevice   mWZAudioDevice    = null;
+    protected WZCameraView  mWZCameraView  = null;
+    protected WZAudioDevice mWZAudioDevice = null;
 
     private boolean mDevicesInitialized = false;
-    private boolean mUIInitialized = false;
+    private boolean mUIInitialized      = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +73,23 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
     protected void onResume() {
         super.onResume();
 
-        initUIControls();
+        if (!mUIInitialized)
+            initUIControls();
+        if (!mDevicesInitialized)
+            initGoCoderDevices();
 
-        initGoCoderDevices();
-        initGoCoderCameraPreview();
+        if (sGoCoderSDK != null && mPermissionsGranted) {
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+            mWZCameraView.setCameraConfig(getBroadcastConfig());
+            mWZCameraView.setScaleMode(ConfigPrefs.getScaleMode(sharedPrefs));
+
+            if (mWZBroadcastConfig.isVideoEnabled())
+                mWZCameraView.startPreview();
+
+            // Briefly display the video frame size from config
+            Toast.makeText(this, getBroadcastConfig().getLabel(true, true, false, true), Toast.LENGTH_LONG).show();
+        }
 
         syncUIControlState();
     }
@@ -135,9 +146,6 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
         if (getBroadcast() == null) return;
 
         if (getBroadcast().getStatus().isIdle()) {
-            // Update the video source orientation in the broadcast config with the current device orientation
-            getBroadcastConfig().setVideoSourceOrientation(WZDeviceUtils.getDeviceOrientation(this));
-
             WZStreamingError configError = startBroadcast();
             if (configError != null) {
                 if (mStatusView != null) mStatusView.setErrorMessage(configError.getErrorDescription());
@@ -155,28 +163,8 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
 
         WZMediaConfig configs[] = (mWZCameraView != null ? getVideoConfigs(mWZCameraView) : new WZMediaConfig[0]);
 
-        int avcProfiles[] = WZEncoderAPI.getProfiles();
-        if (avcProfiles.length > 1) Arrays.sort(avcProfiles);
-
         WZProfileLevel avcProfileLevels[] = WZEncoderAPI.getProfileLevels();
         if (avcProfileLevels.length > 1) Arrays.sort(avcProfileLevels);
-
-        ArrayList<WZProfileLevel> allProfileLevels = new ArrayList<WZProfileLevel>();
-
-        if (avcProfiles.length > 0) {
-            for (int avcProfile : avcProfiles) {
-                WZProfileLevel autoLevel = new WZProfileLevel(avcProfile, WZProfileLevel.PROFILE_LEVEL_AUTO);
-                allProfileLevels.add(autoLevel);
-
-                for (WZProfileLevel avcProfileLevel : avcProfileLevels) {
-                    if (avcProfileLevel.getProfile() == avcProfile) {
-                        allProfileLevels.add(avcProfileLevel);
-                    }
-                }
-            }
-        }
-
-        avcProfileLevels = allProfileLevels.toArray(new WZProfileLevel[allProfileLevels.size()]);
 
         Intent intent = new Intent(this, ConfigPrefsActivity.class);
         intent.putExtra(ConfigPrefs.PREFS_TYPE, ConfigPrefs.ALL_PREFS);
@@ -186,73 +174,30 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
     }
 
     protected void initGoCoderDevices() {
-        if (sGoCoderSDK != null && mPermissionsGranted && !mDevicesInitialized) {
+        if (sGoCoderSDK != null && mPermissionsGranted) {
 
-            // Create an audio input device instance
-            mWZAudioDevice = new WZAudioDevice();
-            // Init the broadcast config audio broadcaster
-            mWZBroadcastConfig.setAudioBroadcaster(mWZAudioDevice);
-
-            // Let's check if we were able to access all of the cameras on this device
-            ArrayList<String> badCameras = new ArrayList<String>();
-            WZCamera[] allCameras = WZCamera.getDeviceCameras();
-            for (int c = 0; c < allCameras.length; c++) {
-                if (!allCameras[c].isAvailable()) {
-                    badCameras.add(allCameras[c].getDirection() == WZCamera.DIRECTION_FRONT ? "front" : "back");
+            // Initialize the camera preview
+            if (mWZCameraView != null) {
+                WZCamera availableCameras[] = mWZCameraView.getCameras();
+                // Ensure we can access to at least one camera
+                if (availableCameras.length > 0) {
+                    // Set the video broadcaster in the broadcast config
+                    getBroadcastConfig().setVideoBroadcaster(mWZCameraView);
+                } else {
+                    mStatusView.setErrorMessage("Could not detect or gain access to any cameras on this device");
+                    getBroadcastConfig().setVideoEnabled(false);
                 }
+            } else {
+                getBroadcastConfig().setVideoEnabled(false);
             }
 
-            // Let's check to see if the any of the cameras could not be opened correctly
-            if (badCameras.size() > 0) {
-                TextUtils.join(" and ", badCameras);
-                mStatusView.setErrorMessage("There was an error attempting to initialize the " +
-                        TextUtils.join(" and ", badCameras) +
-                        " camera" + (badCameras.size() > 1 ? "s" : ""));
-            }
+            // Initialize the audio input device interface
+            mWZAudioDevice = new WZAudioDevice();
+
+            // Set the audio broadcaster in the broadcast config
+            getBroadcastConfig().setAudioBroadcaster(mWZAudioDevice);
 
             mDevicesInitialized = true;
-        }
-    }
-
-    protected void initGoCoderCameraPreview() {
-        if (sGoCoderSDK != null && mPermissionsGranted && mWZCameraView != null) {
-            sGoCoderSDK.setCameraView(mWZCameraView);
-
-            // Initialize the camera view
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-            // Ensure we can access to at least one camera
-            int numberOfCameras = mWZCameraView.getCameras().length;
-            if (numberOfCameras > 1) {
-                int activeCameraId = ConfigPrefs.getActiveCamera(sharedPrefs);
-                WZCamera activeCamera = mWZCameraView.getCameraById(activeCameraId);
-                if (activeCamera != null && activeCamera.isAvailable())
-                    mWZCameraView.setCamera(activeCameraId);
-            } else if (numberOfCameras < 1) {
-                mStatusView.setErrorMessage("Could not detect or gain access to any cameras on this device");
-                getBroadcastConfig().setVideoEnabled(false);
-            } else if (numberOfCameras < 1)
-                getBroadcastConfig().setVideoEnabled(false);
-
-            mWZCameraView.setCameraConfig(mWZBroadcastConfig);
-            mWZCameraView.setScaleMode(ConfigPrefs.getScaleMode(sharedPrefs));
-
-            // If video is enabled in the current broadcast configuration, turn on the camera preview
-            if (getBroadcastConfig().isVideoEnabled()) {
-
-                if (mWZCameraView.isPaused())
-                    mWZCameraView.onResume();
-                else
-                    mWZCameraView.startPreview();
-
-                // Briefly display the video frame size from config
-                Toast.makeText(this, mWZBroadcastConfig.getLabel(true, true, false, true), Toast.LENGTH_LONG).show();
-            }
-
-            // Init the broadcast config video broadcaster
-            if (getBroadcastConfig().isVideoEnabled()) {
-                mWZBroadcastConfig.setVideoBroadcaster(mWZCameraView.getBroadcaster());
-            }
         }
     }
 
@@ -269,8 +214,6 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
     }
 
     protected void initUIControls() {
-        if (mUIInitialized) return;
-
         // Initialize the UI controls
         mBtnBroadcast       = (MultiStateButton) findViewById(R.id.ic_broadcast);
         mBtnSettings        = (MultiStateButton) findViewById(R.id.ic_settings);
@@ -280,7 +223,7 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
         mWZCameraView = (WZCameraView) findViewById(R.id.cameraPreview);
         mWZCameraView.setPreviewReadyListener(this);
 
-        mUIInitialized      = true;
+        mUIInitialized = true;
 
         if (sGoCoderSDK == null && mStatusView != null)
             mStatusView.setErrorMessage(WowzaGoCoder.getLastError().getErrorDescription());

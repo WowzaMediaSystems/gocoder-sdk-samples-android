@@ -191,9 +191,6 @@ public class FaceActivity extends CameraActivityBase
             setFaceDetectionState(mWZCameraView.getCamera(), false);
 
         WZCamera newCamera = mWZCameraView.switchCamera();
-        if (newCamera != null) {
-            ConfigPrefs.setActiveCamera(PreferenceManager.getDefaultSharedPreferences(this), newCamera.getCameraId());
-        }
 
         boolean hasTorch = (newCamera != null && newCamera.hasCapability(WZCamera.TORCH));
         if (hasTorch)

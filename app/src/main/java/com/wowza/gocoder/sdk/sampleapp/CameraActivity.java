@@ -89,8 +89,6 @@ public class CameraActivity extends CameraActivityBase {
 
         WZCamera newCamera = mWZCameraView.switchCamera();
         if (newCamera != null) {
-            ConfigPrefs.setActiveCamera(PreferenceManager.getDefaultSharedPreferences(this), newCamera.getCameraId());
-
             if (newCamera.hasCapability(WZCamera.FOCUS_MODE_CONTINUOUS))
                 newCamera.setFocusMode(WZCamera.FOCUS_MODE_CONTINUOUS);
 
@@ -142,7 +140,8 @@ public class CameraActivity extends CameraActivityBase {
                     mBtnTorch.setState(activeCamera.isTorchOn());
                 }
 
-                mBtnSwitchCamera.setEnabled(mWZCameraView.isSwitchCameraAvailable());
+                mBtnSwitchCamera.setEnabled(mWZCameraView.getCameras().length > 0);
+                //mBtnSwitchCamera.setEnabled(mWZCameraView.isSwitchCameraAvailable());
             } else {
                 mBtnSwitchCamera.setEnabled(false);
                 mBtnTorch.setEnabled(false);

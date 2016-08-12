@@ -99,16 +99,6 @@ public class ConfigPrefs {
         updateConfigFromPrefs(sharedPrefs, (WZStreamConfig) wowzaConfig);
     }
 
-    public static void setActiveCamera(SharedPreferences sharedPrefs, int cameraId) {
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putInt("wz_camera_id", cameraId);
-        editor.apply();
-    }
-
-    public static int getActiveCamera(SharedPreferences sharedPrefs) {
-        return sharedPrefs.getInt("wz_camera_id", WZCamera.DIRECTION_BACK);
-    }
-
     public static int getScaleMode(SharedPreferences sharedPrefs) {
         return sharedPrefs.getBoolean("wz_video_resize_to_aspect", false) ? WZMediaConfig.RESIZE_TO_ASPECT : WZMediaConfig.FILL_VIEW;
     }

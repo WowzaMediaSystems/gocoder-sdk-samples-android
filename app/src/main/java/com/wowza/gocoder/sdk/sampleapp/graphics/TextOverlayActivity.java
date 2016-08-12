@@ -57,4 +57,12 @@ public class TextOverlayActivity extends CameraActivityBase {
             textObject.setAlignment( WZText.CENTER );
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (sGoCoderSDK != null) {
+            WZTextManager.getInstance().release();
+        }
+    }
 }
