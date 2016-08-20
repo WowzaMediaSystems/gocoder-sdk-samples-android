@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -35,7 +36,9 @@ import com.wowza.gocoder.sdk.api.encoder.WZEncoderAPI;
 import com.wowza.gocoder.sdk.api.errors.WZError;
 import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
 import com.wowza.gocoder.sdk.api.geometry.WZSize;
+import com.wowza.gocoder.sdk.api.graphics.WZColor;
 import com.wowza.gocoder.sdk.api.h264.WZProfileLevel;
+import com.wowza.gocoder.sdk.api.logging.WZLog;
 import com.wowza.gocoder.sdk.api.status.WZStatus;
 import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
 import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefsActivity;
@@ -83,9 +86,14 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
 
             mWZCameraView.setCameraConfig(getBroadcastConfig());
             mWZCameraView.setScaleMode(ConfigPrefs.getScaleMode(sharedPrefs));
+            mWZCameraView.setVideoBackgroundColor(WZColor.DARKGREY);
 
-            if (mWZBroadcastConfig.isVideoEnabled())
-                mWZCameraView.startPreview();
+            if (mWZBroadcastConfig.isVideoEnabled()) {
+                if (mWZCameraView.isPreviewPaused())
+                    mWZCameraView.onResume();
+                else
+                    mWZCameraView.startPreview();
+            }
 
             // Briefly display the video frame size from config
             Toast.makeText(this, getBroadcastConfig().getLabel(true, true, false, true), Toast.LENGTH_LONG).show();

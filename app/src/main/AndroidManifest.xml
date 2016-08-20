@@ -55,6 +55,11 @@
             android:screenOrientation="fullSensor"
             android:label="@string/audio_meter_title"/>
 
+        <activity android:name=".audio.BluetoothActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor"
+            android:label="@string/audio_bluetooth_title"/>
+
         <activity android:name=".graphics.BitmapOverlayActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="fullSensor"
@@ -69,8 +74,7 @@
             android:name=".FaceActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:label="@string/camera_example_title">
-        </activity>
+            android:label="@string/camera_example_title"/>
 
         <activity android:name=".InfoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

@@ -5,8 +5,10 @@
     <string name="camera_example_title">GoCoder SDK Capture Example</string>
     <string name="mp4_broadcast_title">GoCoder SDK MP4 Broadcast Example</string>
     <string name="mp4_capture_title">GoCoder SDK MP4 Capture Example</string>
-    <string name="audio_meter_title">GoCoder SDK Audio Meter Example</string>
+    <string name="audio_meter_title">GoCoder SDK Bluetooth Mic Example</string>
     <string name="audio_meter_help">Press the mic icon to toggle the audio level meter</string>
+    <string name="audio_bluetooth_title">GoCoder SDK Audio Meter Example</string>
+    <string name="audio_bluetooth_help">The Bluetooth mic will be used for audio input if present</string>
     <string name="info_title">Device Information APIs</string>
     <string name="face_title">Face Detection Example</string>
 

@@ -61,8 +61,7 @@ public class TextOverlayActivity extends CameraActivityBase {
     @Override
     protected void onStop() {
         super.onStop();
-        if (sGoCoderSDK != null) {
-            WZTextManager.getInstance().release();
-        }
+        if (sGoCoderSDK != null)
+            WZTextManager.getInstance().clear();
     }
 }

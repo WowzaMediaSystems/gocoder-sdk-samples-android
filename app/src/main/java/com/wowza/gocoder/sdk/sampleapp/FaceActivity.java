@@ -47,7 +47,7 @@ public class FaceActivity extends CameraActivityBase
 
     protected WZBitmap              mNinjaFace        = null;
     protected boolean               mDetectingFaces   = false;
-    protected WZText                mNoFaces = null;
+    protected WZText                mNoFaces          = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,7 @@ public class FaceActivity extends CameraActivityBase
             // Read in the text font and create the rotated side banner
             WZTextManager wzTextManager = WZTextManager.getInstance();
             UUID fontId = wzTextManager.loadFont("njnaruto.ttf", 75, 15, 0);
+
             WZText textObject = wzTextManager.createTextObject(fontId, "Become a Wowza Ninja", 0.98f, 0.47f, 0.11f);
             textObject.setPosition( 35, 50 );
             textObject.setRotationAngle(90);
@@ -79,6 +80,13 @@ public class FaceActivity extends CameraActivityBase
             mNoFaces.setAlignment( WZText.CENTER );
             mNoFaces.setVisible(false);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (sGoCoderSDK != null)
+            WZTextManager.getInstance().clear();
     }
 
     /**
@@ -163,7 +171,7 @@ public class FaceActivity extends CameraActivityBase
                 mNinjaFace.setScale(0.50f, WZBitmap.SURFACE_WIDTH);
                 mNinjaFace.setVisible(false);
 
-                mWZCameraView.registerFrameListener(mNinjaFace);
+                mWZCameraView.registerFrameRenderer(mNinjaFace);
             }
         }
     }

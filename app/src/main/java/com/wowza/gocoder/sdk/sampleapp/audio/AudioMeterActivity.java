@@ -25,11 +25,18 @@ package com.wowza.gocoder.sdk.sampleapp.audio;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
+import com.wowza.gocoder.sdk.api.status.WZStatus;
 import com.wowza.gocoder.sdk.sampleapp.CameraActivityBase;
 import com.wowza.gocoder.sdk.sampleapp.R;
+import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
 import com.wowza.gocoder.sdk.sampleapp.ui.AudioLevelMeter;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 
@@ -41,8 +48,9 @@ import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
  */
 public class AudioMeterActivity extends CameraActivityBase {
 
-    protected MultiStateButton  mBtnMic             = null;
-    protected AudioLevelMeter   mAudioLevelMeter    = null;
+    protected MultiStateButton  mBtnMic                 = null;
+    protected AudioLevelMeter   mAudioLevelMeter        = null;
+    private boolean             mRestartAudioSampler    = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,33 +66,46 @@ public class AudioMeterActivity extends CameraActivityBase {
         mAudioLevelMeter    = (AudioLevelMeter) findViewById(R.id.audioLevelMeter);
     }
 
+    /**
+     * Initialize the audio device and audio sampler
+     */
+    protected void setupAudioDevices() {
+        mWZAudioDevice.registerAudioSampleListener(mAudioLevelMeter);
+
+        mBtnMic.setState(true);
+        mAudioLevelMeter.setVisibility(View.VISIBLE);
+        mWZAudioDevice.startAudioSampler();
+
+        Toast.makeText(this, getString(R.string.audio_meter_help), Toast.LENGTH_LONG).show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
         if (mWZAudioDevice != null) {
-            mWZAudioDevice.registerAudioSampleListener(mAudioLevelMeter);
-
-            mBtnMic.setState(true);
-            mAudioLevelMeter.setVisibility(View.VISIBLE);
-            mWZAudioDevice.startAudioSampler();
-
-            Toast.makeText(this, getString(R.string.audio_meter_help), Toast.LENGTH_LONG).show();
+            setupAudioDevices();
         } else {
             mBtnMic.setEnabled(false);
             mAudioLevelMeter.setVisibility(View.GONE);
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
+    /**
+     * Shutdown/release the audio device and audio sampler
+     */
+    protected void releaseAudioDevices() {
         if (mWZAudioDevice != null) {
             if (mWZAudioDevice.isSamplingAudio())
                 mWZAudioDevice.stopAudioSampler();
             mWZAudioDevice.unregisterAudioSampleListener(mAudioLevelMeter);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        releaseAudioDevices();
     }
 
     /**
@@ -105,6 +126,34 @@ public class AudioMeterActivity extends CameraActivityBase {
                 mWZAudioDevice.stopAudioSampler();
         }
    }
+    @Override
+    protected synchronized WZStreamingError startBroadcast() {
+        mRestartAudioSampler = (mWZAudioDevice != null && mWZAudioDevice.isSamplingAudio());
+        return super.startBroadcast();
+    }
+
+    @Override
+    public void onWZStatus(final WZStatus goCoderStatus) {
+        super.onWZStatus(goCoderStatus);
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                // Restart audio sampler if it was running when broadcast began
+                if (goCoderStatus.isIdle() && mRestartAudioSampler) {
+                    mRestartAudioSampler = false;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWZAudioDevice.startAudioSampler();
+                            mBtnMic.setState(true);
+                            mBtnMic.setEnabled(true);
+                        }
+                    });
+                }
+            }
+        });
+    }
 
     @Override
     protected boolean syncUIControlState() {
@@ -112,12 +161,12 @@ public class AudioMeterActivity extends CameraActivityBase {
 
         if (disableControls) {
             mBtnMic.setEnabled(false);
-        } else if (mWZAudioDevice != null ) {
+        } else if (mWZAudioDevice != null) {
             boolean isStreaming = getBroadcast().getStatus().isRunning();
             boolean isStreamingAudio = (isStreaming && getBroadcastConfig().isAudioEnabled());
-            boolean isSamplingAudio = (mWZAudioDevice.isSamplingAudio()||isStreamingAudio);
+            boolean isSamplingAudio = (mRestartAudioSampler || mWZAudioDevice.isSamplingAudio() || isStreamingAudio);
 
-            mBtnMic.setEnabled(!isStreaming||isStreamingAudio);
+            mBtnMic.setEnabled((!isStreaming)||isStreamingAudio);
             mBtnMic.setState(isSamplingAudio);
             mAudioLevelMeter.setVisibility(isSamplingAudio ? View.VISIBLE : View.GONE);
         } else {

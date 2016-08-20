@@ -1,0 +1,265 @@
+/*
+ *
+ * WOWZA MEDIA SYSTEMS, LLC ("Wowza") CONFIDENTIAL
+ * Copyright (c) 2005-2016 Wowza Media Systems, LLC, All Rights Reserved.
+ *
+ * NOTICE: All information contained herein is, and remains the property of Wowza Media Systems, LLC.
+ * The intellectual and technical concepts contained herein are proprietary to Wowza Media Systems, LLC
+ * and may be covered by U.S. and Foreign Patents, patents in process, and are protected by trade secret
+ * or copyright law. Dissemination of this information or reproduction of this material is strictly forbidden
+ * unless prior written permission is obtained from Wowza Media Systems, LLC. Access to the source code
+ * contained herein is hereby forbidden to anyone except current Wowza Media Systems, LLC employees, managers
+ * or contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering such access.
+ *
+ * The copyright notice above does not evidence any actual or intended publication or disclosure of this
+ * source code, which includes information that is confidential and/or proprietary, and is a trade secret, of
+ * Wowza Media Systems, LLC. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR PUBLIC DISPLAY
+ * OF OR THROUGH USE OF THIS SOURCE CODE WITHOUT THE EXPRESS WRITTEN CONSENT OF WOWZA MEDIA SYSTEMS, LLC IS
+ * STRICTLY PROHIBITED, AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES. THE RECEIPT OR POSSESSION
+ * OF THIS SOURCE CODE AND/OR RELATED INFORMATION DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR
+ * DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
+ *
+ */
+
+package com.wowza.gocoder.sdk.sampleapp.audio;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.media.MediaRecorder;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.wowza.gocoder.sdk.api.broadcast.WZBroadcastConfig;
+import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
+import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
+import com.wowza.gocoder.sdk.api.logging.WZLog;
+import com.wowza.gocoder.sdk.sampleapp.R;
+
+/**
+ * This activity class demonstrates how to use a Bluetooth mic as the audio input device
+ * for the GoCoder SDK's WZAudioDevice audio device interface and broadcasting class
+ */
+public class BluetoothActivity  extends AudioMeterActivity {
+    private final static String TAG = BluetoothActivity.class.getSimpleName();
+
+    protected final static int BLUETOOTH_CHANNELS       = WZMediaConfig.AUDIO_CHANNELS_MONO; // mono
+    protected final static int BLUETOOTH_SAMPLE_RATE    = 8000; // 8kHz
+
+    protected ImageView         mBluetoothIcon      = null;
+
+    protected AudioManager      mAudioManager       = null;
+    protected BroadcastReceiver mBroadcastReceiver  = null;
+
+    protected WZBroadcastConfig mSamplerConfig      = null;
+
+    private int mStoredChannels     = WZMediaConfig.AUDIO_CHANNELS_STEREO;
+    private int mStoredSampleRate   = WZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mBluetoothIcon = (ImageView) findViewById(R.id.ic_bluetooth);
+        mBluetoothIcon.setVisibility(View.VISIBLE);
+        mBluetoothIcon.setImageAlpha(128);
+
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+                processBluetoothState(state);
+            }
+        };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    /**
+     * Called from {@link AudioMeterActivity#onResume()} to setup the audio input device(s) and audio sampler
+     */
+    @Override
+    protected void setupAudioDevices() {
+        if (mWZAudioDevice == null) return;
+
+        // Save the values that are persisted with the shared preferences
+        mStoredChannels     = getBroadcastConfig().getAudioChannels();
+        mStoredSampleRate   = getBroadcastConfig().getAudioSampleRate();
+
+        if (mSamplerConfig == null) {
+            mSamplerConfig = new WZBroadcastConfig(getBroadcastConfig());
+            mSamplerConfig.setAudioChannels(mStoredChannels);
+            mSamplerConfig.setAudioSampleRate(mStoredSampleRate);
+        }
+
+        // Start the audio sampler with the default mic selected
+        mWZAudioDevice.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mWZAudioDevice.registerAudioSampleListener(mAudioLevelMeter);
+        mWZAudioDevice.startAudioSampler(mSamplerConfig);
+
+        mBtnMic.setState(true);
+        mBluetoothIcon.setImageAlpha(128);
+
+        // Register the BroadcastReceiver to get notifications of Bluetooth connectivity changes
+        Intent intent = registerReceiver(mBroadcastReceiver,
+                new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED));
+
+        if (intent != null) {
+            // Check to see if the Bluetooth device is already connected
+            int currentState = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+            if (currentState == AudioManager.SCO_AUDIO_STATE_CONNECTED)
+                // If already connected, the BroadcastReceiver will not receive
+                // a state update notification so go ahead and process the state now
+                processBluetoothState(currentState);
+        }
+
+        // Start Bluetooth SCO audio connection
+        WZLog.debug(TAG, "Starting Bluetooth SCO audio connection");
+        mAudioManager.startBluetoothSco();
+
+        Toast.makeText(this, getString(R.string.audio_bluetooth_help), Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Called from {@link AudioMeterActivity#onPause()} to shutdown/release the audio device(s) and audio sampler
+     */
+    @Override
+    protected void releaseAudioDevices() {
+        mBluetoothIcon.setImageAlpha(64);
+
+        if (mWZAudioDevice == null) return;
+
+        if (mWZAudioDevice.isSamplingAudio())
+            mWZAudioDevice.stopAudioSampler();
+
+        mWZAudioDevice.unregisterAudioSampleListener(mAudioLevelMeter);
+        unregisterReceiver(mBroadcastReceiver);
+
+        // Stop bluetooth SCO audio connection.
+        WZLog.debug(TAG, "Stopping Bluetooth SCO audio connection");
+        mAudioManager.stopBluetoothSco();
+    }
+
+    /**
+     * Process the Bluetooth connectivity state received via the intent
+     * @param state the AudioManager intent
+     */
+    protected void processBluetoothState(int state) {
+
+        int currentDevice   = mWZAudioDevice.getAudioSource();
+        int newDevice       = currentDevice;
+
+        switch(state) {
+            case AudioManager.SCO_AUDIO_STATE_CONNECTING:
+                WZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_CONNECTING");
+                break;
+
+            case AudioManager.SCO_AUDIO_STATE_CONNECTED:
+                WZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_CONNECTED");
+
+                if (!isBluetoothActive()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mBluetoothIcon.setImageAlpha(255);
+                            Toast.makeText(BluetoothActivity.this, "Bluetooth mic connected", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                // Select the Bluetooth mic now that connectivity has been established
+                newDevice = MediaRecorder.AudioSource.MIC;
+                break;
+
+            case AudioManager.SCO_AUDIO_STATE_DISCONNECTED:
+                WZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_DISCONNECTED");
+
+                if (isBluetoothActive()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mBluetoothIcon.setImageAlpha(64);
+                            Toast.makeText(BluetoothActivity.this, "Bluetooth mic disconnected", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                // Switch back to the default mic if the Bluetooth mic disconnects
+                newDevice = MediaRecorder.AudioSource.CAMCORDER;
+                break;
+
+            case AudioManager.SCO_AUDIO_STATE_ERROR:
+                WZLog.error(TAG, "An error occurred obtaining Bluetooth state information");
+                break;
+        }
+
+        if (newDevice != currentDevice) {
+            // Make sure the audio sampler is shutdown before switching devices
+            if (mWZAudioDevice.isSamplingAudio())
+                mWZAudioDevice.stopAudioSampler();
+
+            // Select the new device
+            mWZAudioDevice.setAudioSource(newDevice);
+
+            // For Bluetooth devices, the channels must be mono and the sampling rate 8kHz
+            mSamplerConfig.set(getBroadcastConfig());
+            mSamplerConfig.setAudioChannels(isBluetoothActive() ? BLUETOOTH_CHANNELS : mStoredChannels);
+            mSamplerConfig.setAudioSampleRate(isBluetoothActive() ? BLUETOOTH_SAMPLE_RATE : mStoredSampleRate);
+
+            // Restart the audio sampler with the appropriate
+            // configuration for the newly selected audio input device
+            if (mBtnMic.isOn())
+                mWZAudioDevice.startAudioSampler(mSamplerConfig);
+       }
+    }
+
+    /**
+     * @return True if the Bluetooth mic is active, False otherwise
+     */
+    protected boolean isBluetoothActive() {
+        return mWZAudioDevice != null && mWZAudioDevice.getAudioSource() == MediaRecorder.AudioSource.MIC;
+    }
+
+    /**
+     * Ensure broadcast config meets Bluetooth requirements
+     * @return Any synchronous error that may have occurred starting the broadcast, null otherwise
+     */
+    @Override
+    protected synchronized WZStreamingError startBroadcast() {
+        getBroadcastConfig().setAudioChannels(isBluetoothActive() ? BLUETOOTH_CHANNELS : mStoredChannels);
+        getBroadcastConfig().setAudioSampleRate(isBluetoothActive() ? BLUETOOTH_SAMPLE_RATE : mStoredSampleRate);
+
+        return super.startBroadcast();
+    }
+
+    /**
+     * Click handler for the mic/mute button
+     */
+    @Override
+    public void onToggleMute(View v) {
+        mBtnMic.toggleState();
+
+        if (getBroadcast().getStatus().isRunning()) {
+            mWZAudioDevice.setAudioPaused(!mBtnMic.isOn());
+            Toast.makeText(this, "Audio stream " + (mWZAudioDevice.isAudioPaused() ? "muted" : "enabled"), Toast.LENGTH_SHORT).show();
+        } else {
+            mAudioLevelMeter.setVisibility(mBtnMic.isOn() ? View.VISIBLE : View.GONE);
+
+            if (mBtnMic.isOn())
+                // Start the audio sampler with the appropriate config for the active audio input device
+                mWZAudioDevice.startAudioSampler(mSamplerConfig);
+            else
+                mWZAudioDevice.stopAudioSampler();
+        }
+    }
+}

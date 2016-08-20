@@ -105,7 +105,7 @@ public abstract class GoCoderSDKActivityBase extends Activity
         }
 
         if (sGoCoderSDK != null) {
-            // Create a GoCoder broadcaster and an associated streaming configuration
+            // Create a GoCoder broadcaster and an associated broadcast configuration
             mWZBroadcast = new WZBroadcast();
             mWZBroadcastConfig = new WZBroadcastConfig(sGoCoderSDK.getConfig());
             mWZBroadcastConfig.setLogLevel(WZLog.LOG_LEVEL_DEBUG);

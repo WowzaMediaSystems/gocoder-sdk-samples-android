@@ -48,6 +48,10 @@ public class MainActivity extends ListActivity {
                     "Register an audio sample listener and display an audio level meter",
                     "audio.AudioMeterActivity"          },
 
+            {   "Use a Bluetooth mic for audio capture",
+                    "Use a Bluetooth mic for streaming audio if present",
+                    "audio.BluetoothActivity"          },
+
             {   "Display detailed device information",
                     "Demonstrates the informational APIs available in the SDK",
                     "InfoActivity"                      }
@@ -61,6 +65,7 @@ public class MainActivity extends ListActivity {
             R.drawable.ic_mp4_streaming,
             R.drawable.ic_face,
             R.drawable.ic_audio_meter,
+            R.drawable.ic_bluetooth,
             R.drawable.ic_info
     };
 

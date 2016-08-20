@@ -71,7 +71,7 @@ public class BitmapOverlayActivity extends CameraActivityBase {
             mWZBitmap.setScale(0.75f, WZBitmap.SURFACE_WIDTH);
 
             // Register the bitmap renderer with the GoCoder camera preview view as a frame listener
-            mWZCameraView.registerFrameListener(mWZBitmap);
+            mWZCameraView.registerFrameRenderer(mWZBitmap);
 
             Toast.makeText(this, getString(R.string.bitmap_overlay_help), Toast.LENGTH_LONG).show();
         }
