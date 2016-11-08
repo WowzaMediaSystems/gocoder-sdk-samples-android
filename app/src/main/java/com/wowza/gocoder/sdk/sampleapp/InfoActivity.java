@@ -12,7 +12,6 @@
  *
  *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
  */
-
 package com.wowza.gocoder.sdk.sampleapp;
 
 import android.Manifest;
@@ -27,7 +26,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,7 +42,6 @@ import com.wowza.gocoder.sdk.api.WZPlatformInfo;
 import com.wowza.gocoder.sdk.api.WZVersionInfo;
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.devices.WZCamera;
-import com.wowza.gocoder.sdk.api.errors.WZPlatformError;
 import com.wowza.gocoder.sdk.api.logging.WZLog;
 
 import java.util.ArrayList;

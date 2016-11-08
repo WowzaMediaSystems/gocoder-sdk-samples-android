@@ -26,11 +26,14 @@ import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.wowza.gocoder.sdk.api.WZPlatformInfo;
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.broadcast.WZBroadcast;
 import com.wowza.gocoder.sdk.api.broadcast.WZBroadcastConfig;
 import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
 import com.wowza.gocoder.sdk.api.configuration.WowzaConfig;
+import com.wowza.gocoder.sdk.api.data.WZDataItem;
+import com.wowza.gocoder.sdk.api.data.WZDataMap;
 import com.wowza.gocoder.sdk.api.devices.WZCameraView;
 import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
 import com.wowza.gocoder.sdk.api.logging.WZLog;
@@ -39,6 +42,7 @@ import com.wowza.gocoder.sdk.api.status.WZStatusCallback;
 import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
 
 import java.util.Arrays;
+import java.util.Date;
 
 public abstract class GoCoderSDKActivityBase extends Activity
     implements WZStatusCallback {
@@ -53,7 +57,7 @@ public abstract class GoCoderSDKActivityBase extends Activity
     private static Object sBroadcastLock = new Object();
     private static boolean sBroadcastEnded = true;
 
-    // indicates whether this is a full screen activity or note
+    // indicates whether this is a full screen activity or not
     protected static boolean sFullScreenActivity = true;
 
     // GoCoder SDK top level interface
@@ -220,9 +224,8 @@ public abstract class GoCoderSDKActivityBase extends Activity
                         + "\n=======================================================");
 
             configValidationError = mWZBroadcastConfig.validateForBroadcast();
-            if (configValidationError == null) {
+            if (configValidationError == null)
                 mWZBroadcast.startBroadcast(mWZBroadcastConfig, this);
-            }
         } else {
             WZLog.error(TAG, "startBroadcast() called while another broadcast is active");
         }
