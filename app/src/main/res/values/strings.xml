@@ -11,6 +11,7 @@
     <string name="audio_bluetooth_help">The Bluetooth mic will be used for audio input if present</string>
     <string name="info_title">Device Information APIs</string>
     <string name="face_title">Face Detection Example</string>
+    <string name="screenshot_title">Screenshot Example</string>
 
     <string name="text_overlay_title">GoCoder SDK Text Overlay Example</string>
 

@@ -36,6 +36,10 @@ public class MainActivity extends ListActivity {
                     "Display text as an overlay on the camera preview",
                     "graphics.TextOverlayActivity"      },
 
+            {   "Grab a screenshot",
+                    "Take a snapshot of the camera preview",
+                    "ScreenshotActivity"      },
+
             {   "Stream an MP4 file",
                     "Broadcast video from an MP4 file stored on the local device",
                     "mp4.MP4BroadcastActivity"          },
@@ -62,6 +66,7 @@ public class MainActivity extends ListActivity {
             R.drawable.ic_mp4_capture,
             R.drawable.ic_bitmap,
             R.drawable.ic_text_overlay,
+            R.drawable.ic_take_screenshot,
             R.drawable.ic_mp4_streaming,
             R.drawable.ic_face,
             R.drawable.ic_audio_meter,
