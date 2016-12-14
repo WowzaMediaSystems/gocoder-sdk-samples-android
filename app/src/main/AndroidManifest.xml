@@ -66,9 +66,9 @@
             android:label="@string/bitmap_overlay_title"/>
 
         <activity android:name=".graphics.TextOverlayActivity"
-                  android:configChanges="orientation|keyboardHidden|screenSize"
-                  android:screenOrientation="fullSensor"
-                  android:label="@string/text_overlay_title"/>
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor"
+            android:label="@string/text_overlay_title"/>
 
         <activity android:name=".ScreenshotActivity"
                   android:configChanges="orientation|keyboardHidden|screenSize"
