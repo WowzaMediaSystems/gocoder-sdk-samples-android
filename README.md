@@ -4,7 +4,7 @@ This repository contains a sample application that demonstrates the capabilities
 
 ## Development Requirements
 
-- **[Wowza GoCoder SDK v1.0.1.340](https://www.wowza.com/products/gocoder) or later**
+- **[Wowza GoCoder SDK v1.0.2.357](https://www.wowza.com/products/gocoder) or later**
 
      **PLEASE NOTE:** The GoCoder SDK library necessary to build this app is not provided with this sample code. To receive a free trial copy of the SDK, please fill out the **[GoCoder SDK trial signup form](https://www.wowza.com/products/gocoder/sdk/trial)** to be sent a link where you can download the SDK along with a free trial license key.
 

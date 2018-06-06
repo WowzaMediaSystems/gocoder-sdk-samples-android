@@ -92,7 +92,7 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
         mStatusView         = (StatusView) findViewById(R.id.statusView);
 
         if (sGoCoderSDK != null) {
-            mMP4Broadcaster = new WZMP4Broadcaster();
+            mMP4Broadcaster = new WZMP4Broadcaster(this.getApplicationContext());
             mMP4Broadcaster.setLooping(mLooping);
 
             mWZBroadcastConfig.setVideoBroadcaster(mMP4Broadcaster);
@@ -211,8 +211,8 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
         String filePath = getRealPathFromURI(this, fileUri);
 
         if (filePath != null) {
-            WZMediaConfig mp4Config = mMP4Broadcaster.setFilePath(filePath);
-
+            mMP4Broadcaster.setFileUri(fileUri);
+            WZMediaConfig mp4Config = mMP4Broadcaster.getMP4Config();
             if (mp4Config != null) {
                 mMP4FileUri = fileUri;
                 mVideoView.setVideoURI(mMP4FileUri);
