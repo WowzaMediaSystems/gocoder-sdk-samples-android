@@ -8,8 +8,8 @@ This repository contains a sample application that demonstrates the capabilities
 
      **NOTE:** The GoCoder SDK library necessary to build this app is not provided with this sample code. For a free trial of the SDK, complete the **[GoCoder SDK trial sign-up form](https://www.wowza.com/products/gocoder/sdk/trial)** to be sent a link where you can download the SDK along with a free trial license key.
 
-- **[Android SDK 5.0 (API level 21 or later) for broadcasting](https://developer.android.com/studio/index.html)** or later.
-- **[Android SDK 6.0 (API level 23 or later) for playback](https://developer.android.com/studio/index.html)** or later.
+- **[Android 5.0 (API level 21 or later) for broadcasting](https://developer.android.com/about/versions/android-5.0)** or later.
+- **[Android 6.0 (API level 23 or later) for playback](https://developer.android.com/about/versions/marshmallow/android-6.0)** or later.
 - **[Android Studio v1.2.0](https://developer.android.com/studio/index.html)** or later.
 - Access to a **[Wowza Streaming Engine](https://www.wowza.com/products/streaming-engine)™** media server or a **[Wowza Streaming Cloud](https://www.wowza.com/products/streaming-cloud)™** account. You can request a free Wowza Streaming Engine trial by completing the **[Wowza Streaming Engine trial sign-up form](https://www.wowza.com/pricing/trial)** or sign up for a Wowza Streaming Cloud trial by completing the **[Wowza Streaming Cloud free trial form](https://www.wowza.com/pricing/cloud-free-trial)**.
 
