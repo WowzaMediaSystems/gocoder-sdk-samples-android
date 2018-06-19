@@ -6,7 +6,7 @@ This repository contains a sample application that demonstrates the capabilities
 
 - [Wowza GoCoder SDK for Android v1.0.2.357](https://www.wowza.com/products/gocoder)
 
-     **NOTE:** The GoCoder SDK library necessary to build this app is not provided with this sample code. For a free trial of the SDK, complete the **[GoCoder SDK trial sign-up form](https://www.wowza.com/products/gocoder/sdk/trial)** to be sent a link where you can download the SDK along with a free trial license key.
+     **NOTE:** The GoCoder SDK library necessary to build this app is not provided with this sample code. For a free trial of the SDK, complete the [GoCoder SDK trial sign-up form](https://www.wowza.com/products/gocoder/sdk/trial) to receive a link where you can download the SDK along with a free trial license key.
 
 - [Android 5.0 (API level 21 or later) for broadcasting](https://developer.android.com/about/versions/android-5.0) or later.
 - [Android 6.0 (API level 23 or later) for playback](https://developer.android.com/about/versions/marshmallow/android-6.0) or later.
