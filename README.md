@@ -4,7 +4,7 @@ This repository contains a sample application that demonstrates the capabilities
 
 ## Prerequisites
 
-- [Wowza GoCoder SDK for Android v1.0.2.357](https://www.wowza.com/products/gocoder)
+- [Wowza GoCoder SDK for Android v1.0.5.608](https://www.wowza.com/products/gocoder)
 
      **NOTE:** The GoCoder SDK library necessary to build this app is not provided with this sample code. For a free trial of the SDK, complete the [GoCoder SDK trial sign-up form](https://www.wowza.com/products/gocoder/sdk/trial) to receive a link where you can download the SDK along with a free trial license key.
 
@@ -18,7 +18,7 @@ The sample app includes a number of activities that demonstrate the features of 
 
 - CameraActivity.java, which uses the SDK to capture and broadcast video using the device's internal cameras,
 - InfoActivity.java, which uses the SDK's version and device interrogation APIs to list detailed information about the SDK and the mobile device, and
-- MP4BroadcastActivity.java, which uses **WZBroadcast**, **WZBroadcastAPI**, and related classes and interfaces to broadcast frames from a local MP4 file.
+- MP4BroadcastActivity.java, which uses **WOWZBroadcast**, **WOWZBroadcastAPI**, and related classes and interfaces to broadcast frames from a local MP4 file.
 
 ## More Resources
 * [GoCoder SDK Technical Articles](https://www.wowza.com/docs/wowza-gocoder-sdk)

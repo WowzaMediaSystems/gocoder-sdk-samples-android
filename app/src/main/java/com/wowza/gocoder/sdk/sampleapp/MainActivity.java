@@ -11,7 +11,7 @@
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
  *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
- */
+ */ 
 
 package com.wowza.gocoder.sdk.sampleapp;
 
