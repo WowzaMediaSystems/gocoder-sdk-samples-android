@@ -18,7 +18,7 @@
         android:background="#434779"
         android:layout_centerInParent="true">
 
-        <com.wowza.gocoder.sdk.api.devices.WZCameraView
+        <com.wowza.gocoder.sdk.api.devices.WOWZCameraView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/cameraPreview"

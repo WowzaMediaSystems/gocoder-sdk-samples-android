@@ -1,0 +1,109 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.wowza.gocoder.sdk.sampleapp.ui.AboutFragment">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:scaleType="fitCenter"
+        android:src="@drawable/overlay_logo"
+        android:alpha="0.1"
+        android:layout_gravity="center"
+        android:adjustViewBounds="false"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+    </ImageView>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:paddingTop="25dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtAboutProduct"
+                android:textAppearance="@android:style/TextAppearance.Medium"
+                android:text="@string/about_product_label"
+                android:textAlignment="center"
+                android:textStyle="normal|bold"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingEnd="3dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtProductVersion"
+                android:textAppearance="@android:style/TextAppearance.Medium"
+                android:text="X.X.XXX"
+                android:textAlignment="center"
+                android:textStyle="normal|bold"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingStart="3dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtCopyrightLine1"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:text="@string/about_copyright_line1"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textAlignment="center"
+            android:textStyle="normal"
+            android:gravity="center_vertical|center_horizontal"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtCopyrightLine2"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:text="@string/about_copyright_line2"
+            android:paddingTop="5dp"
+            android:paddingBottom="25dp"
+            android:textAlignment="center"
+            android:textStyle="normal"
+            android:gravity="center_vertical|center_horizontal"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/background_light"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:text="@string/about_support_information"
+            android:textAlignment="center"
+            android:textStyle="normal|bold"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/background_light"
+            />
+
+        <ExpandableListView
+            android:id="@+id/info_list"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ExpandableListView>
+    </LinearLayout>
+
+</FrameLayout>

@@ -19,49 +19,37 @@
         android:paddingRight="10dp">
     </ImageView>
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:choiceMode="singleChoice"
-        android:dividerHeight="0dp"
-        android:divider="@null"
-        android:drawSelectorOnTop="false">
-    </ListView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <!--
-        <LinearLayout
-            android:orientation="vertical"
+        <ListView
+            android:id="@android:id/list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/txtSDKVersion"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:choiceMode="singleChoice"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:drawSelectorOnTop="false">
+        </ListView>
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp">
+        <TextView
+            android:id="@+id/txtSDKVersion"
+            android:background="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="GoCoder SDK vX.X.X"
+            android:textAlignment="center"/>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/imageView2"
-                    android:src="@drawable/gocoder_logo"
-                    android:paddingRight="15dp"
-                    android:layout_gravity="center" />
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:text="Wowza GoCoder SDK Examples"
-                    android:id="@+id/textView2"
-                    android:gravity="center_vertical"
-                    android:textStyle="bold" />
-            </LinearLayout>
-    </LinearLayout>
--->
+    </RelativeLayout>
 
 </FrameLayout>

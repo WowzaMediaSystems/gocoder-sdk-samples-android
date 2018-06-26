@@ -1,3 +1,18 @@
+/**
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
+ *
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ */
+
 package com.wowza.gocoder.sdk.sampleapp.ui;
 
 import android.content.Context;
@@ -10,8 +25,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
-import com.wowza.gocoder.sdk.api.devices.WZAudioDevice;
+import com.wowza.gocoder.sdk.api.configuration.WOWZMediaConfig;
+import com.wowza.gocoder.sdk.api.devices.WOWZAudioDevice;
 import com.wowza.gocoder.sdk.sampleapp.audio.VUMeter;
 
 import java.lang.ref.WeakReference;
@@ -22,10 +37,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A custom audio level meter view that demonstrates the use of the GoCoder SDK WZAudioDevice.AudioSampleListener interface
+ * A custom audio level meter view that demonstrates the use of the GoCoder SDK WOWZAudioDevice.AudioSampleListener interface
  */
 public class AudioLevelMeter extends View
-    implements WZAudioDevice.AudioSampleListener {
+    implements WOWZAudioDevice.AudioSampleListener {
 
     private final String TAG = AudioLevelMeter.class.getSimpleName();
 
@@ -165,7 +180,7 @@ public class AudioLevelMeter extends View
      * @param audioConfig The broadcast stream configuration
      */
     @Override
-    public void onWZAudioSampleListenerSetup(WZMediaConfig audioConfig) {
+    public void onWZAudioSampleListenerSetup(WOWZMediaConfig audioConfig) {
         mPeak           = 0;
         mLastPeak       = 0;
         mBeforeLastPeak = 0;

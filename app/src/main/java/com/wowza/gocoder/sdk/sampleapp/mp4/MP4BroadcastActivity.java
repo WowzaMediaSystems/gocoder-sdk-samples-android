@@ -11,42 +11,35 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp.mp4;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.VideoView;
 
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
-import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
-import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
-import com.wowza.gocoder.sdk.api.logging.WZLog;
-import com.wowza.gocoder.sdk.api.mp4.WZMP4Broadcaster;
-import com.wowza.gocoder.sdk.api.status.WZState;
-import com.wowza.gocoder.sdk.api.status.WZStatus;
+import com.wowza.gocoder.sdk.api.configuration.WOWZMediaConfig;
+import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
+import com.wowza.gocoder.sdk.api.logging.WOWZLog;
+import com.wowza.gocoder.sdk.api.mp4.WOWZMP4Broadcaster;
+import com.wowza.gocoder.sdk.api.mp4.WOWZMP4Util;
+import com.wowza.gocoder.sdk.api.status.WOWZState;
+import com.wowza.gocoder.sdk.api.status.WOWZStatus;
 import com.wowza.gocoder.sdk.sampleapp.GoCoderSDKActivityBase;
 import com.wowza.gocoder.sdk.sampleapp.R;
+import com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
-import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
-import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefsActivity;
-
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 
 public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
     final private static String TAG = MP4BroadcastActivity.class.getSimpleName();
@@ -54,20 +47,19 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
     final private static int VIDEO_SELECTED_RESULT_CODE = 1;
 
     // UI controls
-    private MultiStateButton    mBtnFileSelect;
-    private MultiStateButton    mBtnLoop;
+    private MultiStateButton    mBtnFileSelect    = null;
+    private MultiStateButton    mBtnLoop          = null;
 
     protected MultiStateButton  mBtnBroadcast     = null;
     protected MultiStateButton  mBtnSettings      = null;
 
-    private VideoView           mVideoView;
-    private StatusView          mStatusView;
+    private VideoView           mVideoView        = null;
+    private StatusView          mStatusView       = null;
 
-    private Uri                 mMP4FileUri;
-    private WZMP4Broadcaster    mMP4Broadcaster;
+    private WOWZMP4Broadcaster mMP4Broadcaster   = null;
 
-    private MediaPlayer         mMediaPlayer;
-    private boolean             mLooping;
+    private MediaPlayer         mMediaPlayer      = null;
+    private boolean             mLooping          = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +72,6 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
 
         mMediaPlayer        = null;
         mLooping            = true;
-        mMP4FileUri         = null;
 
         mBtnBroadcast       = (MultiStateButton) findViewById(R.id.ic_broadcast);
         mBtnSettings        = (MultiStateButton) findViewById(R.id.ic_settings);
@@ -92,9 +83,8 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
         mStatusView         = (StatusView) findViewById(R.id.statusView);
 
         if (sGoCoderSDK != null) {
-            mMP4Broadcaster = new WZMP4Broadcaster(this.getApplicationContext());
-            mMP4Broadcaster.setLooping(mLooping);
-
+            mMP4Broadcaster = new WOWZMP4Broadcaster(this);
+//            mMP4Broadcaster.setOffset(10000); //set in ms
             mWZBroadcastConfig.setVideoBroadcaster(mMP4Broadcaster);
             mWZBroadcastConfig.setAudioBroadcaster(mMP4Broadcaster);
 
@@ -104,12 +94,13 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
                 public void onPrepared(MediaPlayer mediaPlayer) {
                     mMediaPlayer = mediaPlayer;
                     mediaPlayer.setLooping(mLooping);
-                    mediaPlayer.seekTo(0);
 
                     if (!getBroadcastConfig().isAudioEnabled())
                         mediaPlayer.setVolume(0.0f, 0.0f);
                     else
                         mediaPlayer.setVolume(0.75f, 0.75f);
+
+                    mediaPlayer.seekTo(((int)mMP4Broadcaster.getOffset()));
                 }
             });
 
@@ -117,11 +108,8 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     mMediaPlayer = null;
-                    if (!mLooping && getBroadcast() != null)
-                        getBroadcast().endBroadcast(MP4BroadcastActivity.this);
                 }
             });
-
         } else if (mStatusView != null) {
             mStatusView.setErrorMessage(WowzaGoCoder.getLastError().getErrorDescription());
         }
@@ -159,27 +147,9 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
         mBtnFileSelect.setEnabled(false);
 
         Intent mediaChooser = new Intent(Intent.ACTION_GET_CONTENT);
-        mediaChooser.setType("video/*");
         mediaChooser.addCategory(Intent.CATEGORY_OPENABLE);
+        mediaChooser.setType("video/*");
         startActivityForResult(mediaChooser, VIDEO_SELECTED_RESULT_CODE);
-    }
-
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Video.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-            if (cursor != null) {
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-                cursor.moveToFirst();
-                return cursor.getString(column_index);
-            } else
-                return null;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
     }
 
     @Override
@@ -191,9 +161,10 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
             case VIDEO_SELECTED_RESULT_CODE:
                 if (resultCode==RESULT_OK) {
                     Uri fileUri = returnIntent.getData();
+                    setVideoFile(fileUri);
+                    syncUIControlState();
+/*
                     String mimeType = getContentResolver().getType(fileUri);
-
-                    WZLog.debug(TAG, "PATH = " + getRealPathFromURI(this, fileUri));
 
                     if (mimeType != null && !mimeType.equals("video/mp4")) {
                         mStatusView.setErrorMessage("The video selected is not an MP4 file");
@@ -201,6 +172,7 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
                         setVideoFile(fileUri);
                         syncUIControlState();
                     }
+*/
                 }
                 break;
         }
@@ -208,64 +180,43 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
     }
 
     private void setVideoFile(Uri fileUri) {
-        String filePath = getRealPathFromURI(this, fileUri);
+        if (fileUri == null) return ;
 
-        if (filePath != null) {
+        WOWZMediaConfig mp4FileConfig = WOWZMP4Util.getFileConfig(this, fileUri);
+        if (mp4FileConfig != null) {
+            mWZBroadcastConfig.set(mp4FileConfig);
             mMP4Broadcaster.setFileUri(fileUri);
-            WZMediaConfig mp4Config = mMP4Broadcaster.getMP4Config();
-            if (mp4Config != null) {
-                mMP4FileUri = fileUri;
-                mVideoView.setVideoURI(mMP4FileUri);
-                mVideoView.setVisibility(View.VISIBLE);
+            mVideoView.setVideoURI(fileUri);
 
-                findViewById(R.id.vwHelp).setVisibility(View.INVISIBLE);
-            } else {
-                mMP4FileUri = null;
-                mVideoView.setVisibility(View.INVISIBLE);
-
-                findViewById(R.id.vwHelp).setVisibility(View.VISIBLE);
-                mStatusView.setErrorMessage("The format of the selected file could not be determined");
-            }
+            findViewById(R.id.vwHelp).setVisibility(View.INVISIBLE);
+            mVideoView.setVisibility(View.VISIBLE);
         } else {
-            mStatusView.setErrorMessage("Could not open file");
+            mStatusView.setErrorMessage("The format of the selected MP4 file could not be determined.");
+            mVideoView.setVisibility(View.INVISIBLE);
+            findViewById(R.id.vwHelp).setVisibility(View.VISIBLE);
         }
-    }
-
-    private FileDescriptor getFD(Uri fileUri) {
-        FileDescriptor fd;
-
-        try {
-            ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(fileUri, "r");
-            if (pfd != null)
-                fd = pfd.getFileDescriptor();
-            else
-                return null;
-        } catch (FileNotFoundException e) {
-            fd = null;
-        }
-
-        return fd;
     }
 
     /**
      * Click handler for the broadcast button
      */
     public void onToggleBroadcast(View v) {
-        if (mMP4FileUri == null) {
+        if (mMP4Broadcaster != null && mMP4Broadcaster.getFileUri() == null) {
             mStatusView.setErrorMessage("An MP4 file has not been selected");
             return;
         }
 
-        // Set the broadcast config so that it mirrors the MP4 file's format
-        WZMediaConfig mp4Config = mMP4Broadcaster.getVideoSourceConfig();
-        mWZBroadcastConfig.setVideoSourceConfig(mp4Config);
-        mWZBroadcastConfig.setVideoFrameSize(mp4Config.getVideoFrameSize());
-        mWZBroadcastConfig.setVideoFramerate(mp4Config.getVideoFramerate());
-        mWZBroadcastConfig.setVideoKeyFrameInterval(mp4Config.getVideoKeyFrameInterval());
-        mWZBroadcastConfig.setVideoRotation(mp4Config.getVideoRotation());
 
         if (mWZBroadcast.getStatus().isIdle()) {
-            WZStreamingError configValidationError = mWZBroadcastConfig.validateForBroadcast();
+            // Set the broadcast config so that it mirrors the MP4 file's format
+            WOWZMediaConfig mp4Config = mMP4Broadcaster.getVideoSourceConfig();
+            mWZBroadcastConfig.setVideoSourceConfig(mp4Config);
+            mWZBroadcastConfig.setVideoFrameSize(mp4Config.getVideoFrameSize());
+            mWZBroadcastConfig.setVideoFramerate(mp4Config.getVideoFramerate());
+            mWZBroadcastConfig.setVideoKeyFrameInterval(mp4Config.getVideoKeyFrameInterval());
+            mWZBroadcastConfig.setVideoRotation(mp4Config.getVideoRotation());
+
+            WOWZStreamingError configValidationError = mWZBroadcastConfig.validateForBroadcast();
             if (configValidationError != null) {
                 mStatusView.setErrorMessage(configValidationError.getErrorDescription());
             } else {
@@ -283,11 +234,14 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
      * Click handler for the settings button
      */
     public void onSettings(View v) {
-        Intent intent = new Intent(this, ConfigPrefsActivity.class);
-        intent.putExtra(ConfigPrefs.PREFS_TYPE, ConfigPrefs.ALL_PREFS);
-        intent.putExtra(ConfigPrefs.FIXED_FRAME_SIZE, true);
-        intent.putExtra(ConfigPrefs.FIXED_FRAME_RATE, true);
-        startActivity(intent);
+        // Display the prefs fragment
+        GoCoderSDKPrefs.PrefsFragment prefsFragment = new GoCoderSDKPrefs.PrefsFragment();
+        prefsFragment.setFixedSource(true);
+
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, prefsFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     /**
@@ -301,15 +255,16 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
     }
 
     /**
-     * WZStatusCallback interface methods
+     * WOWZStatusCallback interface methods
      */
+
     @Override
-    public void onWZStatus(final WZStatus goCoderStatus) {
+    public void onWZStatus(final WOWZStatus goCoderStatus) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 switch(goCoderStatus.getState()) {
-                    case WZState.IDLE:
+                    case WOWZState.IDLE:
                         // Clear the "keep screen on" flag
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -317,11 +272,12 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
                             mMediaPlayer.stop();
                         }
                         break;
-                    case WZState.RUNNING:
+                    case WOWZState.RUNNING:
                         // Keep the screen on while we are broadcasting
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-                        mVideoView.seekTo(0);
+                        int seekVal = (int)mMP4Broadcaster.getOffset();
+                        WOWZLog.debug("[broadcastVideoTrack] seekval : "+seekVal);
+                        mVideoView.seekTo(seekVal);
                         mVideoView.start();
                         break;
                 }
@@ -332,7 +288,7 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
     }
 
     @Override
-    public void onWZError(final WZStatus goCoderStatus) {
+    public void onWZError(final WOWZStatus goCoderStatus) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -349,6 +305,8 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
         boolean disableControls = (mWZBroadcast == null ||
                 !(mWZBroadcast.getStatus().isIdle() || mWZBroadcast.getStatus().isRunning()));
 
+        Uri mp4FileUri = mMP4Broadcaster != null ? mMP4Broadcaster.getFileUri() : null;
+
         if (disableControls) {
             mBtnBroadcast.setEnabled(false);
             mBtnSettings.setEnabled(false);
@@ -357,9 +315,8 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
         } else {
             boolean isStreaming = mWZBroadcast.getStatus().isRunning();
             mBtnBroadcast.setState(isStreaming);
-            mBtnBroadcast.setEnabled(mMP4FileUri != null);
+            mBtnBroadcast.setEnabled(mp4FileUri != null);
 
-            mBtnLoop.setEnabled(!isStreaming);
             mBtnSettings.setEnabled(!isStreaming);
             mBtnFileSelect.setEnabled(!isStreaming);
         }

@@ -1,32 +1,25 @@
-/*
+/**
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
  *
- * WOWZA MEDIA SYSTEMS, LLC ("Wowza") CONFIDENTIAL
- * Copyright (c) 2005-2016 Wowza Media Systems, LLC, All Rights Reserved.
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * NOTICE: All information contained herein is, and remains the property of Wowza Media Systems, LLC.
- * The intellectual and technical concepts contained herein are proprietary to Wowza Media Systems, LLC
- * and may be covered by U.S. and Foreign Patents, patents in process, and are protected by trade secret
- * or copyright law. Dissemination of this information or reproduction of this material is strictly forbidden
- * unless prior written permission is obtained from Wowza Media Systems, LLC. Access to the source code
- * contained herein is hereby forbidden to anyone except current Wowza Media Systems, LLC employees, managers
- * or contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering such access.
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * The copyright notice above does not evidence any actual or intended publication or disclosure of this
- * source code, which includes information that is confidential and/or proprietary, and is a trade secret, of
- * Wowza Media Systems, LLC. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR PUBLIC DISPLAY
- * OF OR THROUGH USE OF THIS SOURCE CODE WITHOUT THE EXPRESS WRITTEN CONSENT OF WOWZA MEDIA SYSTEMS, LLC IS
- * STRICTLY PROHIBITED, AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES. THE RECEIPT OR POSSESSION
- * OF THIS SOURCE CODE AND/OR RELATED INFORMATION DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR
- * DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
- *
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp.graphics;
 
+import android.Manifest;
 import android.os.Bundle;
 
-import com.wowza.gocoder.sdk.api.android.graphics.WZText;
-import com.wowza.gocoder.sdk.api.android.graphics.WZTextManager;
+import com.wowza.gocoder.sdk.api.android.graphics.WOWZText;
+import com.wowza.gocoder.sdk.api.android.graphics.WOWZTextManager;
 import com.wowza.gocoder.sdk.sampleapp.CameraActivityBase;
 import com.wowza.gocoder.sdk.sampleapp.R;
 
@@ -44,17 +37,22 @@ public class TextOverlayActivity extends CameraActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overlay);
 
+        mRequiredPermissions = new String[] {
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+        };
+
         if (sGoCoderSDK != null) {
             // Get the GoCoder SDK text manager
-            WZTextManager wzTextManager = WZTextManager.getInstance();
+            WOWZTextManager wzTextManager = WOWZTextManager.getInstance();
 
             // Load a True Type font file from the app's assets folder
             UUID fontId = wzTextManager.loadFont("njnaruto.ttf", 100, 15, 0);
 
             // Display the text centered on the screen
-            WZText textObject = wzTextManager.createTextObject(fontId, "Become a Wowza Ninja", 0.84f, 0.47f, 0f);
-            textObject.setPosition( WZText.CENTER, WZText.CENTER );
-            textObject.setAlignment( WZText.CENTER );
+            WOWZText textObject = wzTextManager.createTextObject(fontId, "Become a Wowza Ninja", 0.84f, 0.47f, 0f);
+            textObject.setPosition(WOWZText.CENTER, WOWZText.CENTER);
+            textObject.setAlignment(WOWZText.CENTER);
         }
     }
 
@@ -62,6 +60,6 @@ public class TextOverlayActivity extends CameraActivityBase {
     protected void onStop() {
         super.onStop();
         if (sGoCoderSDK != null)
-            WZTextManager.getInstance().clear();
+            WOWZTextManager.getInstance().clear();
     }
 }

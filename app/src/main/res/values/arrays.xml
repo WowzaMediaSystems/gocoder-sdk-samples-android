@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="empty_array"/>
+    <string-array name="wz_player1_array">
+        <item>None</item>
+        <item>Stream0</item>
+        <item>Push</item>
+        <item>Denver</item>
+        <item>Booth Cam</item>
+        <item>Play0</item>
+    </string-array>
+    <string-array name="net_log_levels_names_array">
+        <item>VERBOSE</item>
+        <item>DEBUG</item>
+        <item>INFO</item>
+        <item>WARN</item>
+        <item>ERROR</item>
+    </string-array>
+
+    <string-array name="net_log_levels_values_array">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <string-array name="bandwidth_monitor_log_level_names_array">
+        <item>Do not log bandwidth stats</item>
+        <item>Summary stats only</item>
+        <item>Detailed stats</item>
+    </string-array>
+
+    <string-array name="bandwidth_monitor_log_level_values_array">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+</resources>

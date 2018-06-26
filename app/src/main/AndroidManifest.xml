@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.wowza.gocoder.sdk.sampleapp">
+          package="com.wowza.gocoder.sdk.sampleapp">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
@@ -26,9 +27,11 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".MainActivity"
-            android:logo="@drawable/gocoder_logo"
-            android:label="@string/app_name_short">
-           <intent-filter>
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:logo="@drawable/gocoder_logo"
+                  android:label="@string/app_name_short">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -38,59 +41,65 @@
             android:name=".CameraActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="fullSensor"
-            android:logo="@mipmap/ic_launcher"
             android:label="@string/camera_example_title">
         </activity>
 
+        <activity
+            android:name=".EventActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor"
+            android:label="@string/event_example_title">
+        </activity>
+
         <activity android:name=".mp4.MP4BroadcastActivity"
-            android:label="@string/mp4_broadcast_title"/>
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor"
+                  android:label="@string/mp4_broadcast_title"/>
 
         <activity android:name=".mp4.MP4CaptureActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="fullSensor"
-            android:label="@string/mp4_capture_title"/>
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:label="@string/mp4_capture_title"/>
 
         <activity android:name=".audio.AudioMeterActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="fullSensor"
-            android:label="@string/audio_meter_title"/>
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:label="@string/audio_meter_title"/>
 
         <activity android:name=".audio.BluetoothActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="fullSensor"
-            android:label="@string/audio_bluetooth_title"/>
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:label="@string/audio_bluetooth_title"/>
 
         <activity android:name=".graphics.BitmapOverlayActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="fullSensor"
-            android:label="@string/bitmap_overlay_title"/>
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:label="@string/bitmap_overlay_title"/>
 
         <activity android:name=".graphics.TextOverlayActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="fullSensor"
-            android:label="@string/text_overlay_title"/>
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:label="@string/text_overlay_title"/>
+
+        <activity android:name=".graphics.OpenGLActivity"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:label="@string/opengl_title"/>
 
         <activity android:name=".ScreenshotActivity"
                   android:configChanges="orientation|keyboardHidden|screenSize"
                   android:screenOrientation="fullSensor"
                   android:label="@string/screenshot_title"/>
 
-        <activity
-            android:name=".FaceActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="portrait"
-            android:label="@string/camera_example_title"/>
+        <activity android:name=".FaceActivity"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="portrait"
+                  android:label="@string/camera_example_title"/>
 
-        <activity android:name=".InfoActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="fullSensor"
-            android:label="@string/info_title"/>
-
-        <activity android:name=".config.ConfigPrefsActivity"
-            android:screenOrientation="fullSensor"
-            android:icon="@drawable/ic_gear"
-            android:label="@string/configuration_settings_title"
-            android:theme="@style/ConfigTheme"/>
+        <activity android:name=".PlayerActivity"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:screenOrientation="fullSensor"
+                  android:label="@string/stream_player_title"/>
 
     </application>
 

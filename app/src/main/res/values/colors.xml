@@ -4,8 +4,11 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="black_overlay">#66000000</color>
-    <color name="primary_material_dark_1">#931d1d</color>
+    <color name="dataTableRowBackground1">#00ffffff</color>
+    <color name="dataTableRowBackground2">#1affffff</color>
+    <color name="dataTableHeaderBackground">#1a1a1a</color>
+    <color name="dataTableSubHeaderBackground">#da212121</color>
+
     <color name="controlButtonPressed">#80ff8400</color>
     <color name="multiStateButtonPressed">#80ff8400</color>
     <color name="multiStateButtonDisabled">#c1636363</color>

@@ -10,25 +10,24 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.wowza.gocoder.sdk.api.devices.WZCamera;
-import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
+import com.wowza.gocoder.sdk.api.devices.WOWZCamera;
+import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 import com.wowza.gocoder.sdk.sampleapp.ui.AutoFocusListener;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.TimerView;
 
-public class CameraActivity extends CameraActivityBase {
+public class CameraActivity extends CameraActivityBase   {
     private final static String TAG = CameraActivity.class.getSimpleName();
 
     // UI controls
@@ -53,6 +52,7 @@ public class CameraActivity extends CameraActivityBase {
         mBtnTorch           = (MultiStateButton) findViewById(R.id.ic_torch);
         mBtnSwitchCamera    = (MultiStateButton) findViewById(R.id.ic_switch_camera);
         mTimerView          = (TimerView) findViewById(R.id.txtTimer);
+
     }
 
     /**
@@ -61,16 +61,14 @@ public class CameraActivity extends CameraActivityBase {
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (sGoCoderSDK != null && mWZCameraView != null) {
+        if (this.hasDevicePermissionToAccess() && sGoCoderSDK != null && mWZCameraView != null) {
             if (mAutoFocusDetector == null)
                 mAutoFocusDetector = new GestureDetectorCompat(this, new AutoFocusListener(this, mWZCameraView));
 
-            WZCamera activeCamera = mWZCameraView.getCamera();
-            if (activeCamera != null && activeCamera.hasCapability(WZCamera.FOCUS_MODE_CONTINUOUS))
-                activeCamera.setFocusMode(WZCamera.FOCUS_MODE_CONTINUOUS);
+            WOWZCamera activeCamera = mWZCameraView.getCamera();
+            if (activeCamera != null && activeCamera.hasCapability(WOWZCamera.FOCUS_MODE_CONTINUOUS))
+                activeCamera.setFocusMode(WOWZCamera.FOCUS_MODE_CONTINUOUS);
         }
-
     }
 
     @Override
@@ -87,12 +85,22 @@ public class CameraActivity extends CameraActivityBase {
         mBtnTorch.setState(false);
         mBtnTorch.setEnabled(false);
 
-        WZCamera newCamera = mWZCameraView.switchCamera();
-        if (newCamera != null) {
-            if (newCamera.hasCapability(WZCamera.FOCUS_MODE_CONTINUOUS))
-                newCamera.setFocusMode(WZCamera.FOCUS_MODE_CONTINUOUS);
+        // Set the new surface extension prior to camera switch such that
+        // setting will take place with the new one.  So if it is currently the front
+        // camera, then switch to default setting (not mirrored).  Otherwise show mirrored.
+//        if(mWZCameraView.getCamera().getDirection() == WOWZCamera.DIRECTION_FRONT) {
+//            mWZCameraView.setSurfaceExtension(mWZCameraView.EXTENSION_DEFAULT);
+//        }
+//        else{
+//            mWZCameraView.setSurfaceExtension(mWZCameraView.EXTENSION_MIRROR);
+//        }
 
-            boolean hasTorch = newCamera.hasCapability(WZCamera.TORCH);
+        WOWZCamera newCamera = mWZCameraView.switchCamera();
+        if (newCamera != null) {
+            if (newCamera.hasCapability(WOWZCamera.FOCUS_MODE_CONTINUOUS))
+                newCamera.setFocusMode(WOWZCamera.FOCUS_MODE_CONTINUOUS);
+
+            boolean hasTorch = newCamera.hasCapability(WOWZCamera.TORCH);
             if (hasTorch) {
                 mBtnTorch.setState(newCamera.isTorchOn());
                 mBtnTorch.setEnabled(true);
@@ -106,7 +114,7 @@ public class CameraActivity extends CameraActivityBase {
     public void onToggleTorch(View v) {
         if (mWZCameraView == null) return;
 
-        WZCamera activeCamera = mWZCameraView.getCamera();
+        WOWZCamera activeCamera = mWZCameraView.getCamera();
         activeCamera.setTorchOn(mBtnTorch.toggleState());
     }
 
@@ -114,6 +122,7 @@ public class CameraActivity extends CameraActivityBase {
     public boolean onTouchEvent(MotionEvent event) {
         if (mAutoFocusDetector != null)
             mAutoFocusDetector.onTouchEvent(event);
+
         return super.onTouchEvent(event);
     }
 
@@ -128,20 +137,19 @@ public class CameraActivity extends CameraActivityBase {
             mBtnSwitchCamera.setEnabled(false);
             mBtnTorch.setEnabled(false);
         } else {
-            boolean isDisplayingVideo = (getBroadcastConfig().isVideoEnabled() && mWZCameraView.getCameras().length > 0);
+            boolean isDisplayingVideo = (this.hasDevicePermissionToAccess(Manifest.permission.CAMERA) && getBroadcastConfig().isVideoEnabled() && mWZCameraView.getCameras().length > 0);
             boolean isStreaming = getBroadcast().getStatus().isRunning();
 
             if (isDisplayingVideo) {
-                WZCamera activeCamera = mWZCameraView.getCamera();
+                WOWZCamera activeCamera = mWZCameraView.getCamera();
 
-                boolean hasTorch = (activeCamera != null && activeCamera.hasCapability(WZCamera.TORCH));
+                boolean hasTorch = (activeCamera != null && activeCamera.hasCapability(WOWZCamera.TORCH));
                 mBtnTorch.setEnabled(hasTorch);
                 if (hasTorch) {
                     mBtnTorch.setState(activeCamera.isTorchOn());
                 }
 
                 mBtnSwitchCamera.setEnabled(mWZCameraView.getCameras().length > 0);
-                //mBtnSwitchCamera.setEnabled(mWZCameraView.isSwitchCameraAvailable());
             } else {
                 mBtnSwitchCamera.setEnabled(false);
                 mBtnTorch.setEnabled(false);

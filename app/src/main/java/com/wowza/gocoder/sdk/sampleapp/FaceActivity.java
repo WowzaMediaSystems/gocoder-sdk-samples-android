@@ -10,7 +10,7 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp;
@@ -21,15 +21,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.Toast;
 
-import com.wowza.gocoder.sdk.api.android.graphics.WZBitmap;
-import com.wowza.gocoder.sdk.api.android.graphics.WZText;
-import com.wowza.gocoder.sdk.api.android.graphics.WZTextManager;
-import com.wowza.gocoder.sdk.api.devices.WZCamera;
-import com.wowza.gocoder.sdk.api.geometry.WZSize;
-import com.wowza.gocoder.sdk.sampleapp.config.ConfigPrefs;
+import com.wowza.gocoder.sdk.api.android.graphics.WOWZBitmap;
+import com.wowza.gocoder.sdk.api.android.graphics.WOWZText;
+import com.wowza.gocoder.sdk.api.android.graphics.WOWZTextManager;
+import com.wowza.gocoder.sdk.api.devices.WOWZCamera;
+import com.wowza.gocoder.sdk.api.geometry.WOWZSize;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.TimerView;
 
@@ -45,9 +44,9 @@ public class FaceActivity extends CameraActivityBase
     protected MultiStateButton      mBtnTorch         = null;
     protected TimerView             mTimerView        = null;
 
-    protected WZBitmap              mNinjaFace        = null;
+    protected WOWZBitmap mNinjaFace        = null;
     protected boolean               mDetectingFaces   = false;
-    protected WZText                mNoFaces          = null;
+    protected WOWZText mNoFaces          = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,18 +65,18 @@ public class FaceActivity extends CameraActivityBase
 
         if (sGoCoderSDK != null) {
             // Read in the text font and create the rotated side banner
-            WZTextManager wzTextManager = WZTextManager.getInstance();
+            WOWZTextManager wzTextManager = WOWZTextManager.getInstance();
             UUID fontId = wzTextManager.loadFont("njnaruto.ttf", 75, 15, 0);
 
-            WZText textObject = wzTextManager.createTextObject(fontId, "Become a Wowza Ninja", 0.98f, 0.47f, 0.11f);
+            WOWZText textObject = wzTextManager.createTextObject(fontId, "Become a Wowza Ninja", 0.98f, 0.47f, 0.11f);
             textObject.setPosition( 35, 50 );
             textObject.setRotationAngle(90);
-            textObject.setAlignment( WZText.LEFT );
+            textObject.setAlignment( WOWZText.LEFT );
 
             // Create the 'No faces detected' text object
             mNoFaces = wzTextManager.createTextObject(fontId, "No faces detected", 0.98f, 0.47f, 0.11f);
-            mNoFaces.setPosition( WZText.CENTER, WZText.CENTER );
-            mNoFaces.setAlignment( WZText.CENTER );
+            mNoFaces.setPosition( WOWZText.CENTER, WOWZText.CENTER );
+            mNoFaces.setAlignment( WOWZText.CENTER );
             mNoFaces.setVisible(false);
         }
     }
@@ -86,7 +85,27 @@ public class FaceActivity extends CameraActivityBase
     protected void onStop() {
         super.onStop();
         if (sGoCoderSDK != null)
-            WZTextManager.getInstance().clear();
+            WOWZTextManager.getInstance().clear();
+    }
+
+    @Override
+    public void onWZCameraPreviewStarted(WOWZCamera wzCamera, WOWZSize frameSize, int frameRate) {
+        super.onWZCameraPreviewStarted(wzCamera, frameSize, frameRate);
+
+        if (cameraSupportsFaceDetection(wzCamera))
+            mDetectingFaces = setFaceDetectionState(wzCamera, true);
+        else
+            Toast.makeText(this, "The selected camera does not support facial recognition", Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Checks to see if the specified camera support facial recognition
+     * @param camera The camera to check
+     * @return true if the specified camera supports facial recognition, false otherwise
+     */
+    private boolean cameraSupportsFaceDetection(WOWZCamera camera) {
+        Camera nativeCamera = camera.getPlatformDevice();
+        return (nativeCamera.getParameters().getMaxNumDetectedFaces() > 0);
     }
 
     /**
@@ -95,23 +114,18 @@ public class FaceActivity extends CameraActivityBase
      * @param turnOn specifies whether to turn face detection on or off
      * @return Indicates if face detection was turned on or off
      */
-    private boolean setFaceDetectionState(WZCamera camera, boolean turnOn) {
-        if (mDetectingFaces == turnOn) return mDetectingFaces;
-
+    private synchronized boolean setFaceDetectionState(WOWZCamera camera, boolean turnOn) {
         Camera nativeCamera = camera.getPlatformDevice();
-        if (nativeCamera.getParameters().getMaxNumDetectedFaces() == 0) {
-            mStatusView.setErrorMessage("The currently selected camera does not support face detection");
-            return false;
-        }
 
-        if (turnOn) {
+        if (!turnOn) {
+            nativeCamera.stopFaceDetection();
+            mDetectingFaces = false;
+        } else if (nativeCamera.getParameters().getMaxNumDetectedFaces() > 0) {
             nativeCamera.setFaceDetectionListener(this);
             nativeCamera.startFaceDetection();
+            mDetectingFaces = true;
         }
-        else
-            nativeCamera.stopFaceDetection();
 
-        mDetectingFaces = turnOn;
         return mDetectingFaces;
     }
 
@@ -143,9 +157,9 @@ public class FaceActivity extends CameraActivityBase
             // Set the bitmap to the center of the face's bounding box
             mNinjaFace.setPosition((int)viewRect.centerX(), mWZCameraView.getHeight() - Math.round(viewRect.centerY()));
             // Scale the bitmap to the same size as the face
-            mNinjaFace.setScale(faceScale * 1.5f, WZBitmap.SURFACE_WIDTH);
+            mNinjaFace.setScale(faceScale * 1.5f, WOWZBitmap.SURFACE_WIDTH);
 
-            //WZLog.debug(TAG, viewRect.toString());
+            //WOWZLog.debug(TAG, viewRect.toString());
         }
 
         mNinjaFace.setVisible(chosenFace != null);
@@ -157,18 +171,15 @@ public class FaceActivity extends CameraActivityBase
      */
     @Override
     protected void onResume() {
-        if (mWZCameraView != null)
-            mWZCameraView.setPreviewReadyListener(this);
-
         super.onResume();
 
         if (sGoCoderSDK != null && mWZCameraView != null) {
             if (mNinjaFace == null) {
                 // Read in the bitmap for the face detection
                 Bitmap faceBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ninja_face);
-                mNinjaFace = new WZBitmap(faceBitmap);
-                mNinjaFace.setPosition(WZBitmap.CENTER, WZBitmap.CENTER);
-                mNinjaFace.setScale(0.50f, WZBitmap.SURFACE_WIDTH);
+                mNinjaFace = new WOWZBitmap(faceBitmap);
+                mNinjaFace.setPosition(WOWZBitmap.CENTER, WOWZBitmap.CENTER);
+                mNinjaFace.setScale(0.50f, WOWZBitmap.SURFACE_WIDTH);
                 mNinjaFace.setVisible(false);
 
                 mWZCameraView.registerFrameRenderer(mNinjaFace);
@@ -181,12 +192,12 @@ public class FaceActivity extends CameraActivityBase
         if (mDetectingFaces)
             setFaceDetectionState(mWZCameraView.getCamera(), false);
 
-        super.onPause();
-    }
+        if (mNinjaFace != null)
+            mNinjaFace.setVisible(false);
+        if (mNoFaces != null)
+            mNoFaces.setVisible(false);
 
-    @Override
-    public void onWZCameraPreviewStarted(WZCamera wzCamera, WZSize frameSize, int frameRate) {
-        setFaceDetectionState(wzCamera, true);
+        super.onPause();
     }
 
     /**
@@ -198,14 +209,17 @@ public class FaceActivity extends CameraActivityBase
         if (mDetectingFaces)
             setFaceDetectionState(mWZCameraView.getCamera(), false);
 
-        WZCamera newCamera = mWZCameraView.switchCamera();
+        if (mNinjaFace != null)
+            mNinjaFace.setVisible(false);
+        if (mNoFaces != null)
+            mNoFaces.setVisible(false);
 
-        boolean hasTorch = (newCamera != null && newCamera.hasCapability(WZCamera.TORCH));
-        if (hasTorch)
-            mBtnTorch.setState(newCamera.isTorchOn());
+        WOWZCamera newCamera = mWZCameraView.switchCamera();
+
+        if (cameraSupportsFaceDetection(newCamera))
+            mDetectingFaces = setFaceDetectionState(newCamera, true);
         else
-            mBtnTorch.setState(false);
-        mBtnTorch.setEnabled(hasTorch);
+            Toast.makeText(this, "The selected camera does not support facial recognition", Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -214,7 +228,7 @@ public class FaceActivity extends CameraActivityBase
     public void onToggleTorch(View v) {
         if (mWZCameraView == null) return;
 
-        WZCamera activeCamera = mWZCameraView.getCamera();
+        WOWZCamera activeCamera = mWZCameraView.getCamera();
         activeCamera.setTorchOn(mBtnTorch.toggleState());
     }
 
@@ -229,13 +243,17 @@ public class FaceActivity extends CameraActivityBase
             mBtnSwitchCamera.setEnabled(false);
             mBtnTorch.setEnabled(false);
         } else {
-            boolean isDisplayingVideo = (getBroadcastConfig().isVideoEnabled() && mWZCameraView.getCameras().length > 0);
+            boolean isDisplayingVideo = false;
             boolean isStreaming = getBroadcast().getStatus().isRunning();
+            if(this.hasDevicePermissionToAccess()){
+                isDisplayingVideo = (getBroadcastConfig().isVideoEnabled() && mWZCameraView.getCameras().length > 0);
+            }
+
 
             if (isDisplayingVideo) {
-                WZCamera activeCamera = mWZCameraView.getCamera();
+                WOWZCamera activeCamera = mWZCameraView.getCamera();
 
-                boolean hasTorch = (activeCamera != null && activeCamera.hasCapability(WZCamera.TORCH));
+                boolean hasTorch = (activeCamera != null && activeCamera.hasCapability(WOWZCamera.TORCH));
                 mBtnTorch.setEnabled(hasTorch);
                 if (hasTorch) {
                     mBtnTorch.setState(activeCamera.isTorchOn());

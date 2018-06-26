@@ -1,25 +1,19 @@
-package com.wowza.gocoder.sdk.sampleapp.ui;/*
+/**
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
  *
- * WOWZA MEDIA SYSTEMS, LLC ("Wowza") CONFIDENTIAL
- * Copyright (c) 2005-2016 Wowza Media Systems, LLC, All Rights Reserved.
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * NOTICE: All information contained herein is, and remains the property of Wowza Media Systems, LLC.
- * The intellectual and technical concepts contained herein are proprietary to Wowza Media Systems, LLC
- * and may be covered by U.S. and Foreign Patents, patents in process, and are protected by trade secret
- * or copyright law. Dissemination of this information or reproduction of this material is strictly forbidden
- * unless prior written permission is obtained from Wowza Media Systems, LLC. Access to the source code
- * contained herein is hereby forbidden to anyone except current Wowza Media Systems, LLC employees, managers
- * or contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering such access.
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * The copyright notice above does not evidence any actual or intended publication or disclosure of this
- * source code, which includes information that is confidential and/or proprietary, and is a trade secret, of
- * Wowza Media Systems, LLC. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR PUBLIC DISPLAY
- * OF OR THROUGH USE OF THIS SOURCE CODE WITHOUT THE EXPRESS WRITTEN CONSENT OF WOWZA MEDIA SYSTEMS, LLC IS
- * STRICTLY PROHIBITED, AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES. THE RECEIPT OR POSSESSION
- * OF THIS SOURCE CODE AND/OR RELATED INFORMATION DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR
- * DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
- *
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
+
+package com.wowza.gocoder.sdk.sampleapp.ui;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -27,26 +21,26 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
-import com.wowza.gocoder.sdk.api.devices.WZCamera;
-import com.wowza.gocoder.sdk.api.devices.WZCameraView;
-import com.wowza.gocoder.sdk.api.geometry.WZSize;
+import com.wowza.gocoder.sdk.api.devices.WOWZCamera;
+import com.wowza.gocoder.sdk.api.devices.WOWZCameraView;
+import com.wowza.gocoder.sdk.api.geometry.WOWZSize;
 
 public class AutoFocusListener extends GestureDetector.SimpleOnGestureListener {
 
     private Context         mContext    = null;
-    private WZCameraView    mCameraView = null;
+    private WOWZCameraView mCameraView = null;
 
     public AutoFocusListener(Context context) {
         super();
         mContext = context;
     }
 
-    public AutoFocusListener(Context context, WZCameraView cameraView) {
+    public AutoFocusListener(Context context, WOWZCameraView cameraView) {
         this(context);
         mCameraView = cameraView;
     }
 
-    public void setCameraView(WZCameraView mCameraView) {
+    public void setCameraView(WOWZCameraView mCameraView) {
         this.mCameraView = mCameraView;
     }
 
@@ -62,14 +56,14 @@ public class AutoFocusListener extends GestureDetector.SimpleOnGestureListener {
     @Override
     public boolean onDoubleTap(MotionEvent event) {
         if (mCameraView != null) {
-            WZCamera activeCamera = mCameraView.getCamera();
+            WOWZCamera activeCamera = mCameraView.getCamera();
 
-            if (activeCamera != null && activeCamera.hasCapability(WZCamera.FOCUS_MODE_CONTINUOUS)) {
-                if (activeCamera.getFocusMode() != WZCamera.FOCUS_MODE_CONTINUOUS) {
-                    activeCamera.setFocusMode(WZCamera.FOCUS_MODE_CONTINUOUS);
+            if (activeCamera != null && activeCamera.hasCapability(WOWZCamera.FOCUS_MODE_CONTINUOUS)) {
+                if (activeCamera.getFocusMode() != WOWZCamera.FOCUS_MODE_CONTINUOUS) {
+                    activeCamera.setFocusMode(WOWZCamera.FOCUS_MODE_CONTINUOUS);
                     Toast.makeText(mContext, "Continuous video focus on", Toast.LENGTH_SHORT).show();
                 } else {
-                    activeCamera.setFocusMode(WZCamera.FOCUS_MODE_OFF);
+                    activeCamera.setFocusMode(WOWZCamera.FOCUS_MODE_OFF);
                     Toast.makeText(mContext, "Continuous video focus off", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -81,13 +75,13 @@ public class AutoFocusListener extends GestureDetector.SimpleOnGestureListener {
     @Override
     public boolean onSingleTapConfirmed(MotionEvent event) {
         if (mCameraView != null) {
-            WZCamera activeCamera = mCameraView.getCamera();
+            WOWZCamera activeCamera = mCameraView.getCamera();
 
-            if (activeCamera != null && activeCamera.hasCapability(WZCamera.FOCUS_MODE_AUTO)) {
+            if (activeCamera != null && activeCamera.hasCapability(WOWZCamera.FOCUS_MODE_AUTO)) {
 
                 DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
-                WZSize previewScreenSize = mCameraView.getScreenSize();
-                WZSize previewFrameSize = mCameraView.getFrameSize();
+                WOWZSize previewScreenSize = mCameraView.getScreenSize();
+                WOWZSize previewFrameSize = mCameraView.getFrameSize();
 
                 int previewScreenLeft = Math.round((float) (displayMetrics.widthPixels - previewScreenSize.width) / 2f);
                 int previewScreenTop = Math.round((float) (displayMetrics.heightPixels - previewScreenSize.height) / 2f);

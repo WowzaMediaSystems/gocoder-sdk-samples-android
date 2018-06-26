@@ -1,0 +1,82 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e72b2b2b">
+
+    <TextView
+        android:id="@+id/txtTableTitle"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:background="#000"
+        android:paddingBottom="10dp"
+        android:layout_marginBottom="1dp"
+        android:padding="10dp"
+        android:text="@string/label_datagrid_table_title"
+        android:textAppearance="@style/DataTableHeaderAppearance"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/transparent"
+        android:layout_alignParentStart="true"
+        android:scrollbars="vertical"
+        android:layout_below="@+id/txtTableTitle">
+
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                     xmlns:tools="http://schemas.android.com/tools"
+                     android:id="@+id/tblDataTable"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:scrollbars="vertical"
+                     android:stretchColumns="1,2"
+                     android:background="@android:color/transparent"
+                     android:theme="@style/DataTableTheme"
+                     tools:context="com.wowza.gocoder.sdk.sampleapp.ui.DataTableFragment">
+
+<!--
+            <TableRow
+                android:id="@+id/tblRowHeader"
+                android:layout_width="match_parent"
+                android:background="@android:color/transparent"
+                android:theme="@style/DataHeaderTheme">
+
+                <TextView
+                    android:id="@+id/tblCellHeader1"
+                    android:layout_marginEnd="1dp"
+                    android:layout_column="1"
+                    android:background="@color/dataTableHeaderBackground"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    android:gravity="end"
+                    android:text="@string/label_datagrid_header_name"
+                    android:textAppearance="@style/DataTableHeaderAppearance"/>
+
+                <TextView
+                    android:id="@+id/tblCellHeader2"
+                    android:background="@color/dataTableHeaderBackground"
+                    android:layout_column="2"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    android:text="@string/label_datagrid_header_value"
+                    android:textAppearance="@style/DataTableHeaderAppearance"
+                    />
+            </TableRow>
+-->
+
+        </TableLayout>
+
+    </ScrollView>
+</RelativeLayout>

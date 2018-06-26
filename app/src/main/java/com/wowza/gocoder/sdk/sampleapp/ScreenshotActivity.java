@@ -1,7 +1,4 @@
 /**
- *  CameraActivity.java
- *  gocoder-sdk-sampleapp
- *
  *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
  *  purpose of educating developers, and is not intended to be used in any production environment.
  *
@@ -13,7 +10,7 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp;
@@ -26,17 +23,18 @@ import android.opengl.EGL14;
 import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.wowza.gocoder.sdk.api.android.opengl.WZGLES;
-import com.wowza.gocoder.sdk.api.devices.WZCamera;
-import com.wowza.gocoder.sdk.api.devices.WZCameraView;
-import com.wowza.gocoder.sdk.api.errors.WZError;
-import com.wowza.gocoder.sdk.api.geometry.WZSize;
-import com.wowza.gocoder.sdk.api.logging.WZLog;
-import com.wowza.gocoder.sdk.api.render.WZRenderAPI;
+import com.wowza.gocoder.sdk.api.android.opengl.WOWZGLES;
+import com.wowza.gocoder.sdk.api.devices.WOWZCamera;
+import com.wowza.gocoder.sdk.api.devices.WOWZCameraView;
+import com.wowza.gocoder.sdk.api.errors.WOWZError;
+import com.wowza.gocoder.sdk.api.geometry.WOWZSize;
+import com.wowza.gocoder.sdk.api.logging.WOWZLog;
+import com.wowza.gocoder.sdk.api.render.WOWZRenderAPI;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -52,7 +50,7 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
     private final static String TAG = ScreenshotActivity.class.getSimpleName();
 
     // UI views and controls
-    private WZCameraView    mWZCameraView   = null;
+    private WOWZCameraView mWZCameraView   = null;
     private ImageButton     mBtnScreenshot  = null;
     private AtomicBoolean   mGrabFrame      = new AtomicBoolean(false);
     private AtomicBoolean   mSavingFrame    = new AtomicBoolean(false);
@@ -72,10 +70,10 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
         mBtnScreenshot.setClickable(false);
 
         if (sGoCoderSDK != null) {
-            mWZCameraView = (WZCameraView) findViewById(R.id.camera_preview);
+            mWZCameraView = (WOWZCameraView) findViewById(R.id.camera_preview);
 
             // Create an register a video frame listener with WZCameraPreview
-            WZRenderAPI.VideoFrameListener videoFrameListener = new WZRenderAPI.VideoFrameListener() {
+            WOWZRenderAPI.VideoFrameListener videoFrameListener = new WOWZRenderAPI.VideoFrameListener() {
 
                 @Override
                 // onWZVideoFrameListenerFrameAvailable() will only be called nce isWZVideoFrameListenerActive() returns true
@@ -86,32 +84,32 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
                 }
 
                 @Override
-                public void onWZVideoFrameListenerInit(WZGLES.EglEnv eglEnv) {
+                public void onWZVideoFrameListenerInit(WOWZGLES.EglEnv eglEnv) {
                     // nothing needed for this example
                 }
 
                 @Override
                 // onWZVideoFrameListenerFrameAvailable() is called when isWZVideoFrameListenerActive() = true
                 // and a new frame has been rendered on the camera preview display surface
-                public void onWZVideoFrameListenerFrameAvailable(WZGLES.EglEnv eglEnv, WZSize frameSize, int frameRotation, long timecodeNanos) {
+                public void onWZVideoFrameListenerFrameAvailable(WOWZGLES.EglEnv eglEnv, WOWZSize frameSize, int frameRotation, long timecodeNanos) {
                     // set these flags so that this doesn't get called numerous times in parallel
                     mSavingFrame.set(true);
                     mGrabFrame.set(false);
 
                     // create a pixel buffer and read the pixels from the camera preview display surface using GLES
-                    final WZSize bitmapSize = new WZSize(frameSize);
+                    final WOWZSize bitmapSize = new WOWZSize(frameSize);
                     final ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(bitmapSize.getWidth() * bitmapSize.getHeight() * 4);
                     pixelBuffer.order(ByteOrder.LITTLE_ENDIAN);
                     GLES20.glReadPixels(0, 0, bitmapSize.getWidth(),  bitmapSize.getHeight(),
                             GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, pixelBuffer);
-                    final int eglError = WZGLES.checkForEglError(TAG + "(glReadPixels)");
+                    final int eglError = WOWZGLES.checkForEglError(TAG + "(glReadPixels)");
                     if (eglError != EGL14.EGL_SUCCESS) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 mBtnScreenshot.setEnabled(true);
                                 mBtnScreenshot.setClickable(true);
-                                Toast.makeText(getApplicationContext(), WZGLES.getEglErrorString(eglError), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), WOWZGLES.getEglErrorString(eglError), Toast.LENGTH_LONG).show();
                             }
                         });
 
@@ -149,7 +147,7 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
                                 }
 
                             } catch(Exception e) {
-                                WZLog.error(TAG, "An exception occurred trying to create the screenshot", e);
+                                WOWZLog.error(TAG, "An exception occurred trying to create the screenshot", e);
                                 statusMessage.append(e.getLocalizedMessage());
 
                             } finally {
@@ -178,7 +176,7 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
                 }
 
                 @Override
-                public void onWZVideoFrameListenerRelease(WZGLES.EglEnv eglEnv) {
+                public void onWZVideoFrameListenerRelease(WOWZGLES.EglEnv eglEnv) {
                     // nothing needed for this example
                 }
             };
@@ -186,28 +184,29 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
             // register our newly created video frame listener wth the camera preview display view
             mWZCameraView.registerFrameListener(videoFrameListener);
 
-            // don't enable the screenshot button until the camera preview is ready
-            mWZCameraView.setPreviewReadyListener(new WZCameraView.PreviewStatusListener() {
-                @Override
-                public void onWZCameraPreviewStarted(WZCamera wzCamera, WZSize wzSize, int i) {
-                    mBtnScreenshot.setEnabled(true);
-                    mBtnScreenshot.setClickable(true);
-                }
+            if(mPermissionsGranted) {
+                // start the camera preview display and enable the screenshot button when it is ready
+                mWZCameraView.startPreview(new WOWZCameraView.PreviewStatusListener() {
+                    @Override
+                    public void onWZCameraPreviewStarted(WOWZCamera camera, WOWZSize frameSize, int frameRate) {
+                        mBtnScreenshot.setEnabled(true);
+                        mBtnScreenshot.setClickable(true);
+                    }
 
-                @Override
-                public void onWZCameraPreviewStopped(int i) {
-                    mBtnScreenshot.setEnabled(false);
-                    mBtnScreenshot.setClickable(false);
-                }
+                    @Override
+                    public void onWZCameraPreviewStopped(int cameraId) {
+                        mBtnScreenshot.setEnabled(false);
+                        mBtnScreenshot.setClickable(false);
+                    }
 
-                @Override
-                public void onWZCameraPreviewError(WZCamera wzCamera, WZError wzError) {
-                    mBtnScreenshot.setEnabled(false);
-                    mBtnScreenshot.setClickable(false);
-                }
-            });
-
-            mWZCameraView.startPreview();
+                    @Override
+                    public void onWZCameraPreviewError(WOWZCamera camera, WOWZError error) {
+                        mBtnScreenshot.setEnabled(false);
+                        mBtnScreenshot.setClickable(false);
+                        displayErrorDialog(error);
+                    }
+                });
+            }
         }
     }
 
@@ -224,8 +223,41 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
     protected void onResume() {
         super.onResume();
 
-        if (mWZCameraView != null)
+        if (mWZCameraView != null) {
             mWZCameraView.onResume();
+
+            if(mPermissionsGranted && !mWZCameraView.isPreviewing()) {
+                // start the camera preview display and enable the screenshot button when it is ready
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        // start the camera preview display and enable the screenshot button when it is ready
+                        mWZCameraView.startPreview(new WOWZCameraView.PreviewStatusListener() {
+                            @Override
+                            public void onWZCameraPreviewStarted(WOWZCamera camera, WOWZSize frameSize, int frameRate) {
+                                mBtnScreenshot.setEnabled(true);
+                                mBtnScreenshot.setClickable(true);
+                            }
+
+                            @Override
+                            public void onWZCameraPreviewStopped(int cameraId) {
+                                mBtnScreenshot.setEnabled(false);
+                                mBtnScreenshot.setClickable(false);
+                            }
+
+                            @Override
+                            public void onWZCameraPreviewError(WOWZCamera camera, WOWZError error) {
+                                mBtnScreenshot.setEnabled(false);
+                                mBtnScreenshot.setClickable(false);
+                                displayErrorDialog(error);
+                            }
+                        });
+                    }
+                }, 300);
+            }
+        }
     }
 
     @Override
@@ -251,7 +283,7 @@ public class ScreenshotActivity extends GoCoderSDKActivityBase {
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                WZLog.error(TAG, "Failed to create the directory in which to store the screenshot");
+                WOWZLog.error(TAG, "Failed to create the directory in which to store the screenshot");
                 return null;
             }
         }

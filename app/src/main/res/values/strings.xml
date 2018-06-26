@@ -3,22 +3,23 @@
     <string name="app_name_long">Wowza GoCoder SDK Examples</string>
 
     <string name="camera_example_title">GoCoder SDK Capture Example</string>
+    <string name="event_example_title">GoCoder SDK Events and Metadata Example</string>
     <string name="mp4_broadcast_title">GoCoder SDK MP4 Broadcast Example</string>
     <string name="mp4_capture_title">GoCoder SDK MP4 Capture Example</string>
     <string name="audio_meter_title">GoCoder SDK Bluetooth Mic Example</string>
-    <string name="audio_meter_help">Press the mic icon to toggle the audio level meter</string>
     <string name="audio_bluetooth_title">GoCoder SDK Audio Meter Example</string>
-    <string name="audio_bluetooth_help">The Bluetooth mic will be used for audio input if present</string>
     <string name="info_title">Device Information APIs</string>
     <string name="face_title">Face Detection Example</string>
+    <string name="stream_player_title">Live Stream Player Example</string>
     <string name="screenshot_title">Screenshot Example</string>
-
     <string name="text_overlay_title">GoCoder SDK Text Overlay Example</string>
-
+    <string name="opengl_title">GoCoder SDK OpenGL Capture Example</string>
     <string name="bitmap_overlay_title">GoCoder SDK Bitmap Overlay Example</string>
-    <string name="bitmap_overlay_help">Use a pinch gesture to scale the overlay logo</string>
-
     <string name="surface_view_title">GoCoder SDK OpenGL ES Capture Example</string>
+
+    <string name="audio_meter_help">Press the mic icon to toggle the audio level meter</string>
+    <string name="audio_bluetooth_help">The Bluetooth mic will be used for audio input if present</string>
+    <string name="bitmap_overlay_help">Use a pinch gesture to scale the overlay logo</string>
 
     <string name="action_send">Send to Wowza Support</string>
     <string name="action_copy">Copy to clipboard</string>
@@ -26,10 +27,41 @@
     <string name="resize_aspect_mode">Aspect</string>
     <string name="resize_aspect_fill_mode">Fill</string>
 
-    <string name="configuration_settings_title">Configuration Settings</string>
+    <string name="dialog_title_error">An error occurred</string>
+    <string name="dialog_button_ok">OK</string>
+    <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_close">Close</string>
 
-    <string name="streaming_settings">Streaming Settings</string>
+    <string name="status_connecting">Connecting...</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_disconnecting">Disconnecting...</string>
+    <string name="status_buffering">Retrieving Stream...</string>
+    <string name="button_dismiss">Dismiss</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="msg_please_wait">Please wait</string>
 
+    <string name="label_datagrid_table_title">Table Title</string>
+    <string name="label_datagrid_header_property">Property</string>
+    <string name="label_datagrid_header_setting">Setting</string>
+    <string name="label_datagrid_header_key">Key</string>
+    <string name="label_datagrid_header_name">Name</string>
+    <string name="label_datagrid_header_value">Value</string>
+
+    <!-- Device Info Headers -->
+    <string name="about_product_label">Wowza GoCoder SDK</string>
+    <string name="about_copyright_line1">&#169; 2013&#8211;2018 Wowza Media Systems, LLC</string>
+    <string name="about_copyright_line2">All Rights Reserved</string>
+
+    <string name="about_support_information">Support Information</string>
+    <string name="about_header_platform">Device Model and Platform</string>
+    <string name="about_header_display">Display Information</string>
+    <string name="about_header_camera">Camera Information</string>
+    <string name="about_header_codecs">Video and Audio Media Codecs</string>
+    <string name="about_header_opengles">OpenGL ES Information</string>
+
+    <!-- Preferences-related strings -->
+
+    <!-- Connection preferences strings -->
     <string name="connection_settings_title">Connection Settings</string>
     <string name="connection_settings_summary">Specify the connection settings for the Wowza Streaming Engine</string>
 
@@ -41,6 +73,12 @@
     <string name="wz_live_port_number_summary">The port no. for the Wowza Streaming Engine</string>
     <string name="wz_live_port_number_dialog_title">Enter the port number</string>
     <string name="wz_live_port_number_default_value">1935</string>
+
+<!--
+    <string name="wz_live_use_ssl_title">Connect via SSL</string>
+    <string name="wz_live_use_ssl_summary">Establish a secure connection</string>
+    <string name="wz_live_use_ssl_default_value">false</string>
+-->
 
     <string name="wz_live_app_name_title">Application Name</string>
     <string name="wz_live_app_name_summary">The name of the live streaming application</string>
@@ -60,36 +98,47 @@
     <string name="wz_live_password_summary">The password for source authentication</string>
     <string name="wz_live_password_dialog_title">Enter the source password</string>
 
-    <string name="wz_video_enabled_title">Stream Video</string>
-    <string name="wz_video_enabled_title_summary">Indicate if video should be included in the live stream</string>
-    <string name="wz_video_enabled_default_value">true</string>
-
+    <!-- Video preferences strings -->
     <string name="video_settings_title">Video Stream Settings</string>
     <string name="video_settings_summary">Specify the settings for the video stream</string>
 
-    <string name="wz_video_size_title">Video size and bitrate</string>
-    <string name="wz_video_size_summary">Commonly used frame size and bitrate combinations</string>
-    <string name="wz_video_size_dialog_title">Select a video size / bitrate</string>
-    <string name="wz_video_size_default_value">4</string>
+    <string name="wz_video_enabled_title">Enable video streaming</string>
+    <string name="wz_video_enabled_title_summary">Indicates if video should be streamed</string>
+    <string name="wz_video_enabled_default_value">true</string>
 
-    <string name="wz_video_framerate_title">Framerate</string>
-    <string name="wz_video_framerate_summary">The framerate for the video stream (fps)</string>
+    <string name="wz_video_preset_title">Commonly used presets</string>
+    <string name="wz_video_preset_summary">Select from a list of optimized frame size / bitrate combinations</string>
+    <string name="wz_video_preset_dialog_title">Select a frame size / bitrate combination</string>
+    <string name="wz_video_preset_default_value">4</string>
+
+    <string name="wz_video_frame_size_title">Video frame size (px)</string>
+    <string name="wz_video_frame_size_summary">The video frame size</string>
+    <string name="wz_video_frame_size_dialog_title">Select a video frame size (px)</string>
+    <string name="wz_video_frame_size_default_value">4</string>
+
+    <string name="wz_video_bitrate_title">Bitrate (kbps)</string>
+    <string name="wz_video_bitrate_summary">The bitrate for the video stream</string>
+    <string name="wz_video_bitrate_dialog_title">Enter the video stream bitrate (kbps)</string>
+    <string name="wz_video_bitrate_default_value">1500</string>
+
+    <string name="wz_video_framerate_title">Framerate (fps)</string>
+    <string name="wz_video_framerate_summary">The framerate for the video stream</string>
     <string name="wz_video_framerate_dialog_title">Enter the framerate (fps)</string>
     <string name="wz_video_framerate_default_value">30</string>
 
     <string name="wz_video_keyframe_interval_title">Keyframe interval</string>
-    <string name="wz_video_keyframe_interval_summary">The no. of frames between keyframes</string>
-    <string name="wz_video_keyframe_interval_dialog_title">Enter the keyframe interval</string>
+    <string name="wz_video_keyframe_interval_summary">The # of frames in between each keyframe</string>
+    <string name="wz_video_keyframe_interval_dialog_title">Enter the # of frames in between each keyframe</string>
     <string name="wz_video_keyframe_interval_default_value">30</string>
 
-    <string name="wz_video_bitrate_title">Bitrate</string>
-    <string name="wz_video_bitrate_summary">The bitrate for the video stream</string>
-    <string name="wz_video_bitrate_dialog_title">Enter the bitrate</string>
-    <string name="wz_video_bitrate_default_value">1500</string>
+    <string name="wz_video_player_prebuffer_duration_title">Playback pre-buffer duration</string>
+    <string name="wz_video_player_prebuffer_duration_summary">The # of seconds buffered before playback begins</string>
+    <string name="wz_video_player_prebuffer_duration_dialog_title">Enter the # of seconds to buffer before playback begins</string>
+    <string name="wz_video_player_prebuffer_duration_default_value">0</string>
 
     <string name="wz_video_profile_level_title">H.264 profile level</string>
     <string name="wz_video_profile_level_summary">The H.264 profile and profile level</string>
-    <string name="wz_video_profile_level_dialog_title">Select a profile level</string>
+    <string name="wz_video_profile_level_dialog_title">Select a H.264 profile level</string>
     <string name="wz_video_profile_level_default_value">1</string>
 
     <string name="wz_video_letterbox_portrait_title">Letterboxed portrait video</string>
@@ -102,36 +151,60 @@
 
     <string name="wz_video_resize_to_aspect_title">Camera preview matches frame size</string>
     <string name="wz_video_resize_to_aspect_summary">Resize the camera preview view to fit the frame size aspect ratio</string>
+    <string name="wz_use_hls_summary">Playback using HLS</string>
+    <string name="wz_use_hls_title">Use HLS</string>
     <string name="wz_video_resize_to_aspect_default_value">false</string>
+
+    <string name="wz_video_scale_and_crop_title">Scale and crop video to fill entire view</string>
+    <string name="wz_video_scale_and_crop_summary">The video stream will be scaled to fill the entire view and some of the video frame may be cropped.</string>
+    <string name="wz_video_scale_and_crop_default_value">false</string>
 
     <string name="wz_video_use_abr_title">Enable Adaptive Bitrate</string>
     <string name="wz_video_use_abr_summary">The video bitrate will be dynamically adjusted based on bandwidth</string>
     <string name="wz_video_use_abr_default_value">false</string>
 
-    <string name="wz_audio_enabled_title">Stream audio</string>
-    <string name="wz_audio_enabled_title_summary">Indicates if audio should be streamed</string>
-    <string name="wz_audio_enabled_default_value">true</string>
-
+    <!-- Audio preferences strings -->
     <string name="audio_settings_title">Audio Stream Settings</string>
     <string name="audio_settings_summary">Specify the settings for the audio stream</string>
 
-    <string name="wz_audio_samplerate_title">Sample rate</string>
+    <string name="wz_audio_enabled_title">Enable audio streaming</string>
+    <string name="wz_audio_enabled_title_summary">Indicates if audio should be streamed</string>
+    <string name="wz_audio_enabled_default_value">true</string>
+
+    <string name="wz_audio_samplerate_title">Sample rate (Hz)</string>
     <string name="wz_audio_samplerate_summary">The sample rate for the audio stream (hz)</string>
-    <string name="wz_audio_samplerate_dialog_title">Enter the sample rate (hz)</string>
+    <string name="wz_audio_samplerate_dialog_title">Enter the sample rate (Hz)</string>
     <string name="wz_audio_samplerate_default_value">44100</string>
 
-    <string name="wz_audio_bitrate_title">Bitrate</string>
+    <string name="wz_audio_bitrate_title">Bitrate (bps)</string>
     <string name="wz_audio_bitrate_summary">The bitrate for the audio stream</string>
-    <string name="wz_audio_bitrate_dialog_title">Enter the bitrate</string>
+    <string name="wz_audio_bitrate_dialog_title">Enter the audio stream bitrate (bps)</string>
     <string name="wz_audio_bitrate_default_value">64000</string>
 
     <string name="wz_audio_stereo_title">Stream stereo audio</string>
     <string name="wz_audio_stereo_summary">The audio will be streamed in stereo</string>
     <string name="wz_audio_stereo_default_value">true</string>
 
-    <string name="status_connecting">Connecting...</string>
-    <string name="status_connected">Connected</string>
-    <string name="status_disconnecting">Disconnecting...</string>
-    <string name="button_dismiss">Dismiss</string>
+    <!-- Debug preferences strings -->
+    <string name="wz_debug_settings_title">SDK Debug Settings</string>
+    <string name="wz_debug_settings_summary">Useful settings for app debugging</string>
+
+    <string name="wz_debug_net_log_level_title">Network logging level</string>
+    <string name="wz_debug_net_log_level_summary">The logging level for network-related SDK operations</string>
+    <string name="wz_debug_net_log_level_dialog_title">Select the logging level</string>
+    <string name="wz_debug_net_log_level_default_value">2</string>
+
+    <string name="wz_debug_bandwidth_monitor_log_level_title">Streaming Monitor logging level</string>
+    <string name="wz_debug_bandwidth_monitor_log_level_summary">The logging level for the Streaming Monitor</string>
+    <string name="wz_debug_bandwidth_monitor_log_level_dialog_title">Select the logging level</string>
+    <string name="wz_debug_bandwidth_monitor_log_level_default_value">0</string>
+
+    <string name="wz_hls_backup_title">HLS Failover URL</string>
+    <string name="wz_hls_backup_summary">HLS Failover URL</string>
+
+    <string name="wz_player_title">Player Testing Options</string>
+    <string name="wz_player_default">None</string>
+    <string name="wz_player_summary">Set Player to be auto-configured for example 1</string>
+
 
 </resources>

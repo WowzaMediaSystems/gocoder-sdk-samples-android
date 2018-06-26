@@ -1,24 +1,16 @@
-/*
+/**
+ *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
+ *  purpose of educating developers, and is not intended to be used in any production environment.
  *
- * WOWZA MEDIA SYSTEMS, LLC ("Wowza") CONFIDENTIAL
- * Copyright (c) 2005-2016 Wowza Media Systems, LLC, All Rights Reserved.
+ *  IN NO EVENT SHALL WOWZA MEDIA SYSTEMS, LLC BE LIABLE TO YOU OR ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+ *  OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+ *  EVEN IF WOWZA MEDIA SYSTEMS, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * NOTICE: All information contained herein is, and remains the property of Wowza Media Systems, LLC.
- * The intellectual and technical concepts contained herein are proprietary to Wowza Media Systems, LLC
- * and may be covered by U.S. and Foreign Patents, patents in process, and are protected by trade secret
- * or copyright law. Dissemination of this information or reproduction of this material is strictly forbidden
- * unless prior written permission is obtained from Wowza Media Systems, LLC. Access to the source code
- * contained herein is hereby forbidden to anyone except current Wowza Media Systems, LLC employees, managers
- * or contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering such access.
+ *  WOWZA MEDIA SYSTEMS, LLC SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
+ *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * The copyright notice above does not evidence any actual or intended publication or disclosure of this
- * source code, which includes information that is confidential and/or proprietary, and is a trade secret, of
- * Wowza Media Systems, LLC. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR PUBLIC DISPLAY
- * OF OR THROUGH USE OF THIS SOURCE CODE WITHOUT THE EXPRESS WRITTEN CONSENT OF WOWZA MEDIA SYSTEMS, LLC IS
- * STRICTLY PROHIBITED, AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES. THE RECEIPT OR POSSESSION
- * OF THIS SOURCE CODE AND/OR RELATED INFORMATION DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR
- * DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
- *
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp.audio;
@@ -34,20 +26,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.wowza.gocoder.sdk.api.broadcast.WZBroadcastConfig;
-import com.wowza.gocoder.sdk.api.configuration.WZMediaConfig;
-import com.wowza.gocoder.sdk.api.errors.WZStreamingError;
-import com.wowza.gocoder.sdk.api.logging.WZLog;
+import com.wowza.gocoder.sdk.api.broadcast.WOWZBroadcastConfig;
+import com.wowza.gocoder.sdk.api.configuration.WOWZMediaConfig;
+import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
+import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 import com.wowza.gocoder.sdk.sampleapp.R;
 
 /**
  * This activity class demonstrates how to use a Bluetooth mic as the audio input device
- * for the GoCoder SDK's WZAudioDevice audio device interface and broadcasting class
+ * for the GoCoder SDK's WOWZAudioDevice audio device interface and broadcasting class
  */
 public class BluetoothActivity  extends AudioMeterActivity {
     private final static String TAG = BluetoothActivity.class.getSimpleName();
 
-    protected final static int BLUETOOTH_CHANNELS       = WZMediaConfig.AUDIO_CHANNELS_MONO; // mono
+    protected final static int BLUETOOTH_CHANNELS       = WOWZMediaConfig.AUDIO_CHANNELS_MONO; // mono
     protected final static int BLUETOOTH_SAMPLE_RATE    = 8000; // 8kHz
 
     protected ImageView         mBluetoothIcon      = null;
@@ -55,10 +47,10 @@ public class BluetoothActivity  extends AudioMeterActivity {
     protected AudioManager      mAudioManager       = null;
     protected BroadcastReceiver mBroadcastReceiver  = null;
 
-    protected WZBroadcastConfig mSamplerConfig      = null;
+    protected WOWZBroadcastConfig mSamplerConfig      = null;
 
-    private int mStoredChannels     = WZMediaConfig.AUDIO_CHANNELS_STEREO;
-    private int mStoredSampleRate   = WZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE;
+    private int mStoredChannels     = WOWZMediaConfig.AUDIO_CHANNELS_STEREO;
+    private int mStoredSampleRate   = WOWZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +89,7 @@ public class BluetoothActivity  extends AudioMeterActivity {
         mStoredSampleRate   = getBroadcastConfig().getAudioSampleRate();
 
         if (mSamplerConfig == null) {
-            mSamplerConfig = new WZBroadcastConfig(getBroadcastConfig());
+            mSamplerConfig = new WOWZBroadcastConfig(getBroadcastConfig());
             mSamplerConfig.setAudioChannels(mStoredChannels);
             mSamplerConfig.setAudioSampleRate(mStoredSampleRate);
         }
@@ -124,7 +116,7 @@ public class BluetoothActivity  extends AudioMeterActivity {
         }
 
         // Start Bluetooth SCO audio connection
-        WZLog.debug(TAG, "Starting Bluetooth SCO audio connection");
+        WOWZLog.debug(TAG, "Starting Bluetooth SCO audio connection");
         mAudioManager.startBluetoothSco();
 
         Toast.makeText(this, getString(R.string.audio_bluetooth_help), Toast.LENGTH_LONG).show();
@@ -146,7 +138,7 @@ public class BluetoothActivity  extends AudioMeterActivity {
         unregisterReceiver(mBroadcastReceiver);
 
         // Stop bluetooth SCO audio connection.
-        WZLog.debug(TAG, "Stopping Bluetooth SCO audio connection");
+        WOWZLog.debug(TAG, "Stopping Bluetooth SCO audio connection");
         mAudioManager.stopBluetoothSco();
     }
 
@@ -161,11 +153,11 @@ public class BluetoothActivity  extends AudioMeterActivity {
 
         switch(state) {
             case AudioManager.SCO_AUDIO_STATE_CONNECTING:
-                WZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_CONNECTING");
+                WOWZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_CONNECTING");
                 break;
 
             case AudioManager.SCO_AUDIO_STATE_CONNECTED:
-                WZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_CONNECTED");
+                WOWZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_CONNECTED");
 
                 if (!isBluetoothActive()) {
                     runOnUiThread(new Runnable() {
@@ -182,7 +174,7 @@ public class BluetoothActivity  extends AudioMeterActivity {
                 break;
 
             case AudioManager.SCO_AUDIO_STATE_DISCONNECTED:
-                WZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_DISCONNECTED");
+                WOWZLog.debug(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED: SCO_AUDIO_STATE_DISCONNECTED");
 
                 if (isBluetoothActive()) {
                     runOnUiThread(new Runnable() {
@@ -199,7 +191,7 @@ public class BluetoothActivity  extends AudioMeterActivity {
                 break;
 
             case AudioManager.SCO_AUDIO_STATE_ERROR:
-                WZLog.error(TAG, "An error occurred obtaining Bluetooth state information");
+                WOWZLog.error(TAG, "An error occurred obtaining Bluetooth state information");
                 break;
         }
 
@@ -235,7 +227,7 @@ public class BluetoothActivity  extends AudioMeterActivity {
      * @return Any synchronous error that may have occurred starting the broadcast, null otherwise
      */
     @Override
-    protected synchronized WZStreamingError startBroadcast() {
+    protected synchronized WOWZStreamingError startBroadcast() {
         getBroadcastConfig().setAudioChannels(isBluetoothActive() ? BLUETOOTH_CHANNELS : mStoredChannels);
         getBroadcastConfig().setAudioSampleRate(isBluetoothActive() ? BLUETOOTH_SAMPLE_RATE : mStoredSampleRate);
 

@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:key="prefs_screen_gocoder_sdk"
+                  android:title="@string/connection_settings_title"
+                  android:summary="@string/connection_settings_summary">
+
+    <PreferenceCategory android:key="prefs_category_connection"
+        android:icon="@drawable/ic_satellite"
+        android:summary="@string/connection_settings_summary"
+        android:title="@string/connection_settings_title">
+
+        <com.wowza.gocoder.sdk.sampleapp.config.AutoCompletePreference
+            android:autoText="false"
+            android:dialogTitle="@string/wz_live_host_address_dialog_title"
+            android:imeOptions="actionDone"
+            android:key="wz_live_host_address"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/wz_live_host_address_summary"
+            android:title="@string/wz_live_host_address_title"/>
+
+        <com.wowza.gocoder.sdk.sampleapp.config.AutoCompletePreference
+            android:autoText="false"
+            android:defaultValue="@string/wz_live_port_number_default_value"
+            android:dialogTitle="@string/wz_live_port_number_dialog_title"
+            android:key="wz_live_port_number"
+            android:numeric="integer"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/wz_live_port_number_summary"
+            android:title="@string/wz_live_port_number_title"/>
+
+<!--
+        <CheckBoxPreference
+            android:defaultValue="@string/wz_live_use_ssl_default_value"
+            android:key="wz_live_use_ssl"
+            android:summary="@string/wz_live_use_ssl_summary"
+            android:title="@string/wz_live_use_ssl_title"
+            />
+-->
+
+        <com.wowza.gocoder.sdk.sampleapp.config.AutoCompletePreference
+            android:autoText="false"
+            android:defaultValue="@string/wz_live_app_name_default_value"
+            android:dialogTitle="@string/wz_live_app_name_dialog_title"
+            android:key="wz_live_app_name"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/wz_live_app_name_summary"
+            android:title="@string/wz_live_app_name_title"/>
+
+        <com.wowza.gocoder.sdk.sampleapp.config.AutoCompletePreference
+            android:autoText="false"
+            android:defaultValue="@string/wz_live_stream_name_default_value"
+            android:dialogTitle="@string/wz_live_stream_name_dialog_title"
+            android:key="wz_live_stream_name"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/wz_live_stream_name_summary"
+            android:title="@string/wz_live_stream_name_title"/>
+
+        <com.wowza.gocoder.sdk.sampleapp.config.AutoCompletePreference
+            android:autoText="false"
+            android:dialogTitle="@string/wz_live_username_dialog_title"
+            android:key="wz_live_username"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/wz_live_username_summary"
+            android:title="@string/wz_live_username_title"/>
+
+        <EditTextPreference
+            android:dialogTitle="@string/wz_live_password_dialog_title"
+            android:key="wz_live_password"
+            android:password="true"
+            android:inputType="textPassword"
+            android:summary="@string/wz_live_password_summary"
+            android:title="@string/wz_live_password_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="prefs_category_video"
+        android:icon="@drawable/ic_videocam"
+        android:summary="@string/video_settings_summary"
+        android:title="@string/video_settings_title">
+
+        <CheckBoxPreference
+            android:defaultValue="@string/wz_video_enabled_default_value"
+            android:key="wz_video_enabled"
+            android:summary="@string/wz_video_enabled_title_summary"
+            android:title="@string/wz_video_enabled_title"
+            />
+
+        <ListPreference
+            android:dependency="wz_video_enabled"
+            android:key="wz_video_preset"
+            android:summary="@string/wz_video_preset_summary"
+            android:title="@string/wz_video_preset_title">
+        </ListPreference>
+
+        <ListPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_frame_size_default_value"
+            android:key="wz_video_frame_size"
+            android:summary="@string/wz_video_frame_size_summary"
+            android:title="@string/wz_video_frame_size_title">
+        </ListPreference>
+
+        <EditTextPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_bitrate_default_value"
+            android:dialogTitle="@string/wz_video_bitrate_dialog_title"
+            android:key="wz_video_bitrate"
+            android:numeric="integer"
+            android:summary="@string/wz_video_bitrate_summary"
+            android:title="@string/wz_video_bitrate_title"
+            />
+
+        <EditTextPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_framerate_default_value"
+            android:dialogTitle="@string/wz_video_framerate_dialog_title"
+            android:key="wz_video_framerate"
+            android:numeric="integer"
+            android:summary="@string/wz_video_framerate_summary"
+            android:title="@string/wz_video_framerate_title"
+            />
+
+        <EditTextPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_keyframe_interval_default_value"
+            android:dialogTitle="@string/wz_video_keyframe_interval_dialog_title"
+            android:key="wz_video_keyframe_interval"
+            android:numeric="integer"
+            android:summary="@string/wz_video_keyframe_interval_summary"
+            android:title="@string/wz_video_keyframe_interval_title"
+            />
+
+        <ListPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_profile_level_default_value"
+            android:key="wz_video_profile_level"
+            android:summary="@string/wz_video_profile_level_summary"
+            android:title="@string/wz_video_profile_level_title">
+        </ListPreference>
+
+        <CheckBoxPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_resize_to_aspect_default_value"
+            android:key="wz_video_resize_to_aspect"
+            android:summary="@string/wz_video_resize_to_aspect_summary"
+            android:title="@string/wz_video_resize_to_aspect_title"
+            />
+
+        <EditTextPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_player_prebuffer_duration_default_value"
+            android:dialogTitle="@string/wz_video_player_prebuffer_duration_dialog_title"
+            android:key="wz_video_player_prebuffer_duration"
+            android:numeric="decimal"
+            android:summary="@string/wz_video_player_prebuffer_duration_summary"
+            android:title="@string/wz_video_player_prebuffer_duration_title"
+            />
+
+        <EditTextPreference
+            android:dialogTitle="@string/wz_hls_backup_title"
+            android:key="wz_hls_failover"
+            android:inputType="text"
+            android:summary="@string/wz_hls_backup_summary"
+            android:title="@string/wz_hls_backup_title"/>
+
+        <CheckBoxPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="false"
+            android:key="wz_use_hls"
+            android:summary="@string/wz_use_hls_summary"
+            android:title="@string/wz_use_hls_title"
+            />
+<!-- FOR INTERNAL TESTING -->
+        <!--<ListPreference-->
+            <!--android:key="wz_player_example_config"-->
+            <!--android:summary="@string/wz_player_summary"-->
+            <!--android:defaultValue="@string/wz_player_default"-->
+            <!--android:title="@string/wz_player_title"-->
+            <!--android:entries="@array/wz_player1_array"-->
+            <!--android:entryValues="@array/wz_player1_array" />-->
+
+
+
+
+<!--<ListPreference-->
+        <!--android:defaultValue="@array/empty_array"-->
+        <!--android:enabled="true"-->
+        <!--android:entries="@array/wz_player1_array"-->
+        <!--android:entryValues="@array/wz_player1_array"-->
+        <!--android:key="wz_player1_config"-->
+        <!--android:persistent="true"-->
+        <!--android:summary="@string/wz_player1_backup_summary"-->
+        <!--android:title="@string/wz_player1_backup_title" />-->
+
+
+<!--
+                <CheckBoxPreference
+                    android:dependency="wz_video_enabled"
+                    android:defaultValue="@string/wz_video_scale_and_crop_default_value"
+                    android:key="wz_video_scale_and_crop"
+                    android:summary="@string/wz_video_scale_and_crop_summary"
+                    android:title="@string/wz_video_scale_and_crop_title"
+                    />
+        -->
+
+        <CheckBoxPreference
+            android:dependency="wz_video_enabled"
+            android:defaultValue="@string/wz_video_use_abr_default_value"
+            android:key="wz_video_use_abr"
+            android:summary="@string/wz_video_use_abr_summary"
+            android:title="@string/wz_video_use_abr_title"
+            />
+
+<!--
+        <CheckBoxPreference
+            android:dependency="wz_video_enabled"
+            android:key="wz_video_letterbox_portrait"
+                android:title="@string/wz_video_letterbox_portrait_title"
+                android:summary="@string/wz_video_letterbox_portrait_summary"
+                android:defaultValue="@string/wz_video_letterbox_portrait_default_value"
+                />
+
+        <CheckBoxPreference
+            android:dependency="wz_video_enabled"
+             android:key="wz_video_captured_video_rotates"
+                android:title="@string/wz_video_captured_video_rotates_title"
+                android:summary="@string/wz_video_captured_video_rotates_summary"
+                android:defaultValue="@string/wz_video_captured_video_rotates_default_value"
+                />
+-->
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="prefs_category_audio"
+        android:icon="@drawable/ic_mic"
+        android:summary="@string/audio_settings_summary"
+        android:title="@string/audio_settings_title">
+
+        <CheckBoxPreference
+            android:defaultValue="@string/wz_audio_enabled_default_value"
+            android:key="wz_audio_enabled"
+            android:summary="@string/wz_audio_enabled_title_summary"
+            android:title="@string/wz_audio_enabled_title"
+            />
+
+        <EditTextPreference
+            android:dependency="wz_audio_enabled"
+            android:defaultValue="@string/wz_audio_bitrate_default_value"
+            android:dialogTitle="@string/wz_audio_bitrate_dialog_title"
+            android:key="wz_audio_bitrate"
+            android:numeric="integer"
+            android:summary="@string/wz_audio_bitrate_summary"
+            android:title="@string/wz_audio_bitrate_title"
+            />
+
+        <EditTextPreference
+            android:dependency="wz_audio_enabled"
+            android:defaultValue="@string/wz_audio_samplerate_default_value"
+            android:dialogTitle="@string/wz_audio_samplerate_dialog_title"
+            android:key="wz_audio_samplerate"
+            android:numeric="integer"
+            android:summary="@string/wz_audio_samplerate_summary"
+            android:title="@string/wz_audio_samplerate_title"
+            />
+
+        <CheckBoxPreference
+            android:dependency="wz_audio_enabled"
+            android:defaultValue="@string/wz_audio_stereo_default_value"
+            android:key="wz_audio_stereo"
+            android:summary="@string/wz_audio_stereo_summary"
+            android:title="@string/wz_audio_stereo_title"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="prefs_category_debugging"
+                        android:summary="@string/wz_debug_settings_summary"
+                        android:title="@string/wz_debug_settings_title">
+
+        <ListPreference
+            android:defaultValue="@string/wz_debug_net_log_level_default_value"
+            android:key="wz_debug_net_log_level"
+            android:entries="@array/net_log_levels_names_array"
+            android:entryValues="@array/net_log_levels_values_array"
+            android:summary="@string/wz_debug_net_log_level_summary"
+            android:title="@string/wz_debug_net_log_level_title">
+        </ListPreference>
+
+        <ListPreference
+            android:defaultValue="@string/wz_debug_bandwidth_monitor_log_level_default_value"
+            android:key="wz_debug_bandwidth_monitor_log_level"
+            android:entries="@array/bandwidth_monitor_log_level_names_array"
+            android:entryValues="@array/bandwidth_monitor_log_level_values_array"
+            android:summary="@string/wz_debug_bandwidth_monitor_log_level_summary"
+            android:title="@string/wz_debug_bandwidth_monitor_log_level_title">
+        </ListPreference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

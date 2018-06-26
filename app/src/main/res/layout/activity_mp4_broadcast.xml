@@ -6,6 +6,20 @@
     android:layout_height="fill_parent"
     tools:context=".mp4.MP4BroadcastActivity">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/imageView"
+        android:scaleType="fitCenter"
+        android:src="@drawable/overlay_logo"
+        android:alpha="0.1"
+        android:adjustViewBounds="false"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        >
+    </ImageView>
+
     <VideoView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

@@ -1,7 +1,4 @@
 /**
- *  CameraActivity.java
- *  gocoder-sdk-sampleapp
- *
  *  This is sample code provided by Wowza Media Systems, LLC.  All sample code is intended to be a reference for the
  *  purpose of educating developers, and is not intended to be used in any production environment.
  *
@@ -13,7 +10,7 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  Copyright © 2015 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp.mp4;
@@ -26,9 +23,8 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 
-import com.wowza.gocoder.sdk.api.logging.WZLog;
-import com.wowza.gocoder.sdk.api.mp4.WZMP4Writer;
-import com.wowza.gocoder.sdk.api.status.WZStatus;
+import com.wowza.gocoder.sdk.api.logging.WOWZLog;
+import com.wowza.gocoder.sdk.api.mp4.WOWZMP4Writer;
 import com.wowza.gocoder.sdk.sampleapp.CameraActivity;
 import com.wowza.gocoder.sdk.sampleapp.R;
 
@@ -41,7 +37,8 @@ public class MP4CaptureActivity extends CameraActivity {
 
     protected LinearLayout      mMP4Controls        = null;
     protected Switch            mSwitchMP4          = null;
-    protected WZMP4Writer       mMP4Writer          = null;
+    protected WOWZMP4Writer mMP4Writer          = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +66,7 @@ public class MP4CaptureActivity extends CameraActivity {
                 }
             });
 
-            mMP4Writer = new WZMP4Writer();
+            mMP4Writer = new WOWZMP4Writer();
             mWZBroadcastConfig.registerVideoSink(mMP4Writer);
             mWZBroadcastConfig.registerAudioSink(mMP4Writer);
 
@@ -87,21 +84,22 @@ public class MP4CaptureActivity extends CameraActivity {
             if (mSwitchMP4.isChecked()) {
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
                 File outputFile = getOutputMediaFile();
-                if (outputFile != null)
+                if (outputFile != null) {
                     mMP4Writer.setFilePath(outputFile.toString());
+                }
                 else {
-                    mStatusView.setErrorMessage("Could not create or access the directory in which to store the MP");
+                    mStatusView.setErrorMessage("Could not create or access the directory in which to store the MP4");
                     mSwitchMP4.setChecked(false);
                     return;
                 }
             }
         } else if (mSwitchMP4.isChecked()) {
-            WZLog.debug(TAG, "The MP4 file was stored at " + mMP4Writer.getFilePath());
+            WOWZLog.debug(TAG, "The MP4 file was stored at " + mMP4Writer.getFilePath());
             mStatusView.showMessage("The MP4 file was stored at " + mMP4Writer.getFilePath());
-        }
 
+        }
         super.onToggleBroadcast(v);
-   }
+    }
 
     /**
      * Update the state of the UI controls
@@ -128,20 +126,20 @@ public class MP4CaptureActivity extends CameraActivity {
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES), "GoCoderSDK");
+                Environment.DIRECTORY_MOVIES), "GoCoderSDK MP4s");
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                WZLog.warn(TAG, "failed to create the directory in which to store the MP4");
+                WOWZLog.warn(TAG, "failed to create the directory in which to store the MP4");
                 return null;
             }
         }
 
         // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        return new File(mediaStorageDir.getPath() + File.separator +
-                "WOWZA_"+ timeStamp + ".mp4");
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date());
+        return new File(mediaStorageDir.getPath() + File.separator
+                + timeStamp + ".mp4");
     }
 }
 
