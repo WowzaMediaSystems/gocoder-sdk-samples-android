@@ -22,7 +22,7 @@ The sample app includes a number of activities that demonstrate the features of 
 
 ## More Resources
 * [GoCoder SDK Technical Articles](https://www.wowza.com/docs/wowza-gocoder-sdk)
-* [GoCoder SDK for Android Reference Docs](https://www.wowza.com/resources/gocodersdk/docs/1.0/api-reference-android/)
+* [GoCoder SDK for Android Reference Docs](https://www.wowza.com/resources/gocodersdk/docs/api-reference-android/)
 * [GoCoder SDK for Android Release Notes](https://www.wowza.com/docs/wowza-gocoder-sdk-release-notes-for-android)
 * [Wowza GoCoder SDK Community Forum](https://www.wowza.com/community/spaces/36/wowza-gocoder-sdk.html)
 
