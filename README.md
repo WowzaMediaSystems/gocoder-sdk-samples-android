@@ -17,7 +17,7 @@ This repository contains a sample application that demonstrates the capabilities
 The sample app includes a number of activities that demonstrate the features of the GoCoder SDK, including:
 
 - CameraActivity.java, which uses the SDK to capture and broadcast video using the device's internal cameras,
-- InfoActivity.java, which uses the SDK's version and device interrogation APIs to list detailed information about the SDK and the mobile device, and
+- InfoActivity.java, which uses the SDK's version and device interrogation API's to list detailed information about the SDK and the mobile device, and
 - MP4BroadcastActivity.java, which uses **WOWZBroadcast**, **WOWZBroadcastAPI**, and related classes and interfaces to broadcast frames from a local MP4 file.
 
 ## More Resources
