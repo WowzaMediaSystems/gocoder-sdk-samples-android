@@ -4,9 +4,9 @@ This repository contains a sample application that demonstrates the capabilities
 
 ## Prerequisites
 
-- [Wowza GoCoder SDK for Android v1.5.0.609](https://www.wowza.com/products/gocoder)
+- Wowza GoCoder SDK for Android v1.6.0.0628
 
-     **NOTE:** The GoCoder SDK library necessary to build this app is not provided with this sample code. To get the free SDK, complete the [GoCoder SDK sign-up form](https://www.wowza.com/products/gocoder/sdk/license) to receive a link where you can download the SDK along with a license key. If you already have a license key, you can download the current SDK release [here](https://www.wowza.com/pricing/installer#gocodersdk-downloads).
+     **NOTE:** The GoCoder SDK library necessary to build this app is not provided here. To get the free SDK, complete the [GoCoder SDK sign-up form](https://www.wowza.com/products/gocoder/sdk/license) to receive a link where you can download the SDK along with a license key. If you already have a license key, you can download the current SDK release [here](https://www.wowza.com/pricing/installer#gocodersdk-downloads).
 
 - [Android 5.0 (API level 21 or later) for broadcasting](https://developer.android.com/about/versions/android-5.0).
 - [Android 6.0 (API level 23 or later) for playback](https://developer.android.com/about/versions/marshmallow/android-6.0).
@@ -17,7 +17,7 @@ This repository contains a sample application that demonstrates the capabilities
 The sample app includes a number of activities that demonstrate the features of the GoCoder SDK, including:
 
 - CameraActivity.java, which uses the SDK to capture and broadcast video using the device's internal cameras,
-- InfoActivity.java, which uses the SDK's version and device interrogation API's to list detailed information about the SDK and the mobile device, and
+- InfoActivity.java, which uses the SDK's version and device interrogation APIs to list detailed information about the SDK and the mobile device, and
 - MP4BroadcastActivity.java, which uses **WOWZBroadcast**, **WOWZBroadcastAPI**, and related classes and interfaces to broadcast frames from a local MP4 file.
 
 ## More Resources
