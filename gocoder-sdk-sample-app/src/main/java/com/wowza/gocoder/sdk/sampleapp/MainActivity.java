@@ -48,6 +48,10 @@ public class MainActivity extends ListActivity {
                     "Displays an active live stream from Wowza Streaming Engine",
                     "PlayerActivity"            },
 
+            {   "Kotlin Player",
+                    "Displays an active live stream from Wowza Streaming Engine as written in Kotlin",
+                    "KotlinPlayerActivity"            },
+
             {   "Capture an MP4 file",
                     "Broadcast a live video stream while saving it to an MP4 file",
                     "mp4.MP4CaptureActivity"            },
@@ -73,10 +77,6 @@ public class MainActivity extends ListActivity {
                     "Take a snapshot of the camera preview",
                     "ScreenshotActivity"      },
 
-            {   "Facial recognition demo",
-                    "Use facial recognition features to become a Wowza Ninja",
-                    "FaceActivity"                      },
-
             {   "Display an audio level meter",
                     "Register an audio sample listener and display an audio level meter",
                     "audio.AudioMeterActivity"          },
@@ -97,13 +97,13 @@ public class MainActivity extends ListActivity {
     private static final int[] ACTIVITY_ICONS = {
             R.drawable.ic_streaming,
             R.drawable.ic_player,
+            R.drawable.ic_player,
             R.drawable.ic_mp4_capture,
             R.drawable.ic_mp4_streaming,
             R.drawable.ic_opengl,
             R.drawable.ic_bitmap,
             R.drawable.ic_text_overlay,
             R.drawable.ic_take_screenshot,
-            R.drawable.ic_face,
             R.drawable.ic_audio_meter,
             R.drawable.ic_bluetooth,
             R.drawable.ic_event,

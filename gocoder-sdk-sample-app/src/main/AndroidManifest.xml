@@ -91,15 +91,15 @@
                   android:screenOrientation="fullSensor"
                   android:label="@string/screenshot_title"/>
 
-        <activity android:name=".FaceActivity"
-                  android:configChanges="orientation|keyboardHidden|screenSize"
-                  android:screenOrientation="portrait"
-                  android:label="@string/camera_example_title"/>
-
         <activity android:name=".PlayerActivity"
-                  android:configChanges="orientation|keyboardHidden|screenSize"
-                  android:screenOrientation="fullSensor"
-                  android:label="@string/stream_player_title"/>
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor"
+            android:label="@string/stream_player_title"/>
+
+        <activity android:name=".KotlinPlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="fullSensor"
+            android:label="@string/stream_player_title"/>
 
     </application>
 

@@ -227,8 +227,8 @@ public class AboutFragment extends Fragment {
             }
 
             if(result) {
-                if (WOWZCamera.getAvailableDeviceCameras().length > 0) {
-                    return WOWZCamera.getCameraInfo();
+                if (WOWZCamera.getAvailableDeviceCameras(this.getActivity().getApplicationContext()).length > 0) {
+                    return WOWZCamera.getCameraInfo(this.getActivity().getApplicationContext());
                 }
             }
         }

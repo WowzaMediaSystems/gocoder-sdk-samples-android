@@ -1,1 +1,1 @@
-include ':app'
+include ':gocoder-sdk-sample-app'

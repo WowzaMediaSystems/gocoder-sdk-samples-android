@@ -176,11 +176,11 @@ public class EventActivity extends CameraActivityBase {
         if (mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
             mBtnPing.setEnabled(false);
 
-            mWZBroadcast.sendDataEvent(WOWZDataScope.MODULE, "onGetPingTime", new WOWZDataEvent.ResultCallback() {
+            mWZBroadcast.sendPingRequest( new WOWZDataEvent.ResultCallback() {
                 @Override
                 public void onWZDataEventResult(final WOWZDataMap resultParams, boolean isError) {
                     if(resultParams!=null) {
-                        final String result = isError ? "Ping attempt failed (" + resultParams.get("code").toString() + ")" : "Ping time: " + resultParams.get("pingTime") + "ms";
+                        final String result = isError ? "Ping attempt failed (" + resultParams.get("code").toString() + ")" : "SendPingRequest time: " + resultParams.get("responseTime") + "ms";
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
@@ -206,13 +206,23 @@ public class EventActivity extends CameraActivityBase {
         if (event.getAction() == MotionEvent.ACTION_DOWN &&
                 mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
 
+            String  guid = UUID.randomUUID().toString();
+            long timestamp = new java.util.Date().getTime();
             WOWZDataMap dataEventParams = new WOWZDataMap();
-            dataEventParams.put("x", event.getX());
-            dataEventParams.put("y", event.getY());
+
+            dataEventParams.put("text",event.getX() +" x "+ event.getY());
+            dataEventParams.put("timestamp", String.valueOf(timestamp));
+            dataEventParams.put("stream", mWZBroadcastConfig.getStreamName());
+            dataEventParams.put("trackId", "99.0");
+            dataEventParams.put("guid", guid);
+            dataEventParams.put("version", "1.0");
+            dataEventParams.put("source", "encoder");
+            dataEventParams.put("sourceId", "GoCoder");
+            dataEventParams.put("sourceVersion", BuildConfig.VERSION_NAME);
             dataEventParams.put("occurred", event.getEventTime());
 
-            mWZBroadcast.sendDataEvent(WOWZDataScope.MODULE, "onScreenPress", dataEventParams);
-            Toast.makeText(this, "onScreenPress() event sent to server module", Toast.LENGTH_LONG).show();
+            mWZBroadcast.sendDataEvent(WOWZDataScope.STREAM, "onScreenPress", dataEventParams);
+            Toast.makeText(this, "onScreenPress() event sent to server stream", Toast.LENGTH_LONG).show();
 
             return true;
         } else

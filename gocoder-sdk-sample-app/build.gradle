@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+
+    defaultConfig {
+        applicationId "com.wowza.gocoder.sdk.sampleapp"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 11
+        versionName "1.6.0"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+    }
+}
+
+repositories{
+    flatDir{
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    implementation 'com.wowza.gocoder.sdk.android:com.wowza.gocoder.sdk:2.0@aar'
+
+    implementation 'com.android.support:support-v4:25.3.0'
+    implementation 'com.android.support:appcompat-v7:25.3.0'
+    implementation 'com.android.support:recyclerview-v7:25.3.0'
+}

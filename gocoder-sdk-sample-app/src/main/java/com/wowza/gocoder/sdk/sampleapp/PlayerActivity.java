@@ -32,9 +32,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.configuration.WOWZMediaConfig;
+import com.wowza.gocoder.sdk.api.data.WOWZDataEvent;
 import com.wowza.gocoder.sdk.api.data.WOWZDataMap;
 import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
 import com.wowza.gocoder.sdk.api.logging.WOWZLog;
@@ -69,7 +71,7 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
     private TimerView         mTimerView        = null;
     private ImageButton       mStreamMetadata   = null;
     private boolean           mUseHLSPlayback   = false;
-
+    private WOWZPlayerView.PacketThresholdChangeListener packetChangeListener = null;
     private VolumeChangeObserver mVolumeSettingChangeObserver = null;
 
     @Override
@@ -97,6 +99,39 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
 
 
         if (sGoCoderSDK != null) {
+
+            /*
+            Packet change listener setup
+             */
+            final PlayerActivity activity = this;
+            packetChangeListener = new WOWZPlayerView.PacketThresholdChangeListener() {
+                @Override
+                public void packetsBelowMinimumThreshold(int packetCount) {
+                    WOWZLog.debug("Packets have fallen below threshold "+packetCount+"... ");
+
+                    activity.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(activity, "Packets have fallen below threshold ... ", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void packetsAboveMinimumThreshold(int packetCount) {
+                    WOWZLog.debug("Packets have risen above threshold "+packetCount+" ... ");
+
+                    activity.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(activity, "Packets have risen above threshold ... ", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            };
+            mStreamPlayerView.setShowAllNotificationsWhenBelowThreshold(false);
+            mStreamPlayerView.setMinimumPacketThreshold(20);
+            mStreamPlayerView.registerPacketThresholdListener(packetChangeListener);
+            ///// End packet change notification listener
+
             mTimerView.setTimerProvider(new TimerView.TimerProvider() {
                 @Override
                 public long getTimecode() {
@@ -153,6 +188,42 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
                 }
             });
 
+            // testing player data event handler.
+            mStreamPlayerView.registerDataEventListener("onMetaData", new WOWZDataEvent.EventListener(){
+                @Override
+                public WOWZDataMap onWZDataEvent(String eventName, WOWZDataMap eventParams) {
+                    String meta = "";
+                    if(eventParams!=null)
+                        meta = eventParams.toString();
+
+
+                    WOWZLog.debug("onWZDataEvent -> eventName "+eventName+" = "+meta);
+
+                    return null;
+                }
+            });
+
+            // testing player data event handler.
+            mStreamPlayerView.registerDataEventListener("onStatus", new WOWZDataEvent.EventListener(){
+                @Override
+                public WOWZDataMap onWZDataEvent(String eventName, WOWZDataMap eventParams) {
+                    if(eventParams!=null)
+                        WOWZLog.debug("onWZDataEvent -> eventName "+eventName+" = "+eventParams.toString());
+
+                    return null;
+                }
+            });
+
+            // testing player data event handler.
+            mStreamPlayerView.registerDataEventListener("onTextData", new WOWZDataEvent.EventListener(){
+                @Override
+                public WOWZDataMap onWZDataEvent(String eventName, WOWZDataMap eventParams) {
+                    if(eventParams!=null)
+                        WOWZLog.debug("onWZDataEvent -> "+eventName+" = "+eventParams.get("text"));
+
+                    return null;
+                }
+            });
         } else {
             mHelp.setVisibility(View.GONE);
             mStatusView.setErrorMessage(WowzaGoCoder.getLastError().getErrorDescription());

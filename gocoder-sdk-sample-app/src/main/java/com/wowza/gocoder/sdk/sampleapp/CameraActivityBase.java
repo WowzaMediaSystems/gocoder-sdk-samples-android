@@ -322,9 +322,10 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                         mStatusView.setErrorMessage("Could not detect or gain access to any cameras on this device");
                         getBroadcastConfig().setVideoEnabled(false);
                     }
-                } else {
-                    getBroadcastConfig().setVideoEnabled(false);
                 }
+//                else {
+//                    getBroadcastConfig().setVideoEnabled(false);
+//                }
             }
 
             if(this.hasDevicePermissionToAccess(Manifest.permission.RECORD_AUDIO)) {

@@ -21,10 +21,12 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Display;
 
 import com.wowza.gocoder.sdk.api.android.opengl.WOWZGLES;
 import com.wowza.gocoder.sdk.api.broadcast.WOWZGLBroadcaster;
 import com.wowza.gocoder.sdk.api.geometry.WOWZSize;
+import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 import com.wowza.gocoder.sdk.api.render.WOWZRenderAPI;
 
 import java.nio.ByteBuffer;
@@ -425,7 +427,6 @@ public class OpenGLRenderer
             if (!isStreaming()) // don't change the frame size in the video source config while streaming
                 mGLBroadcaster.getVideoSourceConfig().setVideoFrameSize(mSurfaceSize);
         }
-
     }
 
     private synchronized void setCurrentAngle(float angleInDegrees) {

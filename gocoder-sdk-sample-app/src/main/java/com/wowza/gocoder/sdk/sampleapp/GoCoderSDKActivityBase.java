@@ -365,6 +365,7 @@ public abstract class GoCoderSDKActivityBase extends Activity
 //                mWZBroadcast.registerAdaptiveBitRateListener(abrHandler);
 //                mWZBroadcast.registerAdaptiveFrameRateListener(abrHandler);
 //                mWZBroadcastConfig.setFrameRateLowBandwidthSkipCount(1);
+
                 mWZBroadcast.startBroadcast(mWZBroadcastConfig, this);
             }
         } else {
