@@ -10,12 +10,13 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp.config;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -34,6 +35,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.wowza.gocoder.sdk.api.codec.WOWZCodecUtils;
 import com.wowza.gocoder.sdk.api.configuration.WOWZMediaConfig;
@@ -49,18 +51,30 @@ import com.wowza.gocoder.sdk.sampleapp.R;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs.PrefsFragment.getVideoFramerate;
+
 public class GoCoderSDKPrefs {
     private final static String TAG = GoCoderSDKPrefs.class.getSimpleName();
 
+    private static String getPrefString(SharedPreferences sharedPrefs, String key, String defaultValue){
+        String value = sharedPrefs.getString(key, defaultValue);
+        if(value.isEmpty()){
+            return defaultValue;
+        }
+        return value;
+    }
     public static void updateConfigFromPrefs(SharedPreferences sharedPrefs, WOWZMediaConfig mediaConfig) {
         // video settings
         mediaConfig.setVideoEnabled(sharedPrefs.getBoolean("wz_video_enabled", true));
 
         mediaConfig.setVideoFrameWidth(sharedPrefs.getInt("wz_video_frame_width", WOWZMediaConfig.DEFAULT_VIDEO_FRAME_WIDTH));
         mediaConfig.setVideoFrameHeight(sharedPrefs.getInt("wz_video_frame_height", WOWZMediaConfig.DEFAULT_VIDEO_FRAME_HEIGHT));
-        mediaConfig.setVideoFramerate(Integer.parseInt(sharedPrefs.getString("wz_video_frame_rate", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_FRAME_RATE))));
-        mediaConfig.setVideoKeyFrameInterval(Integer.parseInt(sharedPrefs.getString("wz_video_keyframe_interval", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_KEYFRAME_INTERVAL))));
-        mediaConfig.setVideoBitRate(Integer.parseInt(sharedPrefs.getString("wz_video_bitrate", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_BITRATE))));
+
+        String fps = getVideoFramerate(getPrefString(sharedPrefs,"wz_video_framerate", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_FRAME_RATE)));
+        mediaConfig.setVideoFramerate(Integer.parseInt(fps));
+
+        mediaConfig.setVideoKeyFrameInterval(Integer.parseInt(getPrefString(sharedPrefs,"wz_video_keyframe_interval", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_KEYFRAME_INTERVAL))));
+        mediaConfig.setVideoBitRate(Integer.parseInt(getPrefString(sharedPrefs,"wz_video_bitrate", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_BITRATE))));
         mediaConfig.setABREnabled(sharedPrefs.getBoolean("wz_video_use_abr", true));
         mediaConfig.setHLSEnabled(sharedPrefs.getBoolean("wz_use_hls", false));
         mediaConfig.setHLSBackupURL(sharedPrefs.getString("wz_hls_failover", null));
@@ -80,9 +94,9 @@ public class GoCoderSDKPrefs {
         // audio settings
         mediaConfig.setAudioEnabled(sharedPrefs.getBoolean("wz_audio_enabled", true));
 
-        mediaConfig.setAudioSampleRate(Integer.parseInt(sharedPrefs.getString("wz_audio_samplerate", String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE))));
+        mediaConfig.setAudioSampleRate(Integer.parseInt(getPrefString(sharedPrefs,"wz_audio_samplerate", String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE))));
         mediaConfig.setAudioChannels(sharedPrefs.getBoolean("wz_audio_stereo", true) ? WOWZMediaConfig.AUDIO_CHANNELS_STEREO : WOWZMediaConfig.AUDIO_CHANNELS_MONO);
-        mediaConfig.setAudioBitRate(Integer.parseInt(sharedPrefs.getString("wz_audio_bitrate", String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_BITRATE))));
+        mediaConfig.setAudioBitRate(Integer.parseInt(getPrefString(sharedPrefs,"wz_audio_bitrate", String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_BITRATE))));
     }
 
     public static void updateConfigFromPrefsForPlayer(SharedPreferences sharedPrefs, WOWZStreamConfig streamConfig) {
@@ -190,6 +204,18 @@ public class GoCoderSDKPrefs {
             mShowConnectionPrefs = showConnectionPrefs;
         }
 
+        public void setFrameRate(int frameRate){
+            final SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putString("wz_video_framerate", String.valueOf(frameRate));
+            editor.apply();
+
+            Preference pref = (Preference)findPreference("wz_video_framerate");
+            pref.setDefaultValue(String.valueOf(frameRate));
+            setSummaryText(pref,String.valueOf(frameRate));
+        }
+
         public void setShowVideoPrefs(boolean showVideoPrefs) {
             mShowVideoPrefs = showVideoPrefs;
         }
@@ -249,11 +275,16 @@ public class GoCoderSDKPrefs {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
+            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1");
             addPreferencesFromResource(R.xml.gocoder_sdk_prefs);
+
+            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1B");
             mSummaryTexts.clear();
 
             PreferenceScreen prefsScreen = (PreferenceScreen) findPreference("prefs_screen_gocoder_sdk");
             final SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1C");
 
             /**** Connection preferences ****/
 
@@ -263,6 +294,7 @@ public class GoCoderSDKPrefs {
             } else {
                 storeSummaryTexts("prefs_category_connection", mSummaryTexts);
 
+                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1D");
                 String[] prefIds = {
                         "wz_live_port_number",
                         "wz_live_app_name",
@@ -271,14 +303,17 @@ public class GoCoderSDKPrefs {
                 };
                 configurePrefSummaries(this, mSharedPreferences, prefsCategory, prefIds);
 
+                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1E");
                 String[] pwIds = {
                         "wz_live_password"
                 };
                 configurePrefSummaries(this, mSharedPreferences, prefsCategory, pwIds, true);
 
+                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1F");
                 Preference hostAddressPref = prefsCategory.findPreference("wz_live_host_address");
                 setSummaryText(mSharedPreferences, hostAddressPref);
 
+                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START2");
 //                ListPreference streamTestingOptionPref = (ListPreference)findPreference("wz_player_example_config");
 //                streamTestingOptionPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 //                    @Override
@@ -399,7 +434,9 @@ public class GoCoderSDKPrefs {
 
             /**** Video preferences ****/
 
+            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START3");
             prefsCategory = (PreferenceCategory)findPreference("prefs_category_video");
+            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START4");
 
             if (!mShowVideoPrefs) {
                 prefsScreen.removePreference(prefsCategory);
@@ -434,6 +471,7 @@ public class GoCoderSDKPrefs {
 
                     //prefsCategory.removePreference(findPreference("wz_video_scale_and_crop"));
 
+                    WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START5");
                     String[] prefIds = {
                             "wz_video_bitrate",
                             "wz_video_framerate",
@@ -441,6 +479,8 @@ public class GoCoderSDKPrefs {
                     };
                     configurePrefSummaries(this, mSharedPreferences, prefsCategory, prefIds);
 
+                    final EditTextPreference videoFrameratePref = (EditTextPreference) findPreference("wz_video_framerate");
+                    final EditTextPreference videoFrameInterval = (EditTextPreference) findPreference("wz_video_keyframe_interval");
                     final ListPreference videoPresetPref = (ListPreference) findPreference("wz_video_preset");
                     final ListPreference videoFrameSizePref = (ListPreference) findPreference("wz_video_frame_size");
 
@@ -450,9 +490,11 @@ public class GoCoderSDKPrefs {
                     if (mActiveCamera == null) {
                         prefsCategory.removePreference(videoFrameSizePref);
                         prefsCategory.removePreference(videoPresetPref);
+                        prefsCategory.removePreference(videoFrameratePref);
                     } else {
                         final WOWZMediaConfig[] presetConfigs = mActiveCamera.getSupportedConfigs();
 
+                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START6");
                         String[] presetLabels = new String[presetConfigs.length];
                         String[] presetValues = new String[presetConfigs.length];
                         for(int i=0; i < presetConfigs.length; i++) {
@@ -463,7 +505,67 @@ public class GoCoderSDKPrefs {
                         videoPresetPref.setEntries(presetLabels);
                         videoPresetPref.setEntryValues(presetValues);
 
+                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START7");
+                        videoFrameInterval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                            @Override
+                            public boolean onPreferenceChange(Preference preference, Object o) {
+                                if(((String) o).isEmpty()){
+                                    SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                                    prefsEditor.putString("wz_video_keyframe_interval", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_KEYFRAME_INTERVAL));
+                                    prefsEditor.apply();
+
+                                    Preference pref = (Preference) findPreference("wz_video_keyframe_interval");
+                                    pref.setDefaultValue(String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_KEYFRAME_INTERVAL));
+                                    setSummaryText(pref, String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_KEYFRAME_INTERVAL));
+
+                                    String message = "Provided keyframe interval must be greater than 0.  We are defaulting back to " + String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_KEYFRAME_INTERVAL)+".";
+                                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                WOWZLog.debug("Setting bit rate to "+((String) o).toString());
+                                SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                                prefsEditor.putString("wz_video_keyframe_interval", o.toString());
+                                prefsEditor.apply();
+
+                                Preference pref = (Preference) findPreference("wz_video_keyframe_interval");
+                                pref.setDefaultValue(String.valueOf(o.toString()));
+                                setSummaryText(pref, o.toString());
+
+                                return true;
+                            }
+                        });
                         final EditTextPreference bitRatePref = (EditTextPreference)findPreference("wz_video_bitrate");
+                        bitRatePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                            @Override
+                            public boolean onPreferenceChange(Preference preference, Object o) {
+                                if(((String) o).isEmpty()){
+                                    SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                                    prefsEditor.putString("wz_video_bitrate", String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_BITRATE));
+                                    prefsEditor.apply();
+
+                                    Preference pref = (Preference) findPreference("wz_video_bitrate");
+                                    pref.setDefaultValue(String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_BITRATE));
+                                    setSummaryText(pref, String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_BITRATE));
+
+                                    String message = "Provided bitrate must be greater than 0.  We are defaulting back to " + String.valueOf(WOWZMediaConfig.DEFAULT_VIDEO_BITRATE)+".";
+                                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                WOWZLog.debug("Setting bit rate to "+((String) o).toString());
+                                SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                                prefsEditor.putString("wz_video_bitrate", o.toString());
+                                prefsEditor.apply();
+
+                                Preference pref = (Preference) findPreference("wz_video_bitrate");
+                                pref.setDefaultValue(String.valueOf(o.toString()));
+                                //bitRatePref.setText(o.toString());
+                                setSummaryText(pref, o.toString());
+
+                                return true;
+                            }
+                        });
+
+                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START8");
                         videoPresetPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                             @Override
                             public boolean onPreferenceChange(Preference preference, Object o) {
@@ -498,7 +600,10 @@ public class GoCoderSDKPrefs {
                         //
                         // Video frame size preference
                         //
-                        final WOWZSize[] frameSizes = mActiveCamera.getSupportedFrameSizes();
+
+                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS1");
+                        final WOWZSize[] frameSizes = mActiveCamera.getOriginalFrameSizes();
+                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS2");
 
                         int currentFrameWidth = mSharedPreferences.getInt("wz_video_frame_width", WOWZMediaConfig.DEFAULT_VIDEO_FRAME_WIDTH);
                         int currentFrameHeight = mSharedPreferences.getInt("wz_video_frame_height", WOWZMediaConfig.DEFAULT_VIDEO_FRAME_HEIGHT);
@@ -507,11 +612,51 @@ public class GoCoderSDKPrefs {
 
                         int curFrameSizeIdx = frameSizes.length - 1;
 
+                        videoFrameratePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                            @Override
+                            public boolean onPreferenceChange(Preference preference, Object o) {
+                                String frameRate = o.toString();
+                                if(frameRate.isEmpty()){
+                                    frameRate="0";
+                                }
+                                WOWZLog.debug("Updating preferences :: "+frameRate);
+                                if (!mActiveCamera.isFrameRateSupported(Integer.parseInt(frameRate))) {
+                                    int supportedFrameRate = mActiveCamera.getDefaultSupported();
+                                    if (supportedFrameRate > 0) {
+                                        supportedFrameRate = supportedFrameRate / 1000;
+                                    }
+                                    WOWZLog.debug("Updating preferences :: frame rate not supported :: "+frameRate);
+
+                                    SharedPreferences.Editor editor = mSharedPreferences.edit();
+                                    editor.putString("wz_video_framerate", String.valueOf(supportedFrameRate));
+                                    editor.apply();
+
+                                    Preference pref = (Preference) findPreference("wz_video_framerate");
+                                    pref.setDefaultValue(String.valueOf(supportedFrameRate));
+                                    setSummaryText(pref, String.valueOf(supportedFrameRate));
+
+                                    String message = "Provided frame rate is not supported by this device.  We are defaulting back to " + supportedFrameRate + " FPS.";
+                                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                                editor.putString("wz_video_framerate", String.valueOf(frameRate));
+                                editor.apply();
+
+                                Preference pref = (Preference) findPreference("wz_video_framerate");
+                                pref.setDefaultValue(String.valueOf(frameRate));
+                                setSummaryText(pref, String.valueOf(frameRate));
+                                WOWZLog.debug("Updating preferences :: frame rate *IS* supported :: " + frameRate);
+
+                                return true;
+                            }
+                        });
                         String[] frameSizeLabels = new String[frameSizes.length];
                         String[] frameSizeValues = new String[frameSizes.length];
                         for(int i=0; i < frameSizes.length; i++) {
                             frameSizeLabels[i] = frameSizes[i].toString();
                             frameSizeValues[i] = String.valueOf(i);
+                            WOWZLog.debug("FRAME SIZE: "+frameSizeLabels[i]);
                             if (frameSizes[i].equals(currentFrameSize))
                                 curFrameSizeIdx = i;
                         }
@@ -523,6 +668,7 @@ public class GoCoderSDKPrefs {
                         videoFrameSizePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                             @Override
                             public boolean onPreferenceChange(Preference preference, Object o) {
+                                WOWZLog.info("MATTCONFIG : setOnPreferenceChangeListener 77 ");
                                 if (o instanceof String) {
                                     try {
                                         int selectedIndex = Integer.parseInt((String) o);
@@ -545,6 +691,8 @@ public class GoCoderSDKPrefs {
                             }
                         });
                     }
+
+
 
                     //
                     // H.264 profile level preference
@@ -587,6 +735,7 @@ public class GoCoderSDKPrefs {
                         profileLevelsPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                             @Override
                             public boolean onPreferenceChange(Preference preference, Object o) {
+                                WOWZLog.info("MATTCONFIG : profileLevelsPref.setOnPreferenceChangeListener 78 ");
                                 if (o instanceof String) {
                                     try {
                                         int selectedIndex = Integer.parseInt((String) o);
@@ -638,6 +787,66 @@ public class GoCoderSDKPrefs {
 
                 storeSummaryTexts("prefs_category_audio", mSummaryTexts);
                 configurePrefSummaries(this, mSharedPreferences, prefsCategory, prefIds);
+
+                final EditTextPreference audioSampleRatePref = (EditTextPreference)findPreference("wz_audio_samplerate");
+                audioSampleRatePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object o) {
+                        if(((String) o).isEmpty()){
+                            SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                            prefsEditor.putString("wz_audio_samplerate", String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE));
+                            prefsEditor.apply();
+
+                            Preference pref = (Preference) findPreference("wz_audio_samplerate");
+                            pref.setDefaultValue(String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE));
+                            setSummaryText(pref, String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE));
+
+                            String message = "Provided audio sample rate must be greater than 0.  We are defaulting back to " + String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_SAMPLE_RATE)+".";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                            return false;
+                        }
+                        WOWZLog.debug("Setting samplerate bit rate to "+((String) o).toString());
+                        SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                        prefsEditor.putString("wz_audio_samplerate", o.toString());
+                        prefsEditor.apply();
+
+                        Preference pref = (Preference) findPreference("wz_audio_samplerate");
+                        pref.setDefaultValue(String.valueOf(o.toString()));
+                        setSummaryText(pref, o.toString());
+
+                        return true;
+                    }
+                });
+
+                final EditTextPreference audiobitRatePref = (EditTextPreference)findPreference("wz_audio_bitrate");
+                audiobitRatePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object o) {
+                        if(((String) o).isEmpty()){
+                            SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                            prefsEditor.putString("wz_audio_bitrate", String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_BITRATE));
+                            prefsEditor.apply();
+
+                            Preference pref = (Preference) findPreference("wz_audio_bitrate");
+                            pref.setDefaultValue(String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_BITRATE));
+                            setSummaryText(pref, String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_BITRATE));
+
+                            String message = "Provided audio bitrate must be greater than 0.  We are defaulting back to " + String.valueOf(WOWZMediaConfig.DEFAULT_AUDIO_BITRATE)+".";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                            return false;
+                        }
+                        WOWZLog.debug("Setting audio bit rate to "+((String) o).toString());
+                        SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                        prefsEditor.putString("wz_audio_bitrate", o.toString());
+                        prefsEditor.apply();
+
+                        Preference pref = (Preference) findPreference("wz_audio_bitrate");
+                        pref.setDefaultValue(String.valueOf(o.toString()));
+                        setSummaryText(pref, o.toString());
+
+                        return true;
+                    }
+                });
             }
 
         }
@@ -648,14 +857,18 @@ public class GoCoderSDKPrefs {
                                             String[] prefKeys,
                                             boolean isPassword) {
 
-            for(String prefKey : prefKeys) {
+            for(final String prefKey : prefKeys) {
                 Preference pref = prefCategory.findPreference(prefKey);
                 pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object o) {
                         if (o instanceof String) {
+                            if(preference.getKey()=="wz_video_framerate"){
+
+                            }
                             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(prefFragment.getActivity());
                             SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+
                             prefsEditor.putString(preference.getKey(), (String)o);
                             prefsEditor.apply();
 
@@ -703,8 +916,24 @@ public class GoCoderSDKPrefs {
             return (summaryTexts.containsKey(prefKey) ? summaryTexts.get(prefKey) : null);
         }
 
+        protected static String getVideoFramerate(String frameRate){
+            int fps = Integer.parseInt(frameRate);
+            if(fps>60){
+                fps = 60;
+            }
+            if(fps<1){
+                fps = 1;
+            }
+            WOWZLog.debug("FPS TOO BIG "+frameRate + " => "+fps);
+            return String.valueOf(fps);
+        }
+
         private void setSummaryText(Preference pref, String prefValueText, boolean isPasswordPref) {
             String prefKey = pref.getKey();
+            if(prefKey.equalsIgnoreCase("wz_video_framerate")){
+                prefValueText = getVideoFramerate(prefValueText);
+            }
+
             if (prefValueText == null || prefValueText.trim().length() == 0) {
                 pref.setSummary(getStoredSummaryText(prefKey, mSummaryTexts));
             } else {

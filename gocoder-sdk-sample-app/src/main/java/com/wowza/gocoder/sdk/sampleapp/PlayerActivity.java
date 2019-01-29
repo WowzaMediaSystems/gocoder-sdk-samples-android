@@ -11,7 +11,7 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp;
@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -50,6 +51,7 @@ import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
 import com.wowza.gocoder.sdk.sampleapp.ui.TimerView;
 import com.wowza.gocoder.sdk.sampleapp.ui.VolumeChangeObserver;
+import com.wowza.gocoder.sdk.api.player.GlobalPlayerStateManager;
 
 public class PlayerActivity extends GoCoderSDKActivityBase {
     final private static String TAG = PlayerActivity.class.getSimpleName();
@@ -65,13 +67,11 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
     private MultiStateButton    mBtnScale        = null;
     private SeekBar             mSeekVolume      = null;
     private ProgressDialog      mBufferingDialog = null;
-
+    private ProgressDialog mGoingDownDialog =null;
     private StatusView        mStatusView       = null;
     private TextView          mHelp             = null;
     private TimerView         mTimerView        = null;
     private ImageButton       mStreamMetadata   = null;
-    private boolean           mUseHLSPlayback   = false;
-    private WOWZPlayerView.PacketThresholdChangeListener packetChangeListener = null;
     private VolumeChangeObserver mVolumeSettingChangeObserver = null;
 
     @Override
@@ -98,33 +98,34 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
         mTimerView.setVisibility(View.GONE);
 
 
+
         if (sGoCoderSDK != null) {
 
             /*
             Packet change listener setup
              */
             final PlayerActivity activity = this;
-            packetChangeListener = new WOWZPlayerView.PacketThresholdChangeListener() {
+            WOWZPlayerView.PacketThresholdChangeListener packetChangeListener = new WOWZPlayerView.PacketThresholdChangeListener() {
                 @Override
                 public void packetsBelowMinimumThreshold(int packetCount) {
                     WOWZLog.debug("Packets have fallen below threshold "+packetCount+"... ");
 
-                    activity.runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(activity, "Packets have fallen below threshold ... ", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+//                    activity.runOnUiThread(new Runnable() {
+//                        public void run() {
+//                            Toast.makeText(activity, "Packets have fallen below threshold ... ", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
                 }
 
                 @Override
                 public void packetsAboveMinimumThreshold(int packetCount) {
                     WOWZLog.debug("Packets have risen above threshold "+packetCount+" ... ");
 
-                    activity.runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(activity, "Packets have risen above threshold ... ", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+//                    activity.runOnUiThread(new Runnable() {
+//                        public void run() {
+//                            Toast.makeText(activity, "Packets have risen above threshold ... ", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
                 }
             };
             mStreamPlayerView.setShowAllNotificationsWhenBelowThreshold(false);
@@ -184,12 +185,36 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
             mBufferingDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    cancelBuffering(dialogInterface);
+                    cancelBuffering();
                 }
             });
 
+            mGoingDownDialog = new ProgressDialog(this);
+            mGoingDownDialog.setTitle(R.string.status_buffering);
+            mGoingDownDialog.setMessage("Please wait while the decoder is shutting down.");
+
+            mStreamPlayerView.registerDataEventListener("onClientConnected", new WOWZDataEvent.EventListener() {
+                @Override
+                public WOWZDataMap onWZDataEvent(String eventName, WOWZDataMap eventParams) {
+                    WOWZLog.info(TAG, "onClientConnected data event received:\n" + eventParams.toString(true));
+
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                        }
+                    });
+
+                    // this demonstrates how to return a function result back to the original Wowza Streaming Engine
+                    // function call request
+                    WOWZDataMap functionResult = new WOWZDataMap();
+                    functionResult.put("greeting", "Hello New Client!");
+
+                    return functionResult;
+                }
+            });
             // testing player data event handler.
-            mStreamPlayerView.registerDataEventListener("onMetaData", new WOWZDataEvent.EventListener(){
+            mStreamPlayerView.registerDataEventListener("onWowzaData", new WOWZDataEvent.EventListener(){
                 @Override
                 public WOWZDataMap onWZDataEvent(String eventName, WOWZDataMap eventParams) {
                     String meta = "";
@@ -242,21 +267,37 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
     /**
      * Android Activity class methods
      */
-
     @Override
     protected void onResume() {
         super.onResume();
 
-        syncUIControlState();
+
+        hideBuffering();
+        if (!GlobalPlayerStateManager.isReady()) {
+            showTearingdownDialog();
+            mStreamPlayerView.stop();   
+        } else {
+            syncUIControlState();
+        }
     }
 
     @Override
     protected void onPause() {
-        if (mStreamPlayerView != null && mStreamPlayerView.isPlaying()) {
-            mStreamPlayerView.stop();
 
-            // Wait for the streaming player to disconnect and shutdown...
-            mStreamPlayerView.getCurrentStatus().waitForState(WOWZState.IDLE);
+
+        if (mStreamPlayerView != null) {
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    WOWZLog.debug("DECODER STATUS Stopping ... ");
+                    mStreamPlayerView.stop();
+
+                    // Wait for the streaming player to disconnect and shutdown...
+                    mStreamPlayerView.getCurrentStatus().waitForState(WOWZState.IDLE);
+                    WOWZLog.debug("DECODER STATUS Stopped!  ");
+                }
+            });
         }
 
         super.onPause();
@@ -264,14 +305,10 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager==null)
+            return false;
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    public boolean isPlayerConfigReady()
-    {
-
-        return false;
     }
 
     /*
@@ -282,13 +319,38 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
         Button btn = (Button)findViewById(R.id.pause_network);
         if(btn.getText().toString().trim().equalsIgnoreCase("pause network")) {
             WOWZLog.info("Pausing network...");
-            btn.setText("Unpause Network");
+            btn.setText(R.string.wz_unpause_network);
             mStreamPlayerView.pauseNetworkStack();
         }
         else{
             WOWZLog.info("Unpausing network... btn.getText(): "+btn.getText());
-            btn.setText("Pause Network");
+            btn.setText(R.string.wz_pause_network);
             mStreamPlayerView.unpauseNetworkStack();
+        }
+    }
+
+    public void playStream()
+    {
+        if(!this.isNetworkAvailable()){
+            displayErrorDialog("No internet connection, please try again later.");
+            return;
+        }
+
+        mHelp.setVisibility(View.GONE);
+        WOWZStreamingError configValidationError = mStreamPlayerConfig.validateForPlayback();
+        if (configValidationError != null) {
+            mStatusView.setErrorMessage(configValidationError.getErrorDescription());
+        } else {
+            // Set the detail level for network logging output
+            mStreamPlayerView.setLogLevel(mWZNetworkLogLevel);
+
+            // Set the player's pre-buffer duration as stored in the app prefs
+            float preBufferDuration = GoCoderSDKPrefs.getPreBufferDuration(PreferenceManager.getDefaultSharedPreferences(this));
+
+            mStreamPlayerConfig.setPreRollBufferDuration(preBufferDuration);
+
+            // Start playback of the live stream
+            mStreamPlayerView.play(mStreamPlayerConfig, this);
         }
     }
 
@@ -297,35 +359,12 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
      */
     public void onTogglePlayStream(View v) {
         if (mStreamPlayerView.isPlaying()) {
+            showTearingdownDialog();
             mStreamPlayerView.stop();
+            mStreamPlayerView.getCurrentStatus().waitForState(WOWZState.IDLE);
         } else if (mStreamPlayerView.isReadyToPlay()) {
-            if(!this.isNetworkAvailable()){
-                displayErrorDialog("No internet connection, please try again later.");
-                return;
-            }
-
-//            if(!this.isPlayerConfigReady()){
-//                displayErrorDialog("Please be sure to include a host, stream, and application to playback a stream.");
-//                return;
-//            }
-
-            mHelp.setVisibility(View.GONE);
-            WOWZStreamingError configValidationError = mStreamPlayerConfig.validateForPlayback();
-            if (configValidationError != null) {
-                mStatusView.setErrorMessage(configValidationError.getErrorDescription());
-            } else {
-                // Set the detail level for network logging output
-                mStreamPlayerView.setLogLevel(mWZNetworkLogLevel);
-
-                // Set the player's pre-buffer duration as stored in the app prefs
-                float preBufferDuration = GoCoderSDKPrefs.getPreBufferDuration(PreferenceManager.getDefaultSharedPreferences(this));
-
-                mStreamPlayerConfig.setPreRollBufferDuration(preBufferDuration);
-
-                // Start playback of the live stream
-                mStreamPlayerView.play(mStreamPlayerConfig, this);
-            }
-
+            WOWZLog.debug("onTogglePlayStream() :: DECODER STATUS :: start stream");
+            this.playStream();
         }
     }
 
@@ -339,9 +378,8 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                WOWZStatus status = new WOWZStatus(playerStatus.getState());
+                WOWZLog.debug("DECODER STATUS: 000 [player activity] current: "+playerStatus.toString());
                 switch(playerStatus.getState()) {
-
                     case WOWZPlayerView.STATE_PLAYING:
                         // Keep the screen on while we are playing back the stream
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -351,7 +389,6 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
                         }
 
                         // Since we have successfully opened up the server connection, store the connection info for auto complete
-
                         GoCoderSDKPrefs.storeHostConfig(PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this), mStreamPlayerConfig);
 
                         // Log the stream metadata
@@ -368,16 +405,19 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
                         mTimerView.stopTimer();
+                        if(GlobalPlayerStateManager.isReady()){
+                            hideTearingdownDialog();
+                        }
 
                         break;
 
                     case WOWZPlayerView.STATE_PREBUFFERING_STARTED:
-                        WOWZLog.debug(TAG, "Dialog for buffering should show...");
+                        WOWZLog.debug(TAG, "**** Decoder Dialog for buffering should show...");
                         showBuffering();
                         break;
 
                     case WOWZPlayerView.STATE_PREBUFFERING_ENDED:
-                        WOWZLog.debug(TAG, "Dialog for buffering should stop...");
+                        WOWZLog.debug(TAG, "**** Decoder Dialog for buffering should stop...");
                         hideBuffering();
                         // Make sure player wasn't signaled to shutdown
                         if (mStreamPlayerView.isPlaying()) {
@@ -385,7 +425,13 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
                         }
                         break;
 
+                    case WOWZPlayerView.STATE_PLAYBACK_COMPLETE:
+                        WOWZLog.debug("DECODER STATUS: [player activity2] current: "+playerStatus.toString());
+
+                        break;
                     default:
+                        WOWZLog.debug("DECODER STATUS: [player activity] current: "+playerStatus.toString());
+                        WOWZLog.debug("DECODER STATUS: [player activity] current: "+ GlobalPlayerStateManager.isReady());
                         break;
                 }
                 syncUIControlState();
@@ -399,6 +445,7 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
             @Override
             public void run() {
                 displayErrorDialog(playerStatus.getLastError());
+                playerStatus.setState(WOWZState.IDLE);
                 syncUIControlState();
             }
         });
@@ -428,8 +475,6 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
     public void onStreamMetadata(View v) {
         WOWZDataMap streamMetadata = mStreamPlayerView.getMetadata();
         WOWZDataMap streamStats = mStreamPlayerView.getStreamStats();
-//        WOWZDataMap streamConfig = mStreamPlayerView.getStreamConfig().toDataMap();
-        WOWZDataMap streamConfig = new WOWZDataMap();
         WOWZDataMap streamInfo = new WOWZDataMap();
 
         streamInfo.put("- Stream Statistics -", streamStats);
@@ -464,7 +509,7 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
      * Update the state of the UI controls
      */
     private void syncUIControlState() {
-        boolean disableControls = (!(mStreamPlayerView.isReadyToPlay() || mStreamPlayerView.isPlaying()) || sGoCoderSDK == null);
+        boolean disableControls =  !(GlobalPlayerStateManager.isReady() || mStreamPlayerView.isPlaying()); // (!(GlobalPlayerStateManager.isReady() ||  mStreamPlayerView.isReadyToPlay() || mStreamPlayerView.isPlaying()) || sGoCoderSDK == null);
         if (disableControls) {
             mBtnPlayStream.setEnabled(false);
             mBtnSettings.setEnabled(false);
@@ -472,10 +517,9 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
             mBtnScale.setEnabled(false);
             mBtnMic.setEnabled(false);
             mStreamMetadata.setEnabled(false);
-       } else {
+        } else {
             mBtnPlayStream.setState(mStreamPlayerView.isPlaying());
             mBtnPlayStream.setEnabled(true);
-
             if (mStreamPlayerConfig.isAudioEnabled()) {
                 mBtnMic.setVisibility(View.VISIBLE);
                 mBtnMic.setEnabled(true);
@@ -500,20 +544,76 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
         }
     }
 
+    private void showTearingdownDialog(){
+
+        try {
+            if (mGoingDownDialog == null) return;
+            hideBuffering();
+            if(!mGoingDownDialog.isShowing()) {
+                mGoingDownDialog.setCancelable(false);
+                mGoingDownDialog.show();
+            }
+        }
+        catch(Exception ex){
+            WOWZLog.warn(TAG, "showTearingdownDialog:" + ex);
+        }
+    }
+    private void hideTearingdownDialog(){
+
+        try {
+            if (mGoingDownDialog == null) return;
+            hideBuffering();
+            mGoingDownDialog.dismiss();
+        }
+        catch(Exception ex){
+            WOWZLog.warn(TAG, "hideTearingdownDialog exception:" + ex);
+        }
+    }
     private void showBuffering() {
         try {
             if (mBufferingDialog == null) return;
+
+            final Handler mainThreadHandler = new Handler(getBaseContext().getMainLooper());
+            mBufferingDialog.setCancelable(false);
             mBufferingDialog.show();
+            mBufferingDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(false);
+            (new Thread(){
+                public void run(){
+                    try{
+                        int cnt=0;
+                        while(GlobalPlayerStateManager.DECODER_VIDEO_STATE != WOWZState.STARTING && GlobalPlayerStateManager.DECODER_VIDEO_STATE != WOWZState.RUNNING ){
+                            if(cnt>3){
+                                break;
+                            }
+                            Thread.sleep(1000);
+                            cnt++;
+                        }
+                    }catch(Exception ex){
+                        WOWZLog.warn(TAG, "showBuffering:" + ex);
+                    }
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mBufferingDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(true);
+                        }
+                    });
+                }
+            }).start();
         }
-        catch(Exception ex){}
+        catch(Exception ex) {
+            WOWZLog.warn(TAG, "showBuffering:" + ex);
+        }
     }
 
-    private void cancelBuffering(DialogInterface dialogInterface) {
-        if(mStreamPlayerConfig.getHLSBackupURL()!=null || mStreamPlayerConfig.isHLSEnabled()){
-            mStreamPlayerView.stop(true);
+    private void cancelBuffering() {
+
+        showTearingdownDialog();
+        if(mStreamPlayerConfig.getHLSBackupURL()!=null || mStreamPlayerConfig.isHLSEnabled() ||
+                (mStreamPlayerView != null && mStreamPlayerView.isPlaying()) ){
+            mStreamPlayerView.stop();
         }
-        else if (mStreamPlayerView != null && mStreamPlayerView.isPlaying()) {
-            mStreamPlayerView.stop(true);
+        else{
+            hideTearingdownDialog();
         }
     }
 
@@ -522,7 +622,7 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
             mBufferingDialog.dismiss();
     }
 
-   @Override
+    @Override
     public void syncPreferences() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mWZNetworkLogLevel = Integer.valueOf(prefs.getString("wz_debug_net_log_level", String.valueOf(WOWZLog.LOG_LEVEL_DEBUG)));

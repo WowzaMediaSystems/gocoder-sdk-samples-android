@@ -49,7 +49,7 @@
 
     <!-- Device Info Headers -->
     <string name="about_product_label">Wowza GoCoder SDK</string>
-    <string name="about_copyright_line1">&#169; 2013&#8211;2018 Wowza Media Systems, LLC</string>
+    <string name="about_copyright_line1">&#169; 2013&#8211;2019 Wowza Media Systems, LLC</string>
     <string name="about_copyright_line2">All Rights Reserved</string>
 
     <string name="about_support_information">Support Information</string>
@@ -74,7 +74,7 @@
     <string name="wz_live_port_number_dialog_title">Enter the port number</string>
     <string name="wz_live_port_number_default_value">1935</string>
 
-<!--
+    <!--
     <string name="wz_live_use_ssl_title">Connect via SSL</string>
     <string name="wz_live_use_ssl_summary">Establish a secure connection</string>
     <string name="wz_live_use_ssl_default_value">false</string>
@@ -205,6 +205,9 @@
     <string name="wz_player_title">Player Testing Options</string>
     <string name="wz_player_default">None</string>
     <string name="wz_player_summary">Set Player to be auto-configured for example 1</string>
+
+    <string name="wz_pause_network">Pause Network</string>
+    <string name="wz_unpause_network">Un-pause Network</string>
 
 
 </resources>

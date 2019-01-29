@@ -10,11 +10,12 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -43,7 +44,6 @@ public class MainActivity extends ListActivity {
             {   "Stream live video and audio",
                     "Broadcast a live video and audio stream captured with the local camera and mic",
                     "CameraActivity"                        },
-
             {   "Play a live stream",
                     "Displays an active live stream from Wowza Streaming Engine",
                     "PlayerActivity"            },
@@ -97,7 +97,7 @@ public class MainActivity extends ListActivity {
     private static final int[] ACTIVITY_ICONS = {
             R.drawable.ic_streaming,
             R.drawable.ic_player,
-            R.drawable.ic_player,
+            R.drawable.ic_player, 
             R.drawable.ic_mp4_capture,
             R.drawable.ic_mp4_streaming,
             R.drawable.ic_opengl,
@@ -147,8 +147,13 @@ public class MainActivity extends ListActivity {
                     .addToBackStack(null)
                     .commit();
         } else {
-            Intent intent = (Intent) map.get(CLASS_NAME);
-            startActivity(intent);
+            if(map.get(CLASS_NAME) instanceof String && isKotlinMissingWarning(map.get(CLASS_NAME).toString())){
+                showKotlinWarning(map.get(CLASS_NAME).toString());
+            }
+            else {
+                Intent intent = (Intent) map.get(CLASS_NAME);
+                startActivity(intent);
+            }
         }
     }
 
@@ -162,6 +167,21 @@ public class MainActivity extends ListActivity {
             super.onBackPressed();
         }
     }
+
+    private boolean isKotlinMissingWarning(String className){
+        return className.contains("Kotlin");
+    }
+
+    private void showKotlinWarning(String className){
+        if(isKotlinMissingWarning(className)){
+            new AlertDialog.Builder(this)
+                    .setTitle("Class Not Found!")
+                    .setMessage("KotlinPlayerActivity requires the Kotlin plugin for Android Studio.  Please ensure this is installed and try again.")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setNegativeButton(android.R.string.yes, null).show();
+        }
+    }
+
 
     private List<Map<String, Object>> createActivityList() {
         List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
@@ -182,7 +202,10 @@ public class MainActivity extends ListActivity {
                     intent.setClass(this, cls);
                     tmp.put(CLASS_NAME, intent);
                 } catch (ClassNotFoundException cnfe) {
-                    throw new RuntimeException("Unable to find " + activity_text[2], cnfe);
+                    if(!isKotlinMissingWarning(activity_text[2])){
+                        throw new RuntimeException("Unable to find " + activity_text[2], cnfe);
+                    }
+                    tmp.put(CLASS_NAME, activity_text[2]);
                 }
             } else {
                 tmp.put(CLASS_NAME, activity_text[2]);

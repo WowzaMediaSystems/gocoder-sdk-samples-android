@@ -11,7 +11,7 @@
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  * WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ * © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp
@@ -404,9 +404,9 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
 
     private fun cancelBuffering(dialogInterface: DialogInterface) {
         if (mStreamPlayerConfig!!.hlsBackupURL != null || mStreamPlayerConfig!!.isHLSEnabled) {
-            mStreamPlayerView!!.stop(true)
+            mStreamPlayerView!!.stop()
         } else if (mStreamPlayerView != null && mStreamPlayerView!!.isPlaying) {
-            mStreamPlayerView!!.stop(true)
+            mStreamPlayerView!!.stop()
         }
     }
 

@@ -10,7 +10,7 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp.graphics;
@@ -32,7 +32,6 @@ import com.wowza.gocoder.sdk.sampleapp.R;
  * as an overlay within the GoCoder SDK camera preview display
  */
 public class BitmapOverlayActivity extends CameraActivityBase {
-    private final static String TAG = BitmapOverlayActivity.class.getSimpleName();
 
     private WOWZBitmap mWZBitmap = null;
     private ScaleGestureDetector mScaleDetector = null;
@@ -50,11 +49,11 @@ public class BitmapOverlayActivity extends CameraActivityBase {
 
         mScaleDetector = new ScaleGestureDetector(this, new ScaleListener());
     }
-
     @Override
     protected void onResume() {
         super.onResume();
 
+        // Create the initial Bitmap
         if (sGoCoderSDK != null && mWZCameraView != null && mWZBitmap == null) {
             // Read in a PNG file from the app resources as a bitmap
             Bitmap overlayBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.overlay_logo);
@@ -66,13 +65,14 @@ public class BitmapOverlayActivity extends CameraActivityBase {
             mWZBitmap.setPosition(WOWZBitmap.CENTER, WOWZBitmap.CENTER);
 
             // Scale the bitmap initially to 75% of the display surface width
-            mWZBitmap.setScale(0.75f, WOWZBitmap.SURFACE_WIDTH);
+            mWZBitmap.setScale(0.75f, WOWZBitmap.FRAME_WIDTH);
 
             // Register the bitmap renderer with the GoCoder camera preview view as a frame listener
             mWZCameraView.registerFrameRenderer(mWZBitmap);
 
             Toast.makeText(this, getString(R.string.bitmap_overlay_help), Toast.LENGTH_LONG).show();
         }
+
     }
 
     @Override

@@ -10,23 +10,26 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp;
 
 import android.Manifest;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
+import com.wowza.gocoder.sdk.api.configuration.WOWZMediaConfig;
 import com.wowza.gocoder.sdk.api.devices.WOWZAudioDevice;
 import com.wowza.gocoder.sdk.api.devices.WOWZCamera;
 import com.wowza.gocoder.sdk.api.devices.WOWZCameraView;
@@ -41,6 +44,7 @@ import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
 
 import java.util.Arrays;
+import java.util.List;
 
 abstract public class CameraActivityBase extends GoCoderSDKActivityBase
         implements WOWZCameraView.PreviewStatusListener{
@@ -66,6 +70,8 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        prefsFragment = new GoCoderSDKPrefs.PrefsFragment();
     }
 
     //define callback interface
@@ -99,15 +105,18 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
         });
 
         if (sGoCoderSDK != null && this.hasDevicePermissionToAccess(Manifest.permission.CAMERA)) {
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
             /// Set mirror capability.
             //mWZCameraView.setSurfaceExtension(mWZCameraView.EXTENSION_MIRROR);
 
             // Update the camera preview display config based on the stored shared preferences
+
             mWZCameraView.setCameraConfig(getBroadcastConfig());
             mWZCameraView.setScaleMode(GoCoderSDKPrefs.getScaleMode(sharedPrefs));
             mWZCameraView.setVideoBackgroundColor(WOWZColor.DARKGREY);
+
+            CameraActivityBase base = this;
 
 
             // Setup up a shared preferences change listener to update the camera preview
@@ -117,14 +126,42 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String prefsKey) {
                     if (mWZCameraView != null &&  Arrays.binarySearch(CAMERA_CONFIG_PREFS_SORTED, prefsKey) != -1) {
 
-                        // Update the camera preview display frame size
-                        WOWZSize currentFrameSize = mWZCameraView.getFrameSize();
-                        int prefsFrameWidth = sharedPreferences.getInt("wz_video_frame_width", currentFrameSize.getWidth());
-                        int prefsFrameHeight = sharedPreferences.getInt("wz_video_frame_height",currentFrameSize.getHeight());
-                        WOWZSize prefsFrameSize = new WOWZSize(prefsFrameWidth, prefsFrameHeight);
-                        if (!prefsFrameSize.equals(currentFrameSize))
-                            mWZCameraView.setFrameSize(prefsFrameSize);
+                        if(prefsKey.equalsIgnoreCase("wz_video_framerate")){
+                            String currentFrameRate = String.valueOf(mWZCameraView.getFramerate());
+                            String frameRate = sharedPreferences.getString("wz_video_framerate",currentFrameRate);
+                            getBroadcastConfig().setVideoFramerate(Integer.parseInt(frameRate));
+                            mWZBroadcastConfig.setVideoFramerate(Integer.parseInt(frameRate));
+                            mWZBroadcastConfig.getVideoSourceConfig().setVideoFramerate(Integer.parseInt(frameRate));
+                        }
 
+                        if(prefsKey.equalsIgnoreCase("wz_video_bitrate")){
+                            String currentBitrate = String.valueOf(mWZCameraView.getFramerate());
+                            String bitrate = sharedPreferences.getString("wz_video_bitrate",currentBitrate);
+                            getBroadcastConfig().setVideoBitRate(Integer.parseInt(bitrate));
+                            mWZBroadcastConfig.setVideoFramerate(Integer.parseInt(bitrate));
+                            mWZBroadcastConfig.getVideoSourceConfig().setVideoFramerate(Integer.parseInt(bitrate));
+                        }
+
+                        // Update the camera preview display frame size
+
+                        if(prefsKey.equalsIgnoreCase("wz_video_frame_width") || prefsKey.equalsIgnoreCase("wz_video_frame_height")) {
+                            WOWZSize currentFrameSize = mWZCameraView.getFrameSize();
+                            int prefsFrameWidth = sharedPreferences.getInt("wz_video_frame_width", currentFrameSize.getWidth());
+                            int prefsFrameHeight = sharedPreferences.getInt("wz_video_frame_height", currentFrameSize.getHeight());
+                            WOWZSize prefsFrameSize = new WOWZSize(prefsFrameWidth, prefsFrameHeight);
+                            if (!prefsFrameSize.equals(currentFrameSize))
+                                mWZCameraView.setFrameSize(prefsFrameSize);
+                        }
+                        if(prefsKey.equalsIgnoreCase("wz_video_resize_to_aspect") ) {
+                            Boolean scaleMode = sharedPreferences.getBoolean("wz_video_resize_to_aspect", false); // ? WOWZMediaConfig.RESIZE_TO_ASPECT : WOWZMediaConfig.FILL_VIEW;
+                            if (scaleMode) {
+                                mWZCameraView.setScaleMode(WOWZMediaConfig.RESIZE_TO_ASPECT);  //WOWZMediaConfig.RESIZE_TO_ASPECT :
+                            } else {
+                                mWZCameraView.setScaleMode(WOWZMediaConfig.FILL_VIEW);  //WOWZMediaConfig.RESIZE_TO_ASPECT :
+                            }
+                        }
+
+                        mWZCameraView.setCameraConfig(mWZBroadcastConfig);
 
                         // Toggle the camera preview on or off
                         boolean videoEnabled = sharedPreferences.getBoolean("wz_video_enabled", mWZBroadcastConfig.isVideoEnabled());
@@ -133,9 +170,10 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                         }
                         else if (!videoEnabled && mWZCameraView.isPreviewing()) {
                             mWZCameraView.setVideoBackgroundColor(WOWZColor.BLACK);
-                            mWZCameraView.clearView();
-                            mWZCameraView.stopPreview();
                         }
+                        mWZCameraView.clearView();
+                        mWZCameraView.stopPreview();
+
                     }
                 }
             };
@@ -157,7 +195,6 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                 }
             }, 300);
         }
-
         syncUIControlState();
     }
 
@@ -238,6 +275,9 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                 Toast.makeText(this, "Unable to publish if both audio and video are disabled", Toast.LENGTH_LONG).show();
             }
             else{
+
+                WOWZLog.debug("Scale Mode: -> "+mWZCameraView.getScaleMode());
+
                 if(!mWZBroadcastConfig.isAudioEnabled()){
                     Toast.makeText(this, "The audio stream is currently turned off", Toast.LENGTH_LONG).show();
                 }
@@ -245,7 +285,6 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                 if (!mWZBroadcastConfig.isVideoEnabled()) {
                     Toast.makeText(this, "The video stream is currently turned off", Toast.LENGTH_LONG).show();
                 }
-
                 WOWZStreamingError configError = startBroadcast();
                 if (configError != null) {
                     if (mStatusView != null)
@@ -279,23 +318,32 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
         }
     };
 
+    private GoCoderSDKPrefs.PrefsFragment prefsFragment;
     private void showSettings(View v){
         // Display the prefs fragment
-        GoCoderSDKPrefs.PrefsFragment prefsFragment = new GoCoderSDKPrefs.PrefsFragment();
+
+        WOWZLog.debug("*** getOriginalFrameSizes showSettings1");
         prefsFragment.setActiveCamera(mWZCameraView != null ? mWZCameraView.getCamera() : null);
 
+        WOWZLog.debug("*** getOriginalFrameSizes showSettings2");
         getFragmentManager().addOnBackStackChangedListener(backStackListener);
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, prefsFragment)
                 .addToBackStack(null)
+                .show(prefsFragment)
                 .commit();
+        WOWZLog.debug("*** getOriginalFrameSizes showSettings3");
     }
+
+
 
     /**
      * Click handler for the settings button
      */
     public void onSettings(View v) {
+        WOWZLog.debug("*** getOriginalFrameSizes Do we have permission?");
         if(this.hasDevicePermissionToAccess(Manifest.permission.CAMERA) && this.hasDevicePermissionToAccess(Manifest.permission.RECORD_AUDIO)) {
+            WOWZLog.debug("*** getOriginalFrameSizes Do we have permission = yes");
             this.showSettings(v);
         }
         else{
@@ -305,7 +353,6 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
 
     protected void initGoCoderDevices() {
         if (sGoCoderSDK != null) {
-
             boolean videoIsInitialized = false;
             boolean audioIsInitialized = false;
 
@@ -318,14 +365,21 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                         // Set the video broadcaster in the broadcast config
                         getBroadcastConfig().setVideoBroadcaster(mWZCameraView);
                         videoIsInitialized = true;
+
+
+                        (new Thread(){
+                            public void run(){
+                                WOWZLog.debug("*** getOriginalFrameSizes - Get original frame size : ");
+                                prefsFragment.setActiveCamera(mWZCameraView != null ? mWZCameraView.getCamera() : null);
+                                getFragmentManager().beginTransaction().replace(android.R.id.content, prefsFragment).hide(prefsFragment).commit() ;
+                            }
+                        }).start();
+
                     } else {
                         mStatusView.setErrorMessage("Could not detect or gain access to any cameras on this device");
                         getBroadcastConfig().setVideoEnabled(false);
                     }
                 }
-//                else {
-//                    getBroadcastConfig().setVideoEnabled(false);
-//                }
             }
 
             if(this.hasDevicePermissionToAccess(Manifest.permission.RECORD_AUDIO)) {

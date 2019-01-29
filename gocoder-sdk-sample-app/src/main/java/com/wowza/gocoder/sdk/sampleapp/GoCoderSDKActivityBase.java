@@ -10,7 +10,7 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp;
@@ -271,7 +271,6 @@ public abstract class GoCoderSDKActivityBase extends Activity
      */
     @Override
     public void onWZStatus(final WOWZStatus goCoderStatus) {
-        WOWZLog.debug("GOCODERSDKACTIVITYBASE",goCoderStatus.toString());
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -349,6 +348,11 @@ public abstract class GoCoderSDKActivityBase extends Activity
                 WOWZLog.error(TAG, e);
             }
 
+            WOWZMediaConfig mediaConfig = getBroadcastConfig().getVideoSourceConfig();
+            mediaConfig.setVideoFramerate(mWZBroadcastConfig.getVideoFramerate());
+            mediaConfig.setVideoFrameHeight(mWZBroadcastConfig.getVideoFrameHeight());
+            mediaConfig.setVideoFrameWidth(mWZBroadcastConfig.getVideoFrameWidth());
+            mWZBroadcastConfig.setVideoSourceConfig(mediaConfig);
             WOWZLog.info(TAG, "=============== Broadcast Configuration ===============\n"
                     + mWZBroadcastConfig.toString()
                     + "\n=======================================================");
@@ -366,6 +370,7 @@ public abstract class GoCoderSDKActivityBase extends Activity
 //                mWZBroadcast.registerAdaptiveFrameRateListener(abrHandler);
 //                mWZBroadcastConfig.setFrameRateLowBandwidthSkipCount(1);
 
+                WOWZLog.debug("***** [FPS]GoCoderSDKActivity "+mWZBroadcastConfig.getVideoFramerate());
                 mWZBroadcast.startBroadcast(mWZBroadcastConfig, this);
             }
         } else {

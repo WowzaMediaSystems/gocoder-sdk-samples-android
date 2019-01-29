@@ -10,7 +10,7 @@
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. ALL CODE PROVIDED HEREUNDER IS PROVIDED "AS IS".
  *  WOWZA MEDIA SYSTEMS, LLC HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  © 2015 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ *  © 2015 – 2019 Wowza Media Systems, LLC. All rights reserved.
  */
 
 package com.wowza.gocoder.sdk.sampleapp.audio;
@@ -109,10 +109,13 @@ public class AudioMeterActivity extends CameraActivityBase {
         } else {
             mAudioLevelMeter.setVisibility(mBtnMic.isOn() ? View.VISIBLE : View.GONE);
 
-            if (mBtnMic.isOn())
+            if (mBtnMic.isOn()) {
                 mWZAudioDevice.startAudioSampler();
-            else
+                mWZBroadcastConfig.setAudioEnabled(true);
+            }else {
                 mWZAudioDevice.stopAudioSampler();
+                mWZBroadcastConfig.setAudioEnabled(false);
+            }
         }
    }
     @Override

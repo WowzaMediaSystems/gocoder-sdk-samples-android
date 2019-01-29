@@ -1,7 +1,7 @@
 /*
  *
  * WOWZA MEDIA SYSTEMS, LLC ("Wowza") CONFIDENTIAL
- * © 2005 – 2018 Wowza Media Systems, LLC. All rights reserved.
+ * © 2005 – 2019 Wowza Media Systems, LLC. All rights reserved.
  *
  * NOTICE: All information contained herein is, and remains the property of Wowza Media Systems, LLC.
  * The intellectual and technical concepts contained herein are proprietary to Wowza Media Systems, LLC
