@@ -57,7 +57,7 @@
                 android:onClick="onSwitchCamera"
                 android:background="#000000ff"
                 android:padding="10dp"
-                android:contentDescription="Switch Camera" />
+                android:contentDescription="@string/switch_camera" />
 
             <com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton
                 android:layout_width="wrap_content"
@@ -68,7 +68,7 @@
                 android:onClick="onToggleTorch"
                 android:background="#000000ff"
                 android:padding="10dp"
-                android:contentDescription="Torch" />
+                android:contentDescription="@string/torch" />
 
         </LinearLayout>
 
@@ -110,7 +110,7 @@
         <com.wowza.gocoder.sdk.sampleapp.ui.TimerView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00:00"
+            android:text="@string/zero_time"
             android:id="@+id/txtTimer"
             android:layout_centerHorizontal="true"
             android:background="@drawable/rounded_corner"
@@ -133,7 +133,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Save to MP4"
+                android:text="@string/switch_mp4"
                 android:id="@+id/textView"
                 android:textAlignment="center"
                 android:layout_marginBottom="5dp"

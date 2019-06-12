@@ -29,6 +29,8 @@ import android.widget.EditText;
 import com.wowza.gocoder.sdk.api.configuration.WOWZStreamConfig;
 import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -108,30 +110,19 @@ public class AutoCompletePreference extends EditTextPreference {
         editor.apply();
     }
 
+    @Contract("_, null -> null")
     public static WOWZStreamConfig loadAutoCompleteHostConfig(SharedPreferences sharedPrefs, String hostAddress) {
         if (hostAddress == null || hostAddress.trim().length() == 0) return null;
 
-        String hostConfigKey = AutoCompletePreference.hostConfigKey(hostAddress);
-        if (!sharedPrefs.contains(hostConfigKey)) return null;
-
-        String storedConfig = sharedPrefs.getString(hostConfigKey, null);
-        if (storedConfig == null) return null;
-
-        String storedValues[] = TextUtils.split(storedConfig, ";");
-        if (storedValues.length != 4) {
-            removeAutoCompleteHostConfig(sharedPrefs, hostAddress);
-            return null;
-        }
-
         try {
-            int port_number = Integer.parseInt(storedValues[0]);
+            int port_number = Integer.parseInt(sharedPrefs.getString("wz_live_port_number", null));
 
             WOWZStreamConfig hostConfig = new WOWZStreamConfig();
             hostConfig.setHostAddress(hostAddress);
             hostConfig.setPortNumber(port_number);
-            if (storedValues[1].trim().length()>0) hostConfig.setApplicationName(storedValues[1]);
-            if (storedValues[2].trim().length()>0) hostConfig.setStreamName(storedValues[2]);
-            if (storedValues[3].trim().length()>0) hostConfig.setUsername(storedValues[3]);
+            hostConfig.setApplicationName(sharedPrefs.getString("wz_live_app_name", null));
+            hostConfig.setStreamName(sharedPrefs.getString("wz_live_stream_name", null));
+            hostConfig.setUsername(sharedPrefs.getString("wz_live_user_name", null));
 
             return hostConfig;
         } catch (NumberFormatException e) {
@@ -143,7 +134,7 @@ public class AutoCompletePreference extends EditTextPreference {
     public static void storeAutoCompleteHostConfig(SharedPreferences sharedPrefs, WOWZStreamConfig streamConfig) {
         String hostAddress = streamConfig.getHostAddress();
         if (hostAddress == null || hostAddress.trim().length() == 0) return;
-WOWZLog.debug("UPDATING SHARED HOST CONFIG!");
+        WOWZLog.debug("UPDATING SHARED HOST CONFIG!");
 
         AutoCompletePreference.updateAutoCompleteHostsList(sharedPrefs, hostAddress);
 

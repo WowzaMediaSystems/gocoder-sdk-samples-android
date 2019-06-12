@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="empty_array"/>
+    <!-- only for testing
     <string-array name="wz_player1_array">
         <item>None</item>
         <item>Stream0</item>
@@ -9,6 +9,7 @@
         <item>Booth Cam</item>
         <item>Play0</item>
     </string-array>
+    -->
     <string-array name="net_log_levels_names_array">
         <item>VERBOSE</item>
         <item>DEBUG</item>

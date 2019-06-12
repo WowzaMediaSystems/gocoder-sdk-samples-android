@@ -7,12 +7,13 @@
 
     <ImageView
         android:id="@+id/example_icon"
+        android:contentDescription="@string/info_title"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:scaleType="fitCenter"
         android:src="@mipmap/ic_launcher"
-        android:paddingLeft="0dip"
-        android:paddingRight="15dip" />
+        android:paddingStart="0dip"
+        android:paddingEnd="15dip" />
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -23,14 +24,14 @@
             android:id="@+id/example_title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="List Item Title"
+            android:text="@string/list_item_title"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/example_description"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="List item description" />
+            android:text="@string/list_item_description" />
 
     </LinearLayout>
 

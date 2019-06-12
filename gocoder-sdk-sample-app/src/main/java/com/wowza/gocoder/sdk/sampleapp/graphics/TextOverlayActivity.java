@@ -17,6 +17,7 @@ package com.wowza.gocoder.sdk.sampleapp.graphics;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.view.View;
 
 import com.wowza.gocoder.sdk.api.android.graphics.WOWZText;
 import com.wowza.gocoder.sdk.api.android.graphics.WOWZTextManager;
@@ -55,6 +56,15 @@ public class TextOverlayActivity extends CameraActivityBase {
             textObject.setAlignment(WOWZText.CENTER);
         }
     }
+
+
+    /**
+     * Click handler for the broadcast button
+     */
+    public void onToggleBroadcast(View v) {
+        super.onToggleBroadcast(v);
+    }
+
 
     @Override
     protected void onStop() {

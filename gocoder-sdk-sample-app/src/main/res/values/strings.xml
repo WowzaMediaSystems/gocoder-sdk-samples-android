@@ -6,46 +6,40 @@
     <string name="event_example_title">GoCoder SDK Events and Metadata Example</string>
     <string name="mp4_broadcast_title">GoCoder SDK MP4 Broadcast Example</string>
     <string name="mp4_capture_title">GoCoder SDK MP4 Capture Example</string>
+    <string name="mp4_press_select_to_stream_left">Press </string>
+    <string name="mp4_press_select_to_stream_right"> to select an MP4 video file to stream</string>
     <string name="audio_meter_title">GoCoder SDK Bluetooth Mic Example</string>
     <string name="audio_bluetooth_title">GoCoder SDK Audio Meter Example</string>
     <string name="info_title">Device Information APIs</string>
-    <string name="face_title">Face Detection Example</string>
     <string name="stream_player_title">Live Stream Player Example</string>
     <string name="screenshot_title">Screenshot Example</string>
     <string name="text_overlay_title">GoCoder SDK Text Overlay Example</string>
     <string name="opengl_title">GoCoder SDK OpenGL Capture Example</string>
     <string name="bitmap_overlay_title">GoCoder SDK Bitmap Overlay Example</string>
-    <string name="surface_view_title">GoCoder SDK OpenGL ES Capture Example</string>
+    <string name="gocoder_version">GoCoder SDK v %1$s</string>
+    <string name="table_fragment_data_value">} %1$s</string>
+
 
     <string name="audio_meter_help">Press the mic icon to toggle the audio level meter</string>
+    <string name="press_the_gear">Press the gear icon to select a stream and then press the play button</string>
+
     <string name="audio_bluetooth_help">The Bluetooth mic will be used for audio input if present</string>
     <string name="bitmap_overlay_help">Use a pinch gesture to scale the overlay logo</string>
 
-    <string name="action_send">Send to Wowza Support</string>
     <string name="action_copy">Copy to clipboard</string>
 
-    <string name="resize_aspect_mode">Aspect</string>
-    <string name="resize_aspect_fill_mode">Fill</string>
-
     <string name="dialog_title_error">An error occurred</string>
-    <string name="dialog_button_ok">OK</string>
-    <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_button_close">Close</string>
 
-    <string name="status_connecting">Connecting...</string>
+    <string name="status_connecting">Connecting&#8230;</string>
     <string name="status_connected">Connected</string>
-    <string name="status_disconnecting">Disconnecting...</string>
-    <string name="status_buffering">Retrieving Stream...</string>
+    <string name="status_disconnecting">Disconnecting&#8230;</string>
+    <string name="status_buffering">Retrieving Stream&#8230;</string>
     <string name="button_dismiss">Dismiss</string>
     <string name="button_cancel">Cancel</string>
     <string name="msg_please_wait">Please wait</string>
 
     <string name="label_datagrid_table_title">Table Title</string>
-    <string name="label_datagrid_header_property">Property</string>
-    <string name="label_datagrid_header_setting">Setting</string>
-    <string name="label_datagrid_header_key">Key</string>
-    <string name="label_datagrid_header_name">Name</string>
-    <string name="label_datagrid_header_value">Value</string>
 
     <!-- Device Info Headers -->
     <string name="about_product_label">Wowza GoCoder SDK</string>
@@ -108,12 +102,9 @@
 
     <string name="wz_video_preset_title">Commonly used presets</string>
     <string name="wz_video_preset_summary">Select from a list of optimized frame size / bitrate combinations</string>
-    <string name="wz_video_preset_dialog_title">Select a frame size / bitrate combination</string>
-    <string name="wz_video_preset_default_value">4</string>
 
     <string name="wz_video_frame_size_title">Video frame size (px)</string>
     <string name="wz_video_frame_size_summary">The video frame size</string>
-    <string name="wz_video_frame_size_dialog_title">Select a video frame size (px)</string>
     <string name="wz_video_frame_size_default_value">4</string>
 
     <string name="wz_video_bitrate_title">Bitrate (kbps)</string>
@@ -138,16 +129,20 @@
 
     <string name="wz_video_profile_level_title">H.264 profile level</string>
     <string name="wz_video_profile_level_summary">The H.264 profile and profile level</string>
-    <string name="wz_video_profile_level_dialog_title">Select a H.264 profile level</string>
     <string name="wz_video_profile_level_default_value">1</string>
 
-    <string name="wz_video_letterbox_portrait_title">Letterboxed portrait video</string>
-    <string name="wz_video_letterbox_portrait_summary">Video captured in portrait mode will be letter boxed</string>
-    <string name="wz_video_letterbox_portrait_default_value">false</string>
+    <!--
+        <string name="wz_video_letterbox_portrait_title">Letterboxed portrait video</string>
+        <string name="wz_video_letterbox_portrait_default_value">false</string>
+        <string name="wz_video_captured_video_rotates_title">Captured video rotates</string>
+        <string name="wz_video_captured_video_rotates_summary">The captured video rotates as the device is rotated</string>
+        <string name="wz_video_captured_video_rotates_default_value">true</string>
+        <string name="wz_video_letterbox_portrait_summary">Video captured in portrait mode will be letter boxed</string>
 
-    <string name="wz_video_captured_video_rotates_title">Captured video rotates</string>
-    <string name="wz_video_captured_video_rotates_summary">The captured video rotates as the device is rotated</string>
-    <string name="wz_video_captured_video_rotates_default_value">true</string>
+        <string name="wz_video_scale_and_crop_title">Scale and crop video to fill entire view</string>
+        <string name="wz_video_scale_and_crop_summary">The video stream will be scaled to fill the entire view and some of the video frame may be cropped.</string>
+        <string name="wz_video_scale_and_crop_default_value">false</string>
+    -->
 
     <string name="wz_video_resize_to_aspect_title">Camera preview matches frame size</string>
     <string name="wz_video_resize_to_aspect_summary">Resize the camera preview view to fit the frame size aspect ratio</string>
@@ -155,9 +150,7 @@
     <string name="wz_use_hls_title">Use HLS</string>
     <string name="wz_video_resize_to_aspect_default_value">false</string>
 
-    <string name="wz_video_scale_and_crop_title">Scale and crop video to fill entire view</string>
-    <string name="wz_video_scale_and_crop_summary">The video stream will be scaled to fill the entire view and some of the video frame may be cropped.</string>
-    <string name="wz_video_scale_and_crop_default_value">false</string>
+
 
     <string name="wz_video_use_abr_title">Enable Adaptive Bitrate</string>
     <string name="wz_video_use_abr_summary">The video bitrate will be dynamically adjusted based on bandwidth</string>
@@ -191,23 +184,33 @@
 
     <string name="wz_debug_net_log_level_title">Network logging level</string>
     <string name="wz_debug_net_log_level_summary">The logging level for network-related SDK operations</string>
-    <string name="wz_debug_net_log_level_dialog_title">Select the logging level</string>
     <string name="wz_debug_net_log_level_default_value">2</string>
 
     <string name="wz_debug_bandwidth_monitor_log_level_title">Streaming Monitor logging level</string>
     <string name="wz_debug_bandwidth_monitor_log_level_summary">The logging level for the Streaming Monitor</string>
-    <string name="wz_debug_bandwidth_monitor_log_level_dialog_title">Select the logging level</string>
     <string name="wz_debug_bandwidth_monitor_log_level_default_value">0</string>
 
     <string name="wz_hls_backup_title">HLS Failover URL</string>
     <string name="wz_hls_backup_summary">HLS Failover URL</string>
 
+    <!--
     <string name="wz_player_title">Player Testing Options</string>
     <string name="wz_player_default">None</string>
     <string name="wz_player_summary">Set Player to be auto-configured for example 1</string>
+    -->
 
     <string name="wz_pause_network">Pause Network</string>
     <string name="wz_unpause_network">Un-pause Network</string>
+
+
+    <string name="torch">Torch</string>
+    <string name="list_item_title">List Item Title</string>
+    <string name="list_item_description">List item description</string>
+    <string name="switch_mp4">Save to MP4</string>
+    <string name="switch_camera">Switch Camera</string>
+    <string name="scale_button">Scale</string>
+    <string name="mute_button">Mute</string>
+    <string name="zero_time">00:00:00</string>
 
 
 </resources>

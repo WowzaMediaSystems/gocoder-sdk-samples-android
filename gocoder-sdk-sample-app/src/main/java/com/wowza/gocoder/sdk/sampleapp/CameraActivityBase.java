@@ -17,12 +17,10 @@ package com.wowza.gocoder.sdk.sampleapp;
 
 import android.Manifest;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.EditTextPreference;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;

@@ -2,22 +2,9 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo">
-
-    </style>
-
-    <style name="ConfigTheme" parent="android:Theme.Holo.Light">
-
-    </style>
-
-    <style name="FullscreenTheme" parent="AppTheme">
-
     </style>
 
     <style name="DataTableTheme" parent="android:Theme.Holo.Light">
-    </style>
-
-    <style name="DataHeaderTheme" parent="android:Theme.Holo.Light">
-        <item name="android:background">#000</item>
     </style>
 
     <style name="DataTableHeaderAppearance" parent="@android:style/TextAppearance">

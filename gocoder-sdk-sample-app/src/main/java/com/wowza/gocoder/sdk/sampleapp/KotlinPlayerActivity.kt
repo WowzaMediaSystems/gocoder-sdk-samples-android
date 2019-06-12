@@ -64,7 +64,6 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
     private var mHelp: TextView? = null
     private var mTimerView: TimerView? = null
     private var mStreamMetadata: ImageButton? = null
-    private val mUseHLSPlayback = false
 
     private var mVolumeSettingChangeObserver: VolumeChangeObserver? = null
     private val isNetworkAvailable: Boolean
@@ -73,9 +72,6 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             val activeNetworkInfo = connectivityManager.activeNetworkInfo
             return activeNetworkInfo != null && activeNetworkInfo.isConnected
         }
-
-    val isPlayerConfigReady: Boolean
-        get() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,7 +122,7 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             // listen for volume changes from device buttons, etc.
             mVolumeSettingChangeObserver = VolumeChangeObserver(this, Handler())
             applicationContext.contentResolver.registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, mVolumeSettingChangeObserver!!)
-            mVolumeSettingChangeObserver!!.setVolumeChangeListener { previousLevel, currentLevel ->
+            mVolumeSettingChangeObserver!!.setVolumeChangeListener { _, currentLevel ->
                 if (mSeekVolume != null)
                     mSeekVolume!!.progress = currentLevel
 
@@ -143,7 +139,7 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             mBufferingDialog = ProgressDialog(this)
             mBufferingDialog!!.setTitle(R.string.status_buffering)
             mBufferingDialog!!.setMessage(resources.getString(R.string.msg_please_wait))
-            mBufferingDialog!!.setButton(DialogInterface.BUTTON_NEGATIVE, resources.getString(R.string.button_cancel)) { dialogInterface, i -> cancelBuffering(dialogInterface) }
+            mBufferingDialog!!.setButton(DialogInterface.BUTTON_NEGATIVE, resources.getString(R.string.button_cancel)) { dialogInterface, i -> cancelBuffering() }
 
         } else {
             mHelp!!.visibility = View.GONE
@@ -180,19 +176,19 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
         super.onPause()
     }
 
-    /*
-    Click handler for network pausing
+    /**
+     * Click handler for network pausing
      */
     fun onPauseNetwork(v: View) {
-        val btn = findViewById(R.id.pause_network) as Button
+        val btn = findViewById<Button>(R.id.pause_network)
         val btnTitle = btn.text.toString().trim()
         if (btnTitle.equals("pause network")) {
             WOWZLog.info("Pausing network...")
-            btn.text = "Unpause Network"
+            btn.text = getResources().getString(R.string.wz_unpause_network)
             mStreamPlayerView!!.pauseNetworkStack()
         } else {
             WOWZLog.info("Unpausing network... btn.getText(): " + btn.text)
-            btn.text = "Pause Network"
+            btn.text = getResources().getString(R.string.wz_pause_network)
             mStreamPlayerView!!.unpauseNetworkStack()
         }
     }
@@ -237,7 +233,7 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
         val playerStatus = WOWZStatus(status)
 
         Handler(Looper.getMainLooper()).post {
-            val status = WOWZStatus(playerStatus.state)
+            WOWZStatus(playerStatus.state)
             when (playerStatus.state) {
 
                 WOWZPlayerView.STATE_PLAYING -> {
@@ -322,14 +318,13 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
         val streamMetadata = mStreamPlayerView!!.metadata
         val streamStats = mStreamPlayerView!!.streamStats
         //        WOWZDataMap streamConfig = mStreamPlayerView.getStreamConfig().toDataMap();
-        val streamConfig = WOWZDataMap()
         val streamInfo = WOWZDataMap()
 
         streamInfo.put("- Stream Statistics -", streamStats)
         streamInfo.put("- Stream Metadata -", streamMetadata)
         //streamInfo.put("- Stream Configuration -", streamConfig);
 
-        val dataTableFragment = DataTableFragment.newInstance("Stream Information", streamInfo, false, false)
+        val dataTableFragment = DataTableFragment.newInstance("Stream Information", streamInfo, false)
 
         // Display/hide the data table fragment
         fragmentManager.beginTransaction()
@@ -398,11 +393,12 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             if (mBufferingDialog == null) return
             mBufferingDialog!!.show()
         } catch (ex: Exception) {
+            WOWZLog.warn("showBuffering exception: $ex")
         }
 
     }
 
-    private fun cancelBuffering(dialogInterface: DialogInterface) {
+    private fun cancelBuffering() {
         if (mStreamPlayerConfig!!.hlsBackupURL != null || mStreamPlayerConfig!!.isHLSEnabled) {
             mStreamPlayerView!!.stop()
         } else if (mStreamPlayerView != null && mStreamPlayerView!!.isPlaying) {
@@ -425,7 +421,7 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
     }
 
     companion object {
-        private val TAG = PlayerActivity::class.java!!.getSimpleName()
+        private val TAG = PlayerActivity::class.java.getSimpleName()
     }
 
 }

@@ -18,16 +18,17 @@ package com.wowza.gocoder.sdk.sampleapp.ui;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
 import com.wowza.gocoder.sdk.api.logging.WOWZLog;
+import com.wowza.gocoder.sdk.sampleapp.R;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class TimerView extends TextView {
+public class TimerView extends AppCompatTextView {
 
     final public static long DEFAULT_REFRESH_INTERVAL = 1000L;
 
@@ -88,7 +89,7 @@ public class TimerView extends TextView {
         if (mTimerThread != null){  return; }
         if (mTimerProvider == null) mTimerProvider = mDefaultTimerProvider;
 
-        setText("00:00:00");
+        setText(getContext().getResources().getString(R.string.zero_time));
 
         mTimerStart = System.currentTimeMillis();
         mTimerThread = Executors.newSingleThreadScheduledExecutor();
@@ -139,7 +140,7 @@ public class TimerView extends TextView {
         mTimerThread = null;
 
         setVisibility(INVISIBLE);
-        setText("00:00:00");
+        setText(getContext().getResources().getString(R.string.zero_time));
     }
 
     public synchronized boolean isRunning() {

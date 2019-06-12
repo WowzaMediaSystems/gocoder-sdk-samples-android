@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "com.wowza.gocoder.sdk.sampleapp"
-        minSdkVersion 21
-        targetSdkVersion 25
+        minSdkVersion 23
+        targetSdkVersion 28
         versionCode 11
         versionName "1.6.0"
     }
@@ -31,8 +31,8 @@ dependencies {
 
     implementation 'com.wowza.gocoder.sdk.android:com.wowza.gocoder.sdk:2.0@aar'
 
-    implementation 'com.android.support:support-v4:25.3.0'
-    implementation 'com.android.support:appcompat-v7:25.3.0'
-    implementation 'com.android.support:recyclerview-v7:25.3.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

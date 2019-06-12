@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
 import android.widget.Toast;
 
 import com.wowza.gocoder.sdk.api.android.graphics.WOWZBitmap;
@@ -98,4 +99,20 @@ public class BitmapOverlayActivity extends CameraActivityBase {
             return true;
         }
     }
+
+    /**
+     * Click handler for the broadcast button
+     */
+    public void onToggleBroadcast(View v) {
+        super.onToggleBroadcast(v);
+    }
+
+    /**
+     * Click handler for the Settings button
+     */
+    public void onSettings(View v) {
+        super.onToggleBroadcast(v);
+    }
+
+
 }

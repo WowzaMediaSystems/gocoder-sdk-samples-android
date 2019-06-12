@@ -51,8 +51,8 @@ public class AudioMeterActivity extends CameraActivityBase {
                 Manifest.permission.RECORD_AUDIO
         };
 
-        mBtnMic             = (MultiStateButton) findViewById(R.id.ic_mic);
-        mAudioLevelMeter    = (AudioLevelMeter) findViewById(R.id.audioLevelMeter);
+        mBtnMic             = findViewById(R.id.ic_mic);
+        mAudioLevelMeter    = findViewById(R.id.audioLevelMeter);
     }
 
     /**
@@ -95,6 +95,20 @@ public class AudioMeterActivity extends CameraActivityBase {
     protected void onPause() {
         super.onPause();
         releaseAudioDevices();
+    }
+
+    /**
+     * Click handler for the ToggleBroadcast button
+     */
+    public void onToggleBroadcast(View v) {
+        super.onToggleBroadcast(v);
+    }
+
+    /**
+     * Click handler for the ToggleBroadcast button
+     */
+    public void onSettings(View v) {
+        super.onSettings(v);
     }
 
     /**

@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-
     <color name="dataTableRowBackground1">#00ffffff</color>
     <color name="dataTableRowBackground2">#1affffff</color>
-    <color name="dataTableHeaderBackground">#1a1a1a</color>
     <color name="dataTableSubHeaderBackground">#da212121</color>
-
     <color name="controlButtonPressed">#80ff8400</color>
     <color name="multiStateButtonPressed">#80ff8400</color>
     <color name="multiStateButtonDisabled">#c1636363</color>

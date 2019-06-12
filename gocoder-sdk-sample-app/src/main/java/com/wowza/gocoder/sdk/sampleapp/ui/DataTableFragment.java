@@ -54,7 +54,7 @@ public class DataTableFragment extends Fragment {
      * @return A new instance of the fragment.
      */
     public static DataTableFragment newInstance(String tableTitle, WOWZDataMap tableData,
-                                                boolean sortKeyNames, boolean annotateCollections) {
+                                                boolean sortKeyNames) {
 
         DataTableFragment dataTableFragment = new DataTableFragment();
 
@@ -192,8 +192,9 @@ public class DataTableFragment extends Fragment {
         //dataLabel.setLayoutParams(labelParams);
 
         TextView dataValue = new TextView(getActivity());
-        dataValue.setText("}" + (label != null ? " (" + label + ")" : ""));
-        dataValue.setTextAppearance(getActivity(), R.style.DataTableLabelAppearance);
+        String myLabel = (label != null ? " (" + label + ")" : "");
+        dataValue.setText(String.format(getResources().getString(R.string.table_fragment_data_value),myLabel));
+        dataValue.setTextAppearance(R.style.DataTableLabelAppearance);
         dataValue.setPadding( 15, 15, 15, 15);
         TableRow.LayoutParams valueParams = new TableRow.LayoutParams(2);
         valueParams.weight = 1.0f;

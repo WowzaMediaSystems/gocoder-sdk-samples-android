@@ -64,14 +64,14 @@ public class EventActivity extends CameraActivityBase {
         };
 
         // Initialize the UI controls
-        mBtnTorch           = (MultiStateButton) findViewById(R.id.ic_torch);
-        mBtnSwitchCamera    = (MultiStateButton) findViewById(R.id.ic_switch_camera);
-        mBtnPing            = (MultiStateButton) findViewById(R.id.ic_ping);
-        mTimerView          = (TimerView) findViewById(R.id.txtTimer);
+        mBtnTorch           = findViewById(R.id.ic_torch);
+        mBtnSwitchCamera    = findViewById(R.id.ic_switch_camera);
+        mBtnPing            = findViewById(R.id.ic_ping);
+        mTimerView          = findViewById(R.id.txtTimer);
 
 
         if (mWZBroadcast != null) {
-            mWZCameraView = (WOWZCameraView) findViewById(R.id.cameraPreview);
+            mWZCameraView = findViewById(R.id.cameraPreview);
             WOWZRenderAPI.VideoFrameListener videoFrameListener = new WOWZRenderAPI.VideoFrameListener() {
 
                 @Override
@@ -95,7 +95,7 @@ public class EventActivity extends CameraActivityBase {
                         if(!isSendingBeacon) {
                             isSendingBeacon = true;
 
-                            WOWZLog.debug("ENCODER", "Timecode: "+String.valueOf(ms)+" (seconds: "+seconds+" = "+mod+")");
+                            WOWZLog.debug("ENCODER", "Timecode: "+ ms +" (seconds: "+seconds+" = "+mod+")");
 
                             long timestamp = new java.util.Date().getTime(); 
                             String  guid = UUID.randomUUID().toString();
@@ -296,6 +296,20 @@ public class EventActivity extends CameraActivityBase {
 
         WOWZCamera activeCamera = mWZCameraView.getCamera();
         activeCamera.setTorchOn(mBtnTorch.toggleState());
+    }
+
+    /**
+     * Click handler for the Settings button
+     */
+    public void onSettings(View v) {
+        super.onToggleBroadcast(v);
+    }
+
+    /**
+     * Click handler for the ToggleBroadcast button
+     */
+    public void onToggleBroadcast(View v) {
+        super.onToggleBroadcast(v);
     }
 
    /**

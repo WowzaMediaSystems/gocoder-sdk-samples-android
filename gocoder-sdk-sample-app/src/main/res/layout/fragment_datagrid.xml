@@ -2,8 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#e72b2b2b">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/txtTableTitle"
@@ -31,8 +30,7 @@
         android:scrollbars="vertical"
         android:layout_below="@+id/txtTableTitle">
 
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                     xmlns:tools="http://schemas.android.com/tools"
+        <TableLayout
                      android:id="@+id/tblDataTable"
                      android:layout_width="match_parent"
                      android:layout_height="wrap_content"
@@ -41,41 +39,6 @@
                      android:background="@android:color/transparent"
                      android:theme="@style/DataTableTheme"
                      tools:context="com.wowza.gocoder.sdk.sampleapp.ui.DataTableFragment">
-
-<!--
-            <TableRow
-                android:id="@+id/tblRowHeader"
-                android:layout_width="match_parent"
-                android:background="@android:color/transparent"
-                android:theme="@style/DataHeaderTheme">
-
-                <TextView
-                    android:id="@+id/tblCellHeader1"
-                    android:layout_marginEnd="1dp"
-                    android:layout_column="1"
-                    android:background="@color/dataTableHeaderBackground"
-                    android:paddingBottom="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-                    android:gravity="end"
-                    android:text="@string/label_datagrid_header_name"
-                    android:textAppearance="@style/DataTableHeaderAppearance"/>
-
-                <TextView
-                    android:id="@+id/tblCellHeader2"
-                    android:background="@color/dataTableHeaderBackground"
-                    android:layout_column="2"
-                    android:paddingBottom="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-                    android:text="@string/label_datagrid_header_value"
-                    android:textAppearance="@style/DataTableHeaderAppearance"
-                    />
-            </TableRow>
--->
-
         </TableLayout>
 
     </ScrollView>

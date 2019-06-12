@@ -22,13 +22,11 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.wowza.gocoder.sdk.api.devices.WOWZCamera;
-import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 import com.wowza.gocoder.sdk.sampleapp.ui.AutoFocusListener;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.TimerView;
 
 public class CameraActivity extends CameraActivityBase   {
-    private final static String TAG = CameraActivity.class.getSimpleName();
 
     // UI controls
     protected MultiStateButton      mBtnSwitchCamera  = null;
@@ -49,9 +47,9 @@ public class CameraActivity extends CameraActivityBase   {
         };
 
         // Initialize the UI controls
-        mBtnTorch           = (MultiStateButton) findViewById(R.id.ic_torch);
-        mBtnSwitchCamera    = (MultiStateButton) findViewById(R.id.ic_switch_camera);
-        mTimerView          = (TimerView) findViewById(R.id.txtTimer);
+        mBtnTorch           = findViewById(R.id.ic_torch);
+        mBtnSwitchCamera    = findViewById(R.id.ic_switch_camera);
+        mTimerView          = findViewById(R.id.txtTimer);
 
     }
 
@@ -106,6 +104,20 @@ public class CameraActivity extends CameraActivityBase   {
                 mBtnTorch.setEnabled(true);
             }
         }
+    }
+
+    /**
+     * Click handler for the settings button
+     */
+    public void onSettings(View v) {
+        super.onSettings(v);
+    }
+
+    /**
+     * Click handler for the ToggleBroadcast button
+     */
+    public void onToggleBroadcast(View v) {
+        super.onToggleBroadcast(v);
     }
 
     /**

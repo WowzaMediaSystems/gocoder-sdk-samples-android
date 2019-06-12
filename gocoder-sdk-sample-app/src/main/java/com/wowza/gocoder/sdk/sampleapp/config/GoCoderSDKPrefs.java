@@ -314,81 +314,7 @@ public class GoCoderSDKPrefs {
                 setSummaryText(mSharedPreferences, hostAddressPref);
 
                 WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START2");
-//                ListPreference streamTestingOptionPref = (ListPreference)findPreference("wz_player_example_config");
-//                streamTestingOptionPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-//                    @Override
-//                    public boolean onPreferenceChange(Preference preference, Object streamConfigOpt) {
-//                        if (streamConfigOpt instanceof String) {
-//                            String hostAddress = "origin-preview.cdn.wowza.com";
-//                            String applicationName = "live";
-//                            String streamName = "";
-//                            String hlsURL = "";
-//
-//                            //NAB 2018 Pull Office
-//                            if(((String) streamConfigOpt).equalsIgnoreCase("Denver")){
-//                                streamName = "0P1p1RVNnR203dmI1Nm1kT1dvWFJ5c2e";
-//                                hostAddress = "edge-preview.cdn.wowza.com";
-//                                hlsURL ="https://wowzaprod120-i.akamaihd.net/hls/live/266960/0P1p1RVNnR203dmI1Nm1kT1dvWFJ5c2e/playlist.m3u8";
-//                            }
-//                            //// Push
-//                            else if(((String) streamConfigOpt).equalsIgnoreCase("Push")){
-//                                streamName = "0P0p1YjhBMzgyRlc4QzZjckgvbFJ5f63";
-//                                hostAddress = "edge-preview.cdn.wowza.com";
-//                                hlsURL = "https://wowzaprod120-i.akamaihd.net/hls/live/266960/0P0p1YjhBMzgyRlc4QzZjckgvbFJ5f63/playlist.m3u8";
-//                            }
-//                            /// booth
-//                            else if(((String) streamConfigOpt).equalsIgnoreCase("Booth Cam")){
-//                                streamName = "boothcam";
-//                                hostAddress = "10.0.1.5";
-//                                applicationName = "live-low";
-//                                hlsURL ="http://192.168.1.115:1935/live-low/boothcam/playlist.m3u8";
-//                            }
-//                            else if(((String) streamConfigOpt).equalsIgnoreCase("Stream0")){
-//                                streamName = "0I0p1RWJQaX0arA0kEDmxC7sGCRG5c4d";
-//                                hostAddress = "origin-preview.cdn.wowza.com";
-//                                hlsURL = "";
-//                            }
-//                            else if(((String) streamConfigOpt).equalsIgnoreCase("Play0")){
-//                                streamName = "0P0p1RWJQaXBjK25vZmx0Si9QcDJ5d0d";
-//                                hostAddress = "edge-preview.cdn.wowza.com";
-//                                hlsURL = "https://wowzaprod129-i.akamaihd.net/hls/live/263766/0P0p1RWJQaXBjK25vZmx0Si9QcDJ5d0d/playlist.m3u8";
-//                            }
-//
-//                            WOWZLog.debug("CONFIG", "host: "+hostAddress+", stream: "+streamName+", app: "+applicationName);
-//                            WOWZLog.debug("CONFIG", "HLS URL: "+hlsURL);
-//                            SharedPreferences.Editor editor = mSharedPreferences.edit();
-//                            editor.putString("wz_live_port_number", "1935");
-//                            editor.putString("wz_live_host_address", hostAddress);
-//                            editor.putString("wz_live_app_name", applicationName);
-//                            editor.putString("wz_live_stream_name", streamName);
-//                            editor.putString("wz_hls_failover", hlsURL);
-//                            editor.apply();
 
-//                            AutoCompletePreference pref = (AutoCompletePreference)findPreference("wz_live_host_address");
-//                            setSummaryText(pref, (String)hostAddress);
-
-//                            AutoCompletePreference pref = (AutoCompletePreference)findPreference("wz_live_port_number");
-//                            setSummaryText(mSharedPreferences, pref);
-//
-//                            pref = (AutoCompletePreference)findPreference("wz_live_app_name");
-//                            setSummaryText(mSharedPreferences, pref);
-//
-//                            pref = (AutoCompletePreference)findPreference("wz_live_stream_name");
-//                            setSummaryText(mSharedPreferences, pref);
-//
-//                            pref = (AutoCompletePreference)findPreference("wz_live_username");
-//                            setSummaryText(mSharedPreferences, pref);
-
-//                            Preference mypref = findPreference("wz_hls_failover");
-//                            mypref.setDefaultValue(hlsURL);
-//                            setSummaryText(mSharedPreferences, mypref);
-
-//                            EditTextPreference edPrf = (EditTextPreference)findPreference("wz_hls_failover");
-//                            edPrf.setText(hlsURL);
-//                        }
-//                        return true;
-//                    }
-//                });
 
                 //
                 // Host address preference
@@ -397,6 +323,7 @@ public class GoCoderSDKPrefs {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object hostAddress) {
                         if (hostAddress instanceof String) {
+                            String sHostAddress = (String)hostAddress;
 
                             //SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                             WOWZStreamConfig hostConfig = AutoCompletePreference.loadAutoCompleteHostConfig(mSharedPreferences, (String)hostAddress);
@@ -404,6 +331,7 @@ public class GoCoderSDKPrefs {
                             if (hostConfig != null) {
                                 WOWZLog.debug("SDKPREFS: RUNNING: "+hostConfig.getHLSBackupURL());
                                 SharedPreferences.Editor editor = mSharedPreferences.edit();
+                                editor.putString("wz_live_host_address", sHostAddress);
                                 editor.putString("wz_live_port_number", String.valueOf(hostConfig.getPortNumber()));
                                 editor.putString("wz_live_app_name", hostConfig.getApplicationName());
                                 editor.putString("wz_live_stream_name", hostConfig.getStreamName());
@@ -411,7 +339,7 @@ public class GoCoderSDKPrefs {
                                 editor.apply();
 
                                 AutoCompletePreference pref = (AutoCompletePreference)findPreference("wz_live_host_address");
-                                setSummaryText(pref, (String)hostAddress);
+                                setSummaryText(pref, sHostAddress);
 
                                 pref = (AutoCompletePreference)findPreference("wz_live_port_number");
                                 setSummaryText(mSharedPreferences, pref);
@@ -423,6 +351,9 @@ public class GoCoderSDKPrefs {
                                 setSummaryText(mSharedPreferences, pref);
 
                                 pref = (AutoCompletePreference)findPreference("wz_live_username");
+                                setSummaryText(mSharedPreferences, pref);
+
+                                pref = (AutoCompletePreference)findPreference("wz_live_host_address");
                                 setSummaryText(mSharedPreferences, pref);
                             }
                         }

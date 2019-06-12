@@ -33,7 +33,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.configuration.WOWZMediaConfig;
@@ -81,19 +80,19 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
 
         mRequiredPermissions = new String[]{};
 
-        mStreamPlayerView = (WOWZPlayerView) findViewById(R.id.vwStreamPlayer);
+        mStreamPlayerView = findViewById(R.id.vwStreamPlayer);
 
-        mBtnPlayStream = (MultiStateButton) findViewById(R.id.ic_play_stream);
-        mBtnSettings = (MultiStateButton) findViewById(R.id.ic_settings);
-        mBtnMic = (MultiStateButton) findViewById(R.id.ic_mic);
-        mBtnScale = (MultiStateButton) findViewById(R.id.ic_scale);
+        mBtnPlayStream = findViewById(R.id.ic_play_stream);
+        mBtnSettings = findViewById(R.id.ic_settings);
+        mBtnMic = findViewById(R.id.ic_mic);
+        mBtnScale = findViewById(R.id.ic_scale);
 
-        mTimerView = (TimerView) findViewById(R.id.txtTimer);
-        mStatusView = (StatusView) findViewById(R.id.statusView);
-        mStreamMetadata = (ImageButton) findViewById(R.id.imgBtnStreamInfo);
-        mHelp = (TextView) findViewById(R.id.streamPlayerHelp);
+        mTimerView = findViewById(R.id.txtTimer);
+        mStatusView = findViewById(R.id.statusView);
+        mStreamMetadata = findViewById(R.id.imgBtnStreamInfo);
+        mHelp = findViewById(R.id.streamPlayerHelp);
 
-        mSeekVolume = (SeekBar) findViewById(R.id.sb_volume);
+        mSeekVolume = findViewById(R.id.sb_volume);
 
         mTimerView.setVisibility(View.GONE);
 
@@ -104,7 +103,6 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
             /*
             Packet change listener setup
              */
-            final PlayerActivity activity = this;
             WOWZPlayerView.PacketThresholdChangeListener packetChangeListener = new WOWZPlayerView.PacketThresholdChangeListener() {
                 @Override
                 public void packetsBelowMinimumThreshold(int packetCount) {
@@ -316,7 +314,7 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
      */
     public void onPauseNetwork(View v)
     {
-        Button btn = (Button)findViewById(R.id.pause_network);
+        Button btn = findViewById(R.id.pause_network);
         if(btn.getText().toString().trim().equalsIgnoreCase("pause network")) {
             WOWZLog.info("Pausing network...");
             btn.setText(R.string.wz_unpause_network);
@@ -335,7 +333,7 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
             displayErrorDialog("No internet connection, please try again later.");
             return;
         }
-
+        mStreamPlayerView.setMaxSecondsWithNoPackets(4);
         mHelp.setVisibility(View.GONE);
         WOWZStreamingError configValidationError = mStreamPlayerConfig.validateForPlayback();
         if (configValidationError != null) {
@@ -426,12 +424,13 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
                         break;
 
                     case WOWZPlayerView.STATE_PLAYBACK_COMPLETE:
-                        WOWZLog.debug("DECODER STATUS: [player activity2] current: "+playerStatus.toString());
+                        //WOWZLog.debug("DECODER STATUS: [player activity2] current: "+playerStatus.toString());
 
                         break;
+
                     default:
-                        WOWZLog.debug("DECODER STATUS: [player activity] current: "+playerStatus.toString());
-                        WOWZLog.debug("DECODER STATUS: [player activity] current: "+ GlobalPlayerStateManager.isReady());
+                       // WOWZLog.debug("DECODER STATUS: [player activity] current: "+playerStatus.toString());
+                      //  WOWZLog.debug("DECODER STATUS: [player activity] current: "+ GlobalPlayerStateManager.isReady());
                         break;
                 }
                 syncUIControlState();
@@ -481,7 +480,7 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
         streamInfo.put("- Stream Metadata -", streamMetadata);
         //streamInfo.put("- Stream Configuration -", streamConfig);
 
-        DataTableFragment dataTableFragment = DataTableFragment.newInstance("Stream Information", streamInfo, false, false);
+        DataTableFragment dataTableFragment = DataTableFragment.newInstance("Stream Information", streamInfo, false);
 
         // Display/hide the data table fragment
         getFragmentManager().beginTransaction()
@@ -625,7 +624,9 @@ public class PlayerActivity extends GoCoderSDKActivityBase {
     @Override
     public void syncPreferences() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mWZNetworkLogLevel = Integer.valueOf(prefs.getString("wz_debug_net_log_level", String.valueOf(WOWZLog.LOG_LEVEL_DEBUG)));
+        String sLogLevel = prefs.getString("wz_debug_net_log_level", String.valueOf(WOWZLog.LOG_LEVEL_DEBUG));
+        if (sLogLevel!=null)
+            mWZNetworkLogLevel = Integer.valueOf(sLogLevel);
 
         mStreamPlayerConfig.setIsPlayback(true);
         if (mStreamPlayerConfig != null)

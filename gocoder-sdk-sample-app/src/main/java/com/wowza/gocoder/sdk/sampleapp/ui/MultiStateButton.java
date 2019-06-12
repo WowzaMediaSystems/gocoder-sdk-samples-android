@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,7 +30,7 @@ import com.wowza.gocoder.sdk.sampleapp.R;
 /**
  * A utility class for a multi-state toggle button
  */
-public class MultiStateButton extends ImageView {
+public class MultiStateButton extends AppCompatImageView {
 
     private Drawable    mOnDrawable     = null;
     private Drawable    mOffDrawable    = null;

@@ -131,10 +131,10 @@ public class MainActivity extends ListActivity {
                 (sdkPreRelease.substring(0,1).toLowerCase().equals("a") ? " (ALPHA)" : " (BETA)") :
                 "");
 
-        String sdkVersionText = sdkVersionInfo.toString() + " build no. " + String.valueOf(sdkVersionInfo.getBuildNumber() + preReleaseText);
+        String sdkVersionText = sdkVersionInfo.toString() + " build no. " + sdkVersionInfo.getBuildNumber() + preReleaseText;
 
-        TextView txtVersion = (TextView) findViewById(R.id.txtSDKVersion);
-        txtVersion.setText("GoCoder SDK v" + sdkVersionText);
+        TextView txtVersion = findViewById(R.id.txtSDKVersion);
+        txtVersion.setText( String.format( getResources().getString(R.string.gocoder_version), sdkVersionText) );
     }
 
     @Override
