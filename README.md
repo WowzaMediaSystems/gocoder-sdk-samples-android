@@ -1,16 +1,16 @@
 # Wowza GoCoder SDK for Android Sample App
 
-This repository contains a sample application that demonstrates the capabilities of the [Wowza GoCoder™ SDK for Android](https://www.wowza.com/products/gocoder/sdk) and is provided for developer educational purposes. To build your own application, you must use the GoCoder SDK (now free!).
+This repository contains a sample application that demonstrates the capabilities of the [Wowza GoCoder™ SDK for Android](https://www.wowza.com/products/gocoder/sdk) and is provided for developer educational purposes. To build your own application, you must use the GoCoder SDK.
 
 ## Prerequisites
 
-- Wowza GoCoder SDK for Android v1.7.0.0712
+- Wowza GoCoder SDK for Android v1.8.0.0463
 
-     **NOTE:** The GoCoder SDK library necessary to build this app is not provided here. To get the free SDK, complete the [GoCoder SDK sign-up form](https://www.wowza.com/products/gocoder/sdk/license) to receive a link where you can download the SDK along with a license key. If you already have a license key, you can download the current SDK release [here](https://www.wowza.com/pricing/installer#gocodersdk-downloads).
+     **NOTE:** The GoCoder SDK library necessary to build this app is not provided here. To get the free SDK, complete the [GoCoder SDK sign-up form](https://www.wowza.com/products/gocoder/sdk/license) to receive a link to allow you to download the SDK along with a license key. If you already have a license key, you can download the current SDK release [here](https://www.wowza.com/pricing/installer#gocodersdk-downloads).
 
 - [Android 5.0 (API level 21 or later) for broadcasting](https://developer.android.com/about/versions/android-5.0).
 - [Android 6.0 (API level 23 or later) for playback](https://developer.android.com/about/versions/marshmallow/android-6.0).
-- [Android Studio v2.3.3](https://developer.android.com/studio/index.html) or later.
+- [Android Studio 3.4.0](https://developer.android.com/studio/index.html) or later.
 - Access to a [Wowza Streaming Engine](https://www.wowza.com/products/streaming-engine)™ media server or a [Wowza Streaming Cloud](https://www.wowza.com/products/streaming-cloud)™ account. You can request a free 180-day Wowza Streaming Engine developer license by completing the [Wowza Streaming Engine Developer License form](https://www.wowza.com/media-server/developers/license) or sign up for a Wowza Streaming Cloud developer trial by completing the [Wowza Streaming Cloud Developer Free Trial form](https://www.wowza.com/pricing/cloud-developer-free-trial).
 
 ## Sample App Activities
