@@ -6,7 +6,7 @@ This repository contains a sample application that demonstrates the capabilities
 
 - Wowza GoCoder SDK for Android v1.8.0.0463
 
-     **NOTE:** The GoCoder SDK library necessary to build this app is not provided here. To get the free SDK, complete the [GoCoder SDK sign-up form](https://www.wowza.com/products/gocoder/sdk/license) to receive a link to allow you to download the SDK along with a license key. If you already have a license key, you can download the current SDK release [here](https://www.wowza.com/pricing/installer#gocodersdk-downloads).
+     **NOTE:** The GoCoder SDK library necessary to build this app is not provided here. To get the free SDK, complete the [GoCoder SDK sign-up form](https://www.wowza.com/products/gocoder/sdk/license) to receive a link to allow you to download the SDK along with a license key. If you already have a license key, you can download the current SDK release [here](https://www.wowza.com/pricing/installer#gocodersdk-downloads). Be sure to include the ```.aar``` file in the libs directory.
 
 - [Android 5.0 (API level 21 or later) for broadcasting](https://developer.android.com/about/versions/android-5.0).
 - [Android 6.0 (API level 23 or later) for playback](https://developer.android.com/about/versions/marshmallow/android-6.0).
