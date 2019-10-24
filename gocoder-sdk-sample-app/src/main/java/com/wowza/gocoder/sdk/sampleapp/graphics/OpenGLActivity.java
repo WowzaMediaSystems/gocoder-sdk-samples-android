@@ -25,7 +25,7 @@ import android.view.WindowManager;
 
 import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
 import com.wowza.gocoder.sdk.api.geometry.WOWZSize;
-import com.wowza.gocoder.sdk.api.status.WOWZStatus;
+import com.wowza.gocoder.sdk.support.status.WOWZStatus;
 import com.wowza.gocoder.sdk.sampleapp.GoCoderSDKActivityBase;
 import com.wowza.gocoder.sdk.sampleapp.R;
 import com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs;
@@ -164,8 +164,8 @@ public class OpenGLActivity extends GoCoderSDKActivityBase {
     protected boolean syncUIControlState() {
         boolean disableControls = (getBroadcast() == null ||
                 !(getBroadcast().getStatus().isIdle() ||
-                        getBroadcast().getStatus().isRunning()));
-        boolean isStreaming = (getBroadcast() != null && getBroadcast().getStatus().isRunning());
+                        getBroadcast().getStatus().isBroadcasting()));
+        boolean isStreaming = (getBroadcast() != null && getBroadcast().getStatus().isBroadcasting());
 
         if (disableControls) {
             if (mBtnBroadcast != null) mBtnBroadcast.setEnabled(false);

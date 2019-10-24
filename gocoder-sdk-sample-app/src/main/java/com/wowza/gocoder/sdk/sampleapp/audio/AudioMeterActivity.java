@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
-import com.wowza.gocoder.sdk.api.status.WOWZStatus;
+import com.wowza.gocoder.sdk.support.status.WOWZStatus;
 import com.wowza.gocoder.sdk.sampleapp.CameraActivityBase;
 import com.wowza.gocoder.sdk.sampleapp.R;
 import com.wowza.gocoder.sdk.sampleapp.ui.AudioLevelMeter;
@@ -101,7 +101,7 @@ public class AudioMeterActivity extends CameraActivityBase {
      * Click handler for the ToggleBroadcast button
      */
     public void onToggleBroadcast(View v) {
-        super.onToggleBroadcast(v);
+        super.onToggleBroadcast(v, null);
     }
 
     /**
@@ -117,7 +117,7 @@ public class AudioMeterActivity extends CameraActivityBase {
     public void onToggleMute(View v) {
         mBtnMic.toggleState();
 
-        if (getBroadcast().getStatus().isRunning()) {
+        if (getBroadcast().getStatus().isBroadcasting()) {
             mWZAudioDevice.setAudioPaused(!mBtnMic.isOn());
             Toast.makeText(this, "Audio stream " + (mWZAudioDevice.isAudioPaused() ? "muted" : "enabled"), Toast.LENGTH_SHORT).show();
         } else {
@@ -168,7 +168,7 @@ public class AudioMeterActivity extends CameraActivityBase {
         if (disableControls) {
             mBtnMic.setEnabled(false);
         } else if (mWZAudioDevice != null) {
-            boolean isStreaming = getBroadcast().getStatus().isRunning();
+            boolean isStreaming = getBroadcast().getStatus().isBroadcasting();
             boolean isStreamingAudio = (isStreaming && getBroadcastConfig().isAudioEnabled());
             boolean isSamplingAudio = (mRestartAudioSampler || mWZAudioDevice.isSamplingAudio() || isStreamingAudio);
 

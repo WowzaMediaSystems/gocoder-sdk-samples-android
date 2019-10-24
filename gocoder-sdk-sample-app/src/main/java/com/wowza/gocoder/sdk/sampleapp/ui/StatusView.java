@@ -26,8 +26,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.wowza.gocoder.sdk.api.errors.WOWZError;
-import com.wowza.gocoder.sdk.api.status.WOWZState;
-import com.wowza.gocoder.sdk.api.status.WOWZStatus;
+import com.wowza.gocoder.sdk.support.status.WOWZState;
+import com.wowza.gocoder.sdk.support.status.WOWZStatus;
 import com.wowza.gocoder.sdk.sampleapp.R;
 
 public class StatusView extends RelativeLayout {

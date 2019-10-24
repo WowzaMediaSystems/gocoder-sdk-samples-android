@@ -36,18 +36,18 @@ import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
 import com.wowza.gocoder.sdk.api.geometry.WOWZSize;
 import com.wowza.gocoder.sdk.api.graphics.WOWZColor;
 import com.wowza.gocoder.sdk.api.logging.WOWZLog;
-import com.wowza.gocoder.sdk.api.status.WOWZStatus;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatus;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatusCallback;
+import com.wowza.gocoder.sdk.support.status.WOWZStatus;
 import com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
 
 import java.util.Arrays;
-import java.util.List;
 
 abstract public class CameraActivityBase extends GoCoderSDKActivityBase
-        implements WOWZCameraView.PreviewStatusListener{
+        implements WOWZCameraView.PreviewStatusListener, WOWZBroadcastStatusCallback {
 
-    private final static String BASE_TAG = CameraActivityBase.class.getSimpleName();
 
     private final static String[] CAMERA_CONFIG_PREFS_SORTED = new String[]{"wz_video_enabled", "wz_video_frame_size", "wz_video_preset"};
 
@@ -72,6 +72,18 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
         prefsFragment = new GoCoderSDKPrefs.PrefsFragment();
     }
 
+
+    @Override
+    public void onWZStatus(WOWZBroadcastStatus status) {
+        WOWZLog.debug("BroadcastStateMachine[CameraActivityBase] : onWZStatus : "+status.toString());
+        syncUIControlState();
+    }
+
+    @Override
+    public void onWZError(WOWZBroadcastStatus status) {
+        WOWZLog.debug("BroadcastStateMachine[CameraActivityBase] : onWZError : "+status.toString());
+        syncUIControlState();
+    }
     //define callback interface
     interface PermissionCallbackInterface {
 
@@ -122,8 +134,35 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
             mPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String prefsKey) {
-                    if (mWZCameraView != null &&  Arrays.binarySearch(CAMERA_CONFIG_PREFS_SORTED, prefsKey) != -1) {
+                    try {
+                        if (prefsKey.equalsIgnoreCase("wz_live_host_address")) {
+                            String host = sharedPreferences.getString("wz_live_host_address", String.valueOf(getBroadcastConfig().getHostAddress()));
+                            getBroadcastConfig().setHostAddress(host);
+                            mWZBroadcastConfig.setHostAddress(host);
+                        }
+                        if (prefsKey.equalsIgnoreCase("wz_live_port_number")) {
 
+                            String port = sharedPreferences.getString("wz_live_port_number", String.valueOf(getBroadcastConfig().getPortNumber()));
+                            getBroadcastConfig().setPortNumber(Integer.parseInt(port));
+                            mWZBroadcastConfig.setPortNumber(Integer.parseInt(port));
+                        }
+                        if (prefsKey.equalsIgnoreCase("wz_live_app_name")) {
+
+                            String appName = sharedPreferences.getString("wz_live_app_name", String.valueOf(getBroadcastConfig().getApplicationName()));
+                            getBroadcastConfig().setApplicationName(appName);
+                            mWZBroadcastConfig.setApplicationName(appName);
+                        }
+                        if (prefsKey.equalsIgnoreCase("wz_live_stream_name")) {
+                            String streamName = sharedPreferences.getString("wz_live_stream_name", String.valueOf(getBroadcastConfig().getApplicationName()));
+                            getBroadcastConfig().setStreamName(streamName);
+                            mWZBroadcastConfig.setStreamName(streamName);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        WOWZLog.error(ex);
+                    }
+                    if (mWZCameraView != null &&  Arrays.binarySearch(CAMERA_CONFIG_PREFS_SORTED, prefsKey) != -1) {
                         if(prefsKey.equalsIgnoreCase("wz_video_framerate")){
                             String currentFrameRate = String.valueOf(mWZCameraView.getFramerate());
                             String frameRate = sharedPreferences.getString("wz_video_framerate",currentFrameRate);
@@ -265,7 +304,7 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
     /**
      * Click handler for the broadcast button
      */
-    public void onToggleBroadcast(View v) {
+    public void onToggleBroadcast(View v, WOWZBroadcastStatusCallback callback) {
         if (getBroadcast() == null) return;
 
         if (getBroadcast().getStatus().isIdle()) {
@@ -283,7 +322,7 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
                 if (!mWZBroadcastConfig.isVideoEnabled()) {
                     Toast.makeText(this, "The video stream is currently turned off", Toast.LENGTH_LONG).show();
                 }
-                WOWZStreamingError configError = startBroadcast();
+                WOWZStreamingError configError = startBroadcast(callback);
                 if (configError != null) {
                     if (mStatusView != null)
                         mStatusView.setErrorMessage(configError.getErrorDescription());
@@ -396,24 +435,28 @@ abstract public class CameraActivityBase extends GoCoderSDKActivityBase
 
     protected void initUIControls() {
         // Initialize the UI controls
-        mBtnBroadcast       = (MultiStateButton) findViewById(R.id.ic_broadcast);
-        mBtnSettings        = (MultiStateButton) findViewById(R.id.ic_settings);
-        mStatusView         = (StatusView) findViewById(R.id.statusView);
+        mBtnBroadcast       = findViewById(R.id.ic_broadcast);
+        mBtnSettings        = findViewById(R.id.ic_settings);
+        mStatusView         = findViewById(R.id.statusView);
 
         // The GoCoder SDK camera view
-        mWZCameraView = (WOWZCameraView) findViewById(R.id.cameraPreview);
+        mWZCameraView = findViewById(R.id.cameraPreview);
 
         mUIInitialized = true;
 
-        if (sGoCoderSDK == null && mStatusView != null)
-            mStatusView.setErrorMessage(WowzaGoCoder.getLastError().getErrorDescription());
+        if (sGoCoderSDK == null && mStatusView != null) {
+            WOWZError mError = WowzaGoCoder.getLastError();
+            if (mError!=null)
+                mStatusView.setErrorMessage(mError.getErrorDescription());
+        }
     }
 
     protected boolean syncUIControlState() {
         boolean disableControls = (getBroadcast() == null ||
                 !(getBroadcast().getStatus().isIdle() ||
-                        getBroadcast().getStatus().isRunning()));
-        boolean isStreaming = (getBroadcast() != null && getBroadcast().getStatus().isRunning());
+                        getBroadcast().getStatus().isBroadcasting()));
+        boolean isStreaming = (getBroadcast() != null && getBroadcast().getStatus().isBroadcasting());
+
 
         if (disableControls) {
             if (mBtnBroadcast != null) mBtnBroadcast.setEnabled(false);

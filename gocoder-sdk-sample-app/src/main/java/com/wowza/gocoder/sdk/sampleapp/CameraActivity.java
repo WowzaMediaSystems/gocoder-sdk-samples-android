@@ -22,11 +22,14 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.wowza.gocoder.sdk.api.devices.WOWZCamera;
+import com.wowza.gocoder.sdk.api.logging.WOWZLog;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatus;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatusCallback;
 import com.wowza.gocoder.sdk.sampleapp.ui.AutoFocusListener;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.TimerView;
 
-public class CameraActivity extends CameraActivityBase   {
+public class CameraActivity extends CameraActivityBase implements WOWZBroadcastStatusCallback {
 
     // UI controls
     protected MultiStateButton      mBtnSwitchCamera  = null;
@@ -35,6 +38,30 @@ public class CameraActivity extends CameraActivityBase   {
 
     // Gestures are used to toggle the focus modes
     protected GestureDetectorCompat mAutoFocusDetector = null;
+
+    @Override
+    public void onWZStatus(WOWZBroadcastStatus status) {
+        
+        WOWZLog.debug("BroadcastStateMachine[CameraActivity] : onWZStatus : "+status.toString());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                syncUIControlState();
+            }
+        });
+    }
+
+    @Override
+    public void onWZError(final WOWZBroadcastStatus status) {
+        WOWZLog.debug("BroadcastStateMachine[CameraActivity] : onWZError : "+status.toString());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                syncUIControlState();
+                displayErrorDialog(status.getLastError().getErrorDescription());
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +144,7 @@ public class CameraActivity extends CameraActivityBase   {
      * Click handler for the ToggleBroadcast button
      */
     public void onToggleBroadcast(View v) {
-        super.onToggleBroadcast(v);
+        super.onToggleBroadcast(v, this);
     }
 
     /**
@@ -144,13 +171,12 @@ public class CameraActivity extends CameraActivityBase   {
     @Override
     protected boolean syncUIControlState() {
         boolean disableControls = super.syncUIControlState();
-
         if (disableControls) {
             mBtnSwitchCamera.setEnabled(false);
             mBtnTorch.setEnabled(false);
         } else {
             boolean isDisplayingVideo = (this.hasDevicePermissionToAccess(Manifest.permission.CAMERA) && getBroadcastConfig().isVideoEnabled() && mWZCameraView.getCameras().length > 0);
-            boolean isStreaming = getBroadcast().getStatus().isRunning();
+            boolean isStreaming = getBroadcast().getStatus().isBroadcasting();
 
             if (isDisplayingVideo) {
                 WOWZCamera activeCamera = mWZCameraView.getCamera();

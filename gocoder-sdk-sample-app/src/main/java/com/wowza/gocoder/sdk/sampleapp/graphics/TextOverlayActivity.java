@@ -62,7 +62,7 @@ public class TextOverlayActivity extends CameraActivityBase {
      * Click handler for the broadcast button
      */
     public void onToggleBroadcast(View v) {
-        super.onToggleBroadcast(v);
+        super.onToggleBroadcast(v,null);
     }
 
 

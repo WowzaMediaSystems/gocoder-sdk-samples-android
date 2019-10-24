@@ -42,17 +42,18 @@ import com.wowza.gocoder.sdk.api.errors.WOWZError;
 import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
 import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 import com.wowza.gocoder.sdk.api.monitor.WOWZStreamingStat;
-import com.wowza.gocoder.sdk.api.status.WOWZStatus;
-import com.wowza.gocoder.sdk.api.status.WOWZStatusCallback;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatusCallback;
+import com.wowza.gocoder.sdk.support.status.WOWZStatus;
+import com.wowza.gocoder.sdk.support.status.WOWZStatusCallback;
 import com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs;
 import com.wowza.gocoder.sdk.sampleapp.ui.AboutFragment;
 
 public abstract class GoCoderSDKActivityBase extends Activity
-        implements WOWZStatusCallback {
+        implements WOWZStatusCallback
+        {
 
     private final static String TAG = GoCoderSDKActivityBase.class.getSimpleName();
 
-    //private static final String SDK_SAMPLE_APP_LICENSE_KEY = "GOSK-5442-0101-750D-4A14-FB5C";
     private static final String SDK_SAMPLE_APP_LICENSE_KEY = "GOSK-A144-010C-9E08-5FE6-6AA7";
 
     private static final int PERMISSIONS_REQUEST_CODE = 0x1;
@@ -117,7 +118,6 @@ public abstract class GoCoderSDKActivityBase extends Activity
             mWZBroadcast.setLogLevel(WOWZLog.LOG_LEVEL_DEBUG);
         }
     }
-
     protected void hasDevicePermissionToAccess(CameraActivityBase.PermissionCallbackInterface callback){
         this.callbackFunction = callback;
         if (mWZBroadcast != null) {
@@ -185,7 +185,7 @@ public abstract class GoCoderSDKActivityBase extends Activity
     protected void onPause() {
         WOWZLog.debug("GoCoderSDKActivityBase - onResume");
         // Stop any active live stream
-        if (mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
+        if (mWZBroadcast != null && mWZBroadcast.getStatus().isBroadcasting()) {
             endBroadcast(true);
         }
 
@@ -300,6 +300,9 @@ public abstract class GoCoderSDKActivityBase extends Activity
     }
 
     protected synchronized WOWZStreamingError startBroadcast() {
+        return startBroadcast(null);
+    }
+    protected synchronized WOWZStreamingError startBroadcast(WOWZBroadcastStatusCallback callback) {
         WOWZStreamingError configValidationError = null;
 
         if (mWZBroadcast.getStatus().isIdle()) {
@@ -370,8 +373,7 @@ public abstract class GoCoderSDKActivityBase extends Activity
 //                mWZBroadcast.registerAdaptiveFrameRateListener(abrHandler);
 //                mWZBroadcastConfig.setFrameRateLowBandwidthSkipCount(1);
 
-                WOWZLog.debug("***** [FPS]GoCoderSDKActivity "+mWZBroadcastConfig.getVideoFramerate());
-                mWZBroadcast.startBroadcast(mWZBroadcastConfig, this);
+                mWZBroadcast.startBroadcast(mWZBroadcastConfig, callback);
             }
         } else {
             WOWZLog.error(TAG, "startBroadcast() called while another broadcast is active");
@@ -423,11 +425,11 @@ public abstract class GoCoderSDKActivityBase extends Activity
                     }
                 });
 
-                while(!sBroadcastEnded) {
-                    try{
-                        sBroadcastLock.wait();
-                    } catch (InterruptedException e) {}
-                }
+//                while(!sBroadcastEnded) {
+//                    try{
+//                        sBroadcastLock.wait();
+//                    } catch (InterruptedException e) {}
+//                }
             } else {
                 mWZBroadcast.endBroadcast(this);
             }
