@@ -37,8 +37,9 @@ import com.wowza.gocoder.sdk.api.data.WOWZDataMap
 import com.wowza.gocoder.sdk.api.logging.WOWZLog
 import com.wowza.gocoder.sdk.api.player.WOWZPlayerConfig
 import com.wowza.gocoder.sdk.api.player.WOWZPlayerView
-import com.wowza.gocoder.sdk.api.status.WOWZState
-import com.wowza.gocoder.sdk.api.status.WOWZStatus
+import com.wowza.gocoder.sdk.api.status.WOWZPlayerStatus
+import com.wowza.gocoder.sdk.api.status.WOWZPlayerStatus.PlayerState
+import com.wowza.gocoder.sdk.api.status.WOWZPlayerStatusCallback
 import com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs
 import com.wowza.gocoder.sdk.sampleapp.ui.DataTableFragment
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton
@@ -46,7 +47,7 @@ import com.wowza.gocoder.sdk.sampleapp.ui.StatusView
 import com.wowza.gocoder.sdk.sampleapp.ui.TimerView
 import com.wowza.gocoder.sdk.sampleapp.ui.VolumeChangeObserver
 
-class KotlinPlayerActivity : GoCoderSDKActivityBase() {
+class KotlinPlayerActivity : GoCoderSDKActivityBase(), WOWZPlayerStatusCallback {
 
     // Stream player view
     private var mStreamPlayerView: WOWZPlayerView? = null
@@ -59,16 +60,17 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
     private var mBtnScale: MultiStateButton? = null
     private var mSeekVolume: SeekBar? = null
     private var mBufferingDialog: ProgressDialog? = null
-
+    private var mGoingDownDialog: ProgressDialog? = null
     private var mStatusView: StatusView? = null
     private var mHelp: TextView? = null
     private var mTimerView: TimerView? = null
     private var mStreamMetadata: ImageButton? = null
-
     private var mVolumeSettingChangeObserver: VolumeChangeObserver? = null
+    private val callbackHandler = Handler(Looper.getMainLooper())
     private val isNetworkAvailable: Boolean
         get() {
             val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                    ?: return false
             val activeNetworkInfo = connectivityManager.activeNetworkInfo
             return activeNetworkInfo != null && activeNetworkInfo.isConnected
         }
@@ -79,24 +81,54 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
 
         mRequiredPermissions = arrayOf()
 
-        mStreamPlayerView = findViewById(R.id.vwStreamPlayer) as WOWZPlayerView
+        mStreamPlayerView = findViewById(R.id.vwStreamPlayer)
 
-        mBtnPlayStream = findViewById(R.id.ic_play_stream) as MultiStateButton
-        mBtnSettings = findViewById(R.id.ic_settings) as MultiStateButton
-        mBtnMic = findViewById(R.id.ic_mic) as MultiStateButton
-        mBtnScale = findViewById(R.id.ic_scale) as MultiStateButton
+        mBtnPlayStream = findViewById(R.id.ic_play_stream)
+        mBtnSettings = findViewById(R.id.ic_settings)
+        mBtnMic = findViewById(R.id.ic_mic)
+        mBtnScale = findViewById(R.id.ic_scale)
 
-        mTimerView = findViewById(R.id.txtTimer) as TimerView
-        mStatusView = findViewById(R.id.statusView) as StatusView
-        mStreamMetadata = findViewById(R.id.imgBtnStreamInfo) as ImageButton
-        mHelp = findViewById(R.id.streamPlayerHelp) as TextView
+        mTimerView = findViewById(R.id.txtTimer)
+        mStatusView = findViewById(R.id.statusView)
+        mStreamMetadata = findViewById(R.id.imgBtnStreamInfo)
+        mHelp = findViewById(R.id.streamPlayerHelp)
 
-        mSeekVolume = findViewById(R.id.sb_volume) as SeekBar
+        mSeekVolume = findViewById(R.id.sb_volume)
 
         mTimerView!!.visibility = View.GONE
 
 
-        if (GoCoderSDKActivityBase.sGoCoderSDK != null) {
+        if (sGoCoderSDK != null) {
+
+            /*
+            Packet change listener setup
+             */
+            val packetChangeListener = object : WOWZPlayerView.PacketThresholdChangeListener {
+                override fun packetsBelowMinimumThreshold(packetCount: Int) {
+                    WOWZLog.debug("Packets have fallen below threshold $packetCount... ")
+
+                    //                    activity.runOnUiThread(new Runnable() {
+                    //                        public void run() {
+                    //                            Toast.makeText(activity, "Packets have fallen below threshold ... ", Toast.LENGTH_SHORT).show();
+                    //                        }
+                    //                    });
+                }
+
+                override fun packetsAboveMinimumThreshold(packetCount: Int) {
+                    WOWZLog.debug("Packets have risen above threshold $packetCount ... ")
+
+                    //                    activity.runOnUiThread(new Runnable() {
+                    //                        public void run() {
+                    //                            Toast.makeText(activity, "Packets have risen above threshold ... ", Toast.LENGTH_SHORT).show();
+                    //                        }
+                    //                    });
+                }
+            }
+            mStreamPlayerView!!.setShowAllNotificationsWhenBelowThreshold(false)
+            mStreamPlayerView!!.setMinimumPacketThreshold(20)
+            mStreamPlayerView!!.registerPacketThresholdListener(packetChangeListener)
+            ///// End packet change notification listener
+
             mTimerView!!.setTimerProvider(object : TimerView.TimerProvider {
                 override fun getTimecode(): Long {
                     return mStreamPlayerView!!.currentTime
@@ -109,7 +141,7 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
 
             mSeekVolume!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    if (mStreamPlayerView != null && mStreamPlayerView!!.isPlaying) {
+                    if (mStreamPlayerView != null && mStreamPlayerView!!.currentStatus.isPlaying) {
                         mStreamPlayerView!!.volume = progress
                     }
                 }
@@ -122,11 +154,11 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             // listen for volume changes from device buttons, etc.
             mVolumeSettingChangeObserver = VolumeChangeObserver(this, Handler())
             applicationContext.contentResolver.registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, mVolumeSettingChangeObserver!!)
-            mVolumeSettingChangeObserver!!.setVolumeChangeListener { _, currentLevel ->
+            mVolumeSettingChangeObserver!!.setVolumeChangeListener { previousLevel, currentLevel ->
                 if (mSeekVolume != null)
                     mSeekVolume!!.progress = currentLevel
 
-                if (mStreamPlayerView != null && mStreamPlayerView!!.isPlaying) {
+                if (mStreamPlayerView != null && mStreamPlayerView!!.currentStatus.isPlaying) {
                     mStreamPlayerView!!.volume = currentLevel
                 }
             }
@@ -139,8 +171,55 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             mBufferingDialog = ProgressDialog(this)
             mBufferingDialog!!.setTitle(R.string.status_buffering)
             mBufferingDialog!!.setMessage(resources.getString(R.string.msg_please_wait))
-            mBufferingDialog!!.setButton(DialogInterface.BUTTON_NEGATIVE, resources.getString(R.string.button_cancel)) { dialogInterface, i -> cancelBuffering() }
+            mBufferingDialog!!.setButton(DialogInterface.BUTTON_NEGATIVE, resources.getString(R.string.button_cancel)) { dialogInterface, i ->
+                /// test
 
+                cancelBuffering()
+            }
+
+            mGoingDownDialog = ProgressDialog(this)
+            mGoingDownDialog!!.setTitle(R.string.status_buffering)
+            mGoingDownDialog!!.setMessage("Please wait while the decoder is shutting down.")
+
+            mStreamPlayerView!!.registerDataEventListener("onClientConnected") { eventName, eventParams ->
+                WOWZLog.info(TAG, "onClientConnected data event received:\n" + eventParams.toString(true))
+
+                Handler(Looper.getMainLooper()).post { }
+
+                // this demonstrates how to return a function result back to the original Wowza Streaming Engine
+                // function call request
+                val functionResult = WOWZDataMap()
+                functionResult.put("greeting", "Hello New Client!")
+
+                functionResult
+            }
+            // testing player data event handler.
+            mStreamPlayerView!!.registerDataEventListener("onWowzaData") { eventName, eventParams ->
+                var meta = ""
+                if (eventParams != null)
+                    meta = eventParams.toString()
+
+
+                WOWZLog.debug("onWZDataEvent -> eventName $eventName = $meta")
+
+                null
+            }
+
+            // testing player data event handler.
+            mStreamPlayerView!!.registerDataEventListener("onStatus") { eventName, eventParams ->
+                if (eventParams != null)
+                    WOWZLog.debug("onWZDataEvent -> eventName $eventName = $eventParams")
+
+                null
+            }
+
+            // testing player data event handler.
+            mStreamPlayerView!!.registerDataEventListener("onTextData") { eventName, eventParams ->
+                if (eventParams != null)
+                    WOWZLog.debug("onWZDataEvent -> " + eventName + " = " + eventParams.get("text"))
+
+                null
+            }
         } else {
             mHelp!!.visibility = View.GONE
             mStatusView!!.setErrorMessage(WowzaGoCoder.getLastError().errorDescription)
@@ -158,38 +237,56 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
     /**
      * Android Activity class methods
      */
-
     override fun onResume() {
         super.onResume()
-
-        syncUIControlState()
-    }
-
-    override fun onPause() {
-        if (mStreamPlayerView != null && mStreamPlayerView!!.isPlaying) {
+        if (mStreamPlayerView!!.currentStatus.state != PlayerState.IDLE && mStreamPlayerView!!.currentStatus.state != PlayerState.PLAYING) {
+            showTearingdownDialog()
             mStreamPlayerView!!.stop()
 
             // Wait for the streaming player to disconnect and shutdown...
-            mStreamPlayerView!!.currentStatus.waitForState(WOWZState.IDLE)
+            mStreamPlayerView!!.currentStatus.waitForState(PlayerState.IDLE)
+            hideTearingdownDialog()
         }
-
-        super.onPause()
+        syncUIControlState()
     }
 
-    /**
-     * Click handler for network pausing
+    /*
+    Click handler for network pausing
      */
     fun onPauseNetwork(v: View) {
-        val btn = findViewById<Button>(R.id.pause_network)
-        val btnTitle = btn.text.toString().trim()
-        if (btnTitle.equals("pause network")) {
+        val btn = findViewById(R.id.pause_network) as Button
+        if (btn.getText().toString().trim({ it <= ' ' }).equals("pause network", ignoreCase = true)) {
             WOWZLog.info("Pausing network...")
-            btn.text = getResources().getString(R.string.wz_unpause_network)
+            btn.setText(R.string.wz_unpause_network)
             mStreamPlayerView!!.pauseNetworkStack()
         } else {
-            WOWZLog.info("Unpausing network... btn.getText(): " + btn.text)
-            btn.text = getResources().getString(R.string.wz_pause_network)
+            WOWZLog.info("Unpausing network... btn.getText(): " + btn.getText())
+            btn.setText(R.string.wz_pause_network)
             mStreamPlayerView!!.unpauseNetworkStack()
+        }
+    }
+
+    fun playStream() {
+        if (!this.isNetworkAvailable) {
+            displayErrorDialog("No internet connection, please try again later.")
+            return
+        }
+        showBuffering()
+        mStreamPlayerView!!.setMaxSecondsWithNoPackets(4)
+        mHelp!!.visibility = View.GONE
+        val configValidationError = mStreamPlayerConfig!!.validateForPlayback()
+        if (configValidationError != null) {
+            mStatusView!!.setErrorMessage(configValidationError.errorDescription)
+        } else {
+            // Set the detail level for network logging output
+            mStreamPlayerView!!.logLevel = mWZNetworkLogLevel
+
+            // Set the player's pre-buffer duration as stored in the app prefs
+            val preBufferDuration = GoCoderSDKPrefs.getPreBufferDuration(PreferenceManager.getDefaultSharedPreferences(this))
+
+            mStreamPlayerConfig!!.preRollBufferDuration = preBufferDuration
+            // Start playback of the live stream
+            mStreamPlayerView!!.play(mStreamPlayerConfig, this)
         }
     }
 
@@ -197,88 +294,45 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
      * Click handler for the playback button
      */
     fun onTogglePlayStream(v: View) {
-        if (mStreamPlayerView!!.isPlaying) {
+        if (mStreamPlayerView!!.currentStatus.isPlaying) {
             mStreamPlayerView!!.stop()
         } else if (mStreamPlayerView!!.isReadyToPlay) {
-            if (!this.isNetworkAvailable) {
-                displayErrorDialog("No internet connection, please try again later.")
-                return
-            }
-
-            mHelp!!.visibility = View.GONE
-            val configValidationError = mStreamPlayerConfig!!.validateForPlayback()
-            if (configValidationError != null) {
-                mStatusView!!.setErrorMessage(configValidationError.errorDescription)
-            } else {
-                // Set the detail level for network logging output
-                mStreamPlayerView!!.logLevel = mWZNetworkLogLevel
-
-                // Set the player's pre-buffer duration as stored in the app prefs
-                val preBufferDuration = GoCoderSDKPrefs.getPreBufferDuration(PreferenceManager.getDefaultSharedPreferences(this))
-
-                mStreamPlayerConfig!!.preRollBufferDuration = preBufferDuration
-
-                // Start playback of the live stream
-                mStreamPlayerView!!.play(mStreamPlayerConfig, this)
-            }
-
+            this.playStream()
         }
     }
 
-    /**
-     * WOWZStatusCallback interface methods
-     */
+
     @Synchronized
-    override fun onWZStatus(status: WOWZStatus) {
-        val playerStatus = WOWZStatus(status)
-
+    override fun onWZStatus(status: WOWZPlayerStatus) {
         Handler(Looper.getMainLooper()).post {
-            WOWZStatus(playerStatus.state)
-            when (playerStatus.state) {
+            when (status.state) {
+                PlayerState.BUFFERING -> showBuffering()
+                PlayerState.CONNECTING -> showStartingDialog()
+                PlayerState.STOPPING -> {
+                    hideBuffering()
+                    showTearingdownDialog()
+                }
+                PlayerState.PLAYING -> {
+                    hideBuffering()
 
-                WOWZPlayerView.STATE_PLAYING -> {
                     // Keep the screen on while we are playing back the stream
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-                    if (mStreamPlayerConfig!!.preRollBufferDuration == 0f) {
-                        mTimerView!!.startTimer()
-                    }
+                    mTimerView!!.startTimer()
 
                     // Since we have successfully opened up the server connection, store the connection info for auto complete
-
                     GoCoderSDKPrefs.storeHostConfig(PreferenceManager.getDefaultSharedPreferences(this@KotlinPlayerActivity), mStreamPlayerConfig!!)
-
-                    // Log the stream metadata
-                    WOWZLog.debug(TAG, "Stream metadata:\n" + mStreamPlayerView!!.metadata)
                 }
 
-                WOWZPlayerView.STATE_READY_TO_PLAY -> {
-                    // Clear the "keep screen on" flag
-                    WOWZLog.debug(TAG, "STATE_READY_TO_PLAY player activity status!")
-                    if (playerStatus.lastError != null)
-                        displayErrorDialog(playerStatus.lastError)
-
-                    playerStatus.clearLastError()
+                PlayerState.IDLE -> {
+                    if (status.lastError != null) {
+                        displayErrorDialog(status.lastError)
+                    }
+                    status.clearLastError()
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
                     mTimerView!!.stopTimer()
-                }
-
-                WOWZPlayerView.STATE_PREBUFFERING_STARTED -> {
-                    WOWZLog.debug(TAG, "Dialog for buffering should show...")
-                    showBuffering()
-                }
-
-                WOWZPlayerView.STATE_PREBUFFERING_ENDED -> {
-                    WOWZLog.debug(TAG, "Dialog for buffering should stop...")
-                    hideBuffering()
-                    // Make sure player wasn't signaled to shutdown
-                    if (mStreamPlayerView!!.isPlaying) {
-                        mTimerView!!.startTimer()
-                    }
-                }
-
-                else -> {
+                    hideTearingdownDialog()
                 }
             }
             syncUIControlState()
@@ -286,7 +340,7 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
     }
 
     @Synchronized
-    override fun onWZError(playerStatus: WOWZStatus) {
+    override fun onWZError(playerStatus: WOWZPlayerStatus) {
         Handler(Looper.getMainLooper()).post {
             displayErrorDialog(playerStatus.lastError)
             syncUIControlState()
@@ -317,7 +371,6 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
     fun onStreamMetadata(v: View) {
         val streamMetadata = mStreamPlayerView!!.metadata
         val streamStats = mStreamPlayerView!!.streamStats
-        //        WOWZDataMap streamConfig = mStreamPlayerView.getStreamConfig().toDataMap();
         val streamInfo = WOWZDataMap()
 
         streamInfo.put("- Stream Statistics -", streamStats)
@@ -352,7 +405,7 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
      * Update the state of the UI controls
      */
     private fun syncUIControlState() {
-        val disableControls = !(mStreamPlayerView!!.isReadyToPlay || mStreamPlayerView!!.isPlaying) || GoCoderSDKActivityBase.sGoCoderSDK == null
+        val disableControls = !(mStreamPlayerView!!.isReadyToPlay || mStreamPlayerView!!.currentStatus.isPlaying) // (!(GlobalPlayerStateManager.isReady() ||  mStreamPlayerView.isReadyToPlay() || mStreamPlayerView.isPlaying()) || sGoCoderSDK == null);
         if (disableControls) {
             mBtnPlayStream!!.isEnabled = false
             mBtnSettings!!.isEnabled = false
@@ -361,9 +414,8 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             mBtnMic!!.isEnabled = false
             mStreamMetadata!!.isEnabled = false
         } else {
-            mBtnPlayStream!!.setState(mStreamPlayerView!!.isPlaying)
+            mBtnPlayStream!!.setState(mStreamPlayerView!!.currentStatus.isPlaying)
             mBtnPlayStream!!.isEnabled = true
-
             if (mStreamPlayerConfig!!.isAudioEnabled) {
                 mBtnMic!!.visibility = View.VISIBLE
                 mBtnMic!!.isEnabled = true
@@ -377,51 +429,109 @@ class KotlinPlayerActivity : GoCoderSDKActivityBase() {
             }
 
             mBtnScale!!.visibility = View.VISIBLE
-            mBtnScale!!.visibility = if (mStreamPlayerView!!.isPlaying && mStreamPlayerConfig!!.isVideoEnabled) View.VISIBLE else View.GONE
-            mBtnScale!!.isEnabled = mStreamPlayerView!!.isPlaying && mStreamPlayerConfig!!.isVideoEnabled
+            mBtnScale!!.visibility = if (mStreamPlayerView!!.currentStatus.isPlaying && mStreamPlayerConfig!!.isVideoEnabled) View.VISIBLE else View.GONE
+            mBtnScale!!.isEnabled = mStreamPlayerView!!.currentStatus.isPlaying && mStreamPlayerConfig!!.isVideoEnabled
 
-            mBtnSettings!!.isEnabled = !mStreamPlayerView!!.isPlaying
-            mBtnSettings!!.visibility = if (mStreamPlayerView!!.isPlaying) View.GONE else View.VISIBLE
+            mBtnSettings!!.isEnabled = !mStreamPlayerView!!.currentStatus.isPlaying
+            mBtnSettings!!.visibility = if (mStreamPlayerView!!.currentStatus.isPlaying) View.GONE else View.VISIBLE
 
-            mStreamMetadata!!.isEnabled = mStreamPlayerView!!.isPlaying
-            mStreamMetadata!!.visibility = if (mStreamPlayerView!!.isPlaying) View.VISIBLE else View.GONE
+            mStreamMetadata!!.isEnabled = mStreamPlayerView!!.currentStatus.isPlaying
+            mStreamMetadata!!.visibility = if (mStreamPlayerView!!.currentStatus.isPlaying) View.VISIBLE else View.GONE
         }
+    }
+
+    private fun showStartingDialog() {
+        try {
+            if (mBufferingDialog == null) return
+            //            hideBuffering();
+            mBufferingDialog!!.setMessage("Connecting")
+            if (!mBufferingDialog!!.isShowing) {
+                mBufferingDialog!!.setCancelable(false)
+                mBufferingDialog!!.show()
+            }
+        } catch (ex: Exception) {
+            WOWZLog.warn(TAG, "showTearingdownDialog:$ex")
+        }
+
+    }
+
+    private fun showTearingdownDialog() {
+        try {
+            if (mGoingDownDialog == null) return
+            hideBuffering()
+            if (!mGoingDownDialog!!.isShowing) {
+                mGoingDownDialog!!.setCancelable(false)
+                mGoingDownDialog!!.show()
+            }
+        } catch (ex: Exception) {
+            WOWZLog.warn(TAG, "showTearingdownDialog:$ex")
+        }
+
+    }
+
+    private fun hideTearingdownDialog() {
+
+        try {
+            if (mGoingDownDialog == null) return
+            hideBuffering()
+            mGoingDownDialog!!.dismiss()
+        } catch (ex: Exception) {
+            WOWZLog.warn(TAG, "hideTearingdownDialog exception:$ex")
+        }
+
     }
 
     private fun showBuffering() {
         try {
             if (mBufferingDialog == null) return
+
+            if (mBufferingDialog!!.isShowing) {
+                mBufferingDialog!!.setMessage(resources.getString(R.string.msg_please_wait))
+                return
+            }
+
+            val mainThreadHandler = Handler(baseContext.mainLooper)
+            mBufferingDialog!!.setCancelable(false)
             mBufferingDialog!!.show()
+            mBufferingDialog!!.getButton(DialogInterface.BUTTON_NEGATIVE).isEnabled = false
+            object : Thread() {
+                override fun run() {
+
+                    mainThreadHandler.post { mBufferingDialog!!.getButton(DialogInterface.BUTTON_NEGATIVE).isEnabled = true }
+                }
+            }.start()
         } catch (ex: Exception) {
-            WOWZLog.warn("showBuffering exception: $ex")
+            WOWZLog.warn(TAG, "showBuffering:$ex")
         }
 
     }
 
     private fun cancelBuffering() {
-        if (mStreamPlayerConfig!!.hlsBackupURL != null || mStreamPlayerConfig!!.isHLSEnabled) {
-            mStreamPlayerView!!.stop()
-        } else if (mStreamPlayerView != null && mStreamPlayerView!!.isPlaying) {
-            mStreamPlayerView!!.stop()
-        }
+
+        showTearingdownDialog()
+        mStreamPlayerView!!.stop()
+        hideTearingdownDialog()
+
     }
 
     private fun hideBuffering() {
-        if (mBufferingDialog!!.isShowing)
+        if (mBufferingDialog != null && mBufferingDialog!!.isShowing)
             mBufferingDialog!!.dismiss()
     }
 
     override fun syncPreferences() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        mWZNetworkLogLevel = Integer.valueOf(prefs.getString("wz_debug_net_log_level", WOWZLog.LOG_LEVEL_DEBUG.toString()))
+        val sLogLevel = prefs.getString("wz_debug_net_log_level", WOWZLog.LOG_LEVEL_DEBUG.toString())
+        if (sLogLevel != null)
+            mWZNetworkLogLevel = Integer.valueOf(sLogLevel)
 
-        mStreamPlayerConfig!!.setIsPlayback(true)
+        mStreamPlayerConfig!!.isPlayback = true
         if (mStreamPlayerConfig != null)
             GoCoderSDKPrefs.updateConfigFromPrefsForPlayer(prefs, mStreamPlayerConfig!!)
     }
 
     companion object {
-        private val TAG = PlayerActivity::class.java.getSimpleName()
+        private val TAG = KotlinPlayerActivity::class.java.simpleName
     }
 
 }

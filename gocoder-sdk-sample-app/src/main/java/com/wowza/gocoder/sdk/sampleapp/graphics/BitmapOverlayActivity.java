@@ -104,14 +104,14 @@ public class BitmapOverlayActivity extends CameraActivityBase {
      * Click handler for the broadcast button
      */
     public void onToggleBroadcast(View v) {
-        super.onToggleBroadcast(v);
+        super.onToggleBroadcast(v,null);
     }
 
     /**
      * Click handler for the Settings button
      */
     public void onSettings(View v) {
-        super.onToggleBroadcast(v);
+        super.onToggleBroadcast(v,null);
     }
 
 

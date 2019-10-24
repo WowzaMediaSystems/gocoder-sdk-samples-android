@@ -37,9 +37,9 @@ import com.wowza.gocoder.sdk.api.devices.WOWZCameraView;
 import com.wowza.gocoder.sdk.api.geometry.WOWZSize;
 import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 import com.wowza.gocoder.sdk.api.render.WOWZRenderAPI;
-import com.wowza.gocoder.sdk.api.status.WOWZState;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.TimerView;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatus.BroadcastState;
 
 import java.util.UUID;
 
@@ -76,7 +76,7 @@ public class EventActivity extends CameraActivityBase {
 
                 @Override
                 public boolean isWZVideoFrameListenerActive() {
-                    return mWZBroadcast.getStatus().getState()== WOWZState.RUNNING;
+                    return mWZBroadcast.getStatus().getState()== BroadcastState.BROADCASTING;
                 }
 
                 @Override
@@ -173,7 +173,7 @@ public class EventActivity extends CameraActivityBase {
         //
         // Sending an event to a server module method (with a result callback)
         //
-        if (mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
+        if (mWZBroadcast != null && mWZBroadcast.getStatus().isBroadcasting()) {
             mBtnPing.setEnabled(false);
 
             mWZBroadcast.sendPingRequest( new WOWZDataEvent.ResultCallback() {
@@ -204,7 +204,7 @@ public class EventActivity extends CameraActivityBase {
         // and time
         //
         if (event.getAction() == MotionEvent.ACTION_DOWN &&
-                mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
+                mWZBroadcast != null && mWZBroadcast.getStatus().isBroadcasting()) {
 
             String  guid = UUID.randomUUID().toString();
             long timestamp = new java.util.Date().getTime();
@@ -239,7 +239,7 @@ public class EventActivity extends CameraActivityBase {
         // send a stream data event containing the device orientation
         // and rotation
         //
-        if (mWZBroadcast != null && mWZBroadcast.getStatus().isRunning()) {
+        if (mWZBroadcast != null && mWZBroadcast.getStatus().isBroadcasting()) {
 
             WOWZDataMap dataEventParams = new WOWZDataMap();
             dataEventParams.put("deviceOrientation",
@@ -302,14 +302,14 @@ public class EventActivity extends CameraActivityBase {
      * Click handler for the Settings button
      */
     public void onSettings(View v) {
-        super.onToggleBroadcast(v);
+        super.onToggleBroadcast(v,null);
     }
 
     /**
      * Click handler for the ToggleBroadcast button
      */
     public void onToggleBroadcast(View v) {
-        super.onToggleBroadcast(v);
+        super.onToggleBroadcast(v,null);
     }
 
    /**
@@ -325,7 +325,7 @@ public class EventActivity extends CameraActivityBase {
             mBtnPing.setEnabled(false);
         } else {
             boolean isDisplayingVideo = false;
-            boolean isStreaming = getBroadcast().getStatus().isRunning();
+            boolean isStreaming = getBroadcast().getStatus().isBroadcasting();
 
             if(this.hasDevicePermissionToAccess()){
                 isDisplayingVideo = (getBroadcastConfig().isVideoEnabled() && mWZCameraView.getCameras().length > 0);

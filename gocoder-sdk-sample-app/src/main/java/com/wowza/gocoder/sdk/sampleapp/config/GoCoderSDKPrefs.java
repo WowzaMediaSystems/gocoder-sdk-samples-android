@@ -16,7 +16,6 @@
 package com.wowza.gocoder.sdk.sampleapp.config;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -54,7 +53,6 @@ import java.util.HashMap;
 import static com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs.PrefsFragment.getVideoFramerate;
 
 public class GoCoderSDKPrefs {
-    private final static String TAG = GoCoderSDKPrefs.class.getSimpleName();
 
     private static String getPrefString(SharedPreferences sharedPrefs, String key, String defaultValue){
         String value = sharedPrefs.getString(key, defaultValue);
@@ -276,15 +274,12 @@ public class GoCoderSDKPrefs {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1");
             addPreferencesFromResource(R.xml.gocoder_sdk_prefs);
 
-            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1B");
             mSummaryTexts.clear();
 
             PreferenceScreen prefsScreen = (PreferenceScreen) findPreference("prefs_screen_gocoder_sdk");
             final SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1C");
 
             /**** Connection preferences ****/
 
@@ -294,7 +289,6 @@ public class GoCoderSDKPrefs {
             } else {
                 storeSummaryTexts("prefs_category_connection", mSummaryTexts);
 
-                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1D");
                 String[] prefIds = {
                         "wz_live_port_number",
                         "wz_live_app_name",
@@ -303,17 +297,14 @@ public class GoCoderSDKPrefs {
                 };
                 configurePrefSummaries(this, mSharedPreferences, prefsCategory, prefIds);
 
-                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1E");
                 String[] pwIds = {
                         "wz_live_password"
                 };
                 configurePrefSummaries(this, mSharedPreferences, prefsCategory, pwIds, true);
 
-                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START1F");
                 Preference hostAddressPref = prefsCategory.findPreference("wz_live_host_address");
                 setSummaryText(mSharedPreferences, hostAddressPref);
 
-                WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START2");
 
 
                 //
@@ -329,7 +320,6 @@ public class GoCoderSDKPrefs {
                             WOWZStreamConfig hostConfig = AutoCompletePreference.loadAutoCompleteHostConfig(mSharedPreferences, (String)hostAddress);
 
                             if (hostConfig != null) {
-                                WOWZLog.debug("SDKPREFS: RUNNING: "+hostConfig.getHLSBackupURL());
                                 SharedPreferences.Editor editor = mSharedPreferences.edit();
                                 editor.putString("wz_live_host_address", sHostAddress);
                                 editor.putString("wz_live_port_number", String.valueOf(hostConfig.getPortNumber()));
@@ -365,9 +355,7 @@ public class GoCoderSDKPrefs {
 
             /**** Video preferences ****/
 
-            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START3");
             prefsCategory = (PreferenceCategory)findPreference("prefs_category_video");
-            WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START4");
 
             if (!mShowVideoPrefs) {
                 prefsScreen.removePreference(prefsCategory);
@@ -402,7 +390,6 @@ public class GoCoderSDKPrefs {
 
                     //prefsCategory.removePreference(findPreference("wz_video_scale_and_crop"));
 
-                    WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START5");
                     String[] prefIds = {
                             "wz_video_bitrate",
                             "wz_video_framerate",
@@ -425,7 +412,6 @@ public class GoCoderSDKPrefs {
                     } else {
                         final WOWZMediaConfig[] presetConfigs = mActiveCamera.getSupportedConfigs();
 
-                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START6");
                         String[] presetLabels = new String[presetConfigs.length];
                         String[] presetValues = new String[presetConfigs.length];
                         for(int i=0; i < presetConfigs.length; i++) {
@@ -436,7 +422,6 @@ public class GoCoderSDKPrefs {
                         videoPresetPref.setEntries(presetLabels);
                         videoPresetPref.setEntryValues(presetValues);
 
-                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START7");
                         videoFrameInterval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                             @Override
                             public boolean onPreferenceChange(Preference preference, Object o) {
@@ -496,7 +481,6 @@ public class GoCoderSDKPrefs {
                             }
                         });
 
-                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS-START8");
                         videoPresetPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                             @Override
                             public boolean onPreferenceChange(Preference preference, Object o) {
@@ -532,9 +516,7 @@ public class GoCoderSDKPrefs {
                         // Video frame size preference
                         //
 
-                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS1");
                         final WOWZSize[] frameSizes = mActiveCamera.getOriginalFrameSizes();
-                        WOWZLog.debug("*** getOriginalFrameSizes GOCODERSDKPREFS2");
 
                         int currentFrameWidth = mSharedPreferences.getInt("wz_video_frame_width", WOWZMediaConfig.DEFAULT_VIDEO_FRAME_WIDTH);
                         int currentFrameHeight = mSharedPreferences.getInt("wz_video_frame_height", WOWZMediaConfig.DEFAULT_VIDEO_FRAME_HEIGHT);

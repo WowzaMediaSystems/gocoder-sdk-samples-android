@@ -33,15 +33,17 @@ import com.wowza.gocoder.sdk.api.errors.WOWZStreamingError;
 import com.wowza.gocoder.sdk.api.logging.WOWZLog;
 import com.wowza.gocoder.sdk.api.mp4.WOWZMP4Broadcaster;
 import com.wowza.gocoder.sdk.api.mp4.WOWZMP4Util;
-import com.wowza.gocoder.sdk.api.status.WOWZState;
-import com.wowza.gocoder.sdk.api.status.WOWZStatus;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatus;
+import com.wowza.gocoder.sdk.api.status.WOWZBroadcastStatusCallback;
+import com.wowza.gocoder.sdk.support.status.WOWZState;
+import com.wowza.gocoder.sdk.support.status.WOWZStatus;
 import com.wowza.gocoder.sdk.sampleapp.GoCoderSDKActivityBase;
 import com.wowza.gocoder.sdk.sampleapp.R;
 import com.wowza.gocoder.sdk.sampleapp.config.GoCoderSDKPrefs;
 import com.wowza.gocoder.sdk.sampleapp.ui.MultiStateButton;
 import com.wowza.gocoder.sdk.sampleapp.ui.StatusView;
 
-public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
+public class MP4BroadcastActivity extends GoCoderSDKActivityBase implements WOWZBroadcastStatusCallback {
     final private static String TAG = MP4BroadcastActivity.class.getSimpleName();
 
     final private static int VIDEO_SELECTED_RESULT_CODE = 1;
@@ -222,7 +224,7 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
             } else {
                 mWZBroadcast.startBroadcast(mWZBroadcastConfig, this);
             }
-        } else if (mWZBroadcast.getStatus().isRunning()) {
+        } else if (mWZBroadcast.getStatus().isBroadcasting()) {
             if (mVideoView.isPlaying()) {
                 mVideoView.pause();
             }
@@ -303,7 +305,7 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
      */
     private void syncUIControlState() {
         boolean disableControls = (mWZBroadcast == null ||
-                !(mWZBroadcast.getStatus().isIdle() || mWZBroadcast.getStatus().isRunning()));
+                !(mWZBroadcast.getStatus().isIdle() || mWZBroadcast.getStatus().isBroadcasting()));
 
         Uri mp4FileUri = mMP4Broadcaster != null ? mMP4Broadcaster.getFileUri() : null;
 
@@ -313,12 +315,25 @@ public class MP4BroadcastActivity extends GoCoderSDKActivityBase {
             mBtnLoop.setEnabled(false);
             mBtnFileSelect.setEnabled(false);
         } else {
-            boolean isStreaming = mWZBroadcast.getStatus().isRunning();
+            boolean isStreaming = mWZBroadcast.getStatus().isBroadcasting();
             mBtnBroadcast.setState(isStreaming);
             mBtnBroadcast.setEnabled(mp4FileUri != null);
 
             mBtnSettings.setEnabled(!isStreaming);
             mBtnFileSelect.setEnabled(!isStreaming);
         }
+    }
+
+
+    @Override
+    public void onWZStatus(WOWZBroadcastStatus status) {
+        WOWZLog.debug("BroadcastStateMachine : onWZStatus : "+status.toString());
+        syncUIControlState();
+    }
+
+    @Override
+    public void onWZError(WOWZBroadcastStatus status) {
+        WOWZLog.debug("BroadcastStateMachine : onWZError : "+status.toString());
+        syncUIControlState();
     }
 }

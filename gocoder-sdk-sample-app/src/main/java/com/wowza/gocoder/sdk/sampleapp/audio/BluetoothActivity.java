@@ -241,7 +241,7 @@ public class BluetoothActivity  extends AudioMeterActivity {
     public void onToggleMute(View v) {
         mBtnMic.toggleState();
 
-        if (getBroadcast().getStatus().isRunning()) {
+        if (getBroadcast().getStatus().isBroadcasting()) {
             mWZAudioDevice.setAudioPaused(!mBtnMic.isOn());
             Toast.makeText(this, "Audio stream " + (mWZAudioDevice.isAudioPaused() ? "muted" : "enabled"), Toast.LENGTH_SHORT).show();
         } else {
