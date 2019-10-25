@@ -6,7 +6,7 @@ This repository contains a sample application that demonstrates the capabilities
 
 - Wowza GoCoder SDK for Android v1.9.0.0632
 
->     **Notes:** 
+> **Notes:**
 >
 >       - The GoCoder SDK library necessary to build this app is not provided here. To get the free SDK, complete the [GoCoder SDK sign-up form](https://www.wowza.com/products/gocoder/sdk/license) to receive a link to allow you to download the SDK along with a license key. If you already have a license key, you can download the current SDK release [here](https://www.wowza.com/pricing/installer#gocodersdk-downloads). Be sure to include the ```.aar``` file in the libs directory.
 >       - In the **GoCoderSDKActivityBase.java** file located at **gocoder-sdk-sample-app/java/ui/GoCoderSDKActivityBase.java**, be sure to replace the **SDK_SAMPLE_APP_LICENSE_KEY** value with your license key. 
