@@ -1,5 +1,7 @@
 # Wowza GoCoder SDK for Android Sample App
 
+**Wowza Player, Wowza GoCoder SDK, and the technology powering the Ultra Low Latency (ULL) service in Wowza Streaming Cloud will no longer be available on January 5, 2021. [Learn more](https://info.wowza.com/product-notification-april-2020).**
+
 This repository contains a sample application that demonstrates the capabilities of the [Wowza GoCoder™ SDK for Android](https://www.wowza.com/products/gocoder/sdk) and is provided for developer educational purposes. To build your own application, you must use the GoCoder SDK.
 
 ## Prerequisites
@@ -37,5 +39,3 @@ Wowza Media Systems™ provides developers with a platform to create streaming a
 
 ## License
 This code is distributed under the [BSD 3-Clause License](https://github.com/WowzaMediaSystems/gocoder-sdk-samples-android/blob/master/LICENSE.txt).
-
-![alt tag](http://wowzalogs.com/stats/githubimage.php?plugin=gocoder-sdk-samples-android)
