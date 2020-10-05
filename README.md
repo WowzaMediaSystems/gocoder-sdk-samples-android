@@ -32,10 +32,10 @@ The sample app includes a number of activities that demonstrate the features of 
 * [GoCoder SDK for Android Release Notes](https://www.wowza.com/docs/wowza-gocoder-sdk-release-notes-for-android)
 * [Wowza GoCoder SDK Community Forum](https://www.wowza.com/community/spaces/36/wowza-gocoder-sdk.html)
 
-Wowza Media Systems™ provides developers with a platform to create streaming applications and solutions. See [Wowza Developer Tools](https://www.wowza.com/resources/developers) to learn more about our APIs and SDK.
+Wowza Media Systems™ provides developers with a platform to create streaming applications and solutions. See [Wowza Developer Tools](https://www.wowza.com/developer) to learn more about our APIs and SDK.
 
 ## Contact
 [Wowza Media Systems, LLC](https://www.wowza.com/contact)
 
 ## License
-This code is distributed under the [BSD 3-Clause License](https://github.com/WowzaMediaSystems/gocoder-sdk-samples-android/blob/master/LICENSE.txt).
+This code is distributed under the [BSD 3-Clause License](/LICENSE.txt).
